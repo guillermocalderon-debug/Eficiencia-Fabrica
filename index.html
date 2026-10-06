@@ -40,10 +40,10 @@
 <body>
 
     <!-- CONEXIÓN AL BACKEND DE GOOGLE SHEETS -->
-    <script>const API_URL = "https://script.google.com/macros/s/AKfycbxbmiAhkZRbtvUXrxTNKvOB3zwqydEr1HPmjBhO_b6FLfBrVYGTrr4236jjgbn1C-dP/exec";</script>
+    <script>const API_URL = "https://script.google.com/macros/s/AKfycbytlOmX-j60FU_uiCd-RS8KWeJewQ6I6AXFPZoc0glnqRAPQs3dqqH0XJ_NOCDiYrI/exec";</script>
 
     <header id="main-header">
-        <img src="libus_positivo_CMYK.jpg" alt="Libus" class="logo" onerror="this.src='https://latam.libus.com/imagenes/logo_libus.png'">
+        <img src="https://latam.libus.com/imagenes/logo_libus.png" alt="Libus" class="logo">
         <div class="nav-btns">
             <button onclick="switchView('form-view')">📱 Ingreso Operador</button>
             <button onclick="switchView('dash-view'); loadDashboard();">📺 Pantalla TV (Yodeck)</button>
@@ -87,8 +87,8 @@
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
-                    <div class="form-group" style="margin-bottom: 0;"><label>Horómetro Inicio</label><input type="number" id="horoIn" required step="0.01"></div>
-                    <div class="form-group" style="margin-bottom: 0;"><label>Horómetro Fin</label><input type="number" id="horoFin" required step="0.01"></div>
+                    <div class="form-group" style="margin-bottom: 0;"><label>Contador Inicio</label><input type="number" id="contIn" required step="1"></div>
+                    <div class="form-group" style="margin-bottom: 0;"><label>Contador Fin</label><input type="number" id="contFin" required step="1"></div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -155,22 +155,22 @@
                 fecha: document.getElementById('fecha').value,
                 turno: document.getElementById('turno').value,
                 maquina: document.getElementById('maquina').value,
-                horoInicial: document.getElementById('horoIn').value,
-                horoFinal: document.getElementById('horoFin').value,
+                contInicial: document.getElementById('contIn').value,
+                contFinal: document.getElementById('contFin').value,
                 cavidades: document.getElementById('cavidades').value,
                 ciclo: document.getElementById('ciclo').value,
                 malas: document.getElementById('malas').value
             };
 
-            // Se usa no-cors para evitar bloqueos del navegador al enviar a Google Scripts
+            // Se usa no-cors y text/plain para evitar bloqueos del navegador al enviar a Google Scripts
             fetch(API_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             }).then(() => {
                 document.getElementById('loader').style.display = 'none';
-                alert("✅ Registro guardado con éxito en la base de datos.");
+                alert("✅ Registro guardado con éxito.");
                 document.getElementById('prodForm').reset();
                 document.getElementById('fecha').valueAsDate = new Date();
             }).catch(err => {
@@ -195,16 +195,15 @@
                 let dataMaq = {};
 
                 data.forEach(row => {
-                    // Adaptamos a los nombres de las columnas que genere tu App Script (Ajusta si es necesario)
+                    // Adaptamos a los nombres de las columnas en tu Sheet
                     let eff = parseFloat(row["Eficiencia"] || row["eficiencia"]) || 0;
                     let disp = parseFloat(row["Disponibilidad"] || row["disponibilidad"]) || 0;
                     let cal = parseFloat(row["Calidad"] || row["calidad"]) || 0;
                     
-                    // La resta de Horómetro Final - Inicial (Cantidad Inyectada)
                     let pzas = parseFloat(row["Cantidad Inyectada"] || row["inyectada"] || row["Cantidad"]) || 0; 
                     
                     let tno = row["Turno"] || row["turno"];
-                    let maq = row["Maquina"] || row["maquina"] || row["Máquina"];
+                    let maq = row["Máquina"] || row["Maquina"] || row["maquina"];
 
                     tPzas += pzas;
                     
@@ -224,7 +223,7 @@
 
                 // Inyectar KPIs a la pantalla
                 if(validRows > 0) {
-                    // Multiplicamos por 100 asumiendo que el script de google arrojó decimales (Ej: 0.85 -> 85%)
+                    // Si los valores llegan en formato decimal (ej: 0.85 en lugar de 85), los multiplicamos
                     let isDecimal = tEff / validRows < 2; 
                     let multiplier = isDecimal ? 100 : 1;
 
@@ -235,7 +234,7 @@
                 document.getElementById('kpi-pzas').innerText = tPzas.toLocaleString('es-ES');
 
                 // Graficar
-                const avg = arr => arr.length > 0 ? (arr.reduce((a,b)=>a+b,0)/arr.length) * (arr[0] < 2 ? 100 : 1) : 0;
+                const avg = arr => arr.length > 0 ? (arr.reduce((a,b)=>a+b,0)/arr.length) * (arr[0] <= 1 ? 100 : 1) : 0;
                 
                 // Gráfico 1: Eficiencia por Turno
                 const shiftLabels = ["Mañana", "Tarde", "Noche"];
