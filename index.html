@@ -20,7 +20,7 @@
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg-light); color: var(--text-dark); }
         
-        /* HEADER PRINCIPAL (Se oculta en Yodeck) */
+        /* HEADER PRINCIPAL */
         header { background: #ffffff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: 3px solid var(--primary);}
         .logo-box { display: inline-flex; align-items: center;}
         .logo { height: 40px; }
@@ -31,6 +31,7 @@
         /* GESTIÓN DE VISTAS */
         .view { display: none; padding: 20px; max-width: 1400px; margin: auto; }
         .view.active { display: block; animation: fadeIn 0.4s; }
+        #dash-view.active { display: flex; } /* Forzamos flex solo cuando el dash está activo */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         /* FORMULARIO MÓVIL */
@@ -42,7 +43,7 @@
         .btn-submit:hover { background: #c20042; }
         
         /* DASHBOARD TV */
-        .dashboard-tv { display: flex; flex-direction: column; min-height: 100vh; padding: 20px 30px; box-sizing: border-box; max-width: 100%;}
+        .dashboard-tv { flex-direction: column; min-height: 100vh; padding: 20px 30px; box-sizing: border-box; max-width: 100%;}
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px;}
         .dash-header h2 { margin: 0; font-size: 2vw; font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase;}
         .clock-tv { font-size: 1.5vw; font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 5px 15px; border-radius: 20px; letter-spacing: 2px;}
@@ -55,9 +56,8 @@
         .kpi-card p { margin: 10px 0 0; font-size: 2.8vw; font-weight: 900; color: #111;}
 
         /* Tarjetas por Turno */
-        /* Se le da un margin-top grande (30px) para que la etiqueta "Mejor Turno" tenga espacio para rebotar */
         .shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5vw; margin-top: 30px; margin-bottom: 20px;}
-        .shift-panel { background: var(--card-bg); border-radius: 12px; overflow: visible; /* overflow visible vital para que no se corte la etiqueta */ box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.4s ease;}
+        .shift-panel { background: var(--card-bg); border-radius: 12px; overflow: visible; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.4s ease;}
         .shift-header { padding: 0.8vw; text-align: center; font-weight: 900; font-size: 1.2vw; color: white; letter-spacing: 1px; text-transform: uppercase; border-top-left-radius: 11px; border-top-right-radius: 11px;}
         .shift-body { padding: 1.2vw; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background-color: #fafbfc; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px;}
         .shift-stat { background: white; padding: 1vw; border-radius: 8px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
@@ -75,7 +75,7 @@
         .best-shift::after {
             content: '🏆 MEJOR TURNO';
             position: absolute;
-            top: -20px; /* Movido un poco más arriba */
+            top: -20px;
             right: 15px;
             background: var(--primary);
             color: white;
@@ -124,7 +124,7 @@
         const CACHE_KEY = "libus_eficiencia_data";
     </script>
 
-    <!-- HEADER PRINCIPAL (Se oculta dinámicamente cuando estamos viendo el Dashboard) -->
+    <!-- HEADER PRINCIPAL -->
     <header id="main-header">
         <div class="logo-box">
             <img src="libus_positivo_CMYK.jpg" alt="Libus" class="logo" onerror="this.src='https://latam.libus.com/imagenes/logo_libus.png'">
@@ -135,7 +135,7 @@
         </div>
     </header>
 
-    <!-- VISTA 1: FORMULARIO MÓVIL (Solo se ve esto al iniciar en PC/Celular) -->
+    <!-- VISTA 1: FORMULARIO MÓVIL -->
     <div id="form-view" class="view active">
         <div class="form-container">
             <h2 style="text-align: center; margin-top: 0; color: #111; border-bottom: 2px solid #eee; padding-bottom: 15px; font-size: 22px; font-weight: 900; text-transform: uppercase;">Registro de Máquina</h2>
@@ -170,7 +170,7 @@
                     <label style="color: var(--primary);">Unidades Malas (Scrap)</label>
                     <input type="number" id="malas" required step="1" min="0" placeholder="Ej: 15">
                 </div>
-                <button type="submit" class="btn-submit" id="btnGuardar">Subir Datos a la Nube ☁️️</button>
+                <button type="submit" class="btn-submit" id="btnGuardar">Subir Datos a la Nube ☁</button>
             </form>
         </div>
     </div>
@@ -232,7 +232,6 @@
     </div>
 
     <script>
-        // Reloj en tiempo real
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL');
         }, 1000);
@@ -241,14 +240,12 @@
             document.getElementById('fecha').valueAsDate = new Date();
             const urlParams = new URLSearchParams(window.location.search);
             
-            // Si el enlace tiene ?view=tv, entra al Dashboard directo
             if(urlParams.get('view') === 'tv') {
-                document.getElementById('main-header').style.display = 'none'; // Oculta cabecera roja general
-                document.getElementById('btnExitTv').style.display = 'none'; // Oculta botón de salir porque es Yodeck
+                document.getElementById('main-header').style.display = 'none';
+                document.getElementById('btnExitTv').style.display = 'none';
                 switchView('dash-view');
                 initDashboard();
             } else {
-                // Estado Normal: Muestra Cabecera y Formulario
                 document.getElementById('main-header').style.display = 'flex';
                 switchView('form-view');
             }
@@ -258,7 +255,6 @@
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             
-            // Si abrimos la TV manualmente con el botón
             if(id === 'dash-view') {
                 document.getElementById('main-header').style.display = 'none';
             } else {
@@ -299,7 +295,7 @@
             descargarDatosJSONP(); 
         }
 
-        // --- FORMATEO MATEMÁTICO (Puntos y Comas) ---
+        // --- FORMATEO MATEMÁTICO ---
         function parseRobustFloat(val) {
             if (val === undefined || val === null || val === "") return 0;
             let str = String(val).replace(/%/g, '').trim(); 
@@ -364,13 +360,11 @@
                 }
             });
 
-            // Globales
             document.getElementById('kpi-eff').innerText = formatPct(tEff, validRows);
             document.getElementById('kpi-disp').innerText = formatPct(tDisp, validRows);
             document.getElementById('kpi-cal').innerText = formatPct(tCal, validRows);
             document.getElementById('kpi-pzas').innerText = formatThous(tPzas);
 
-            // Determinar el mejor turno del día
             let bestShift = "";
             let maxEff = 0;
             ["Mañana", "Tarde", "Noche"].forEach(t => {
@@ -378,7 +372,6 @@
                 if(val > maxEff && val > 0) { maxEff = val; bestShift = t; }
             });
 
-            // Turnos & Animación de Mejor Turno
             ["Mañana", "Tarde", "Noche"].forEach(t => {
                 let d = shiftsData[t];
                 let prefix = t === "Mañana" ? "m" : (t === "Tarde" ? "t" : "n");
@@ -395,7 +388,6 @@
                 }
             });
 
-            // Tabla Comparativa
             const getAvgArr = arr => {
                 if(arr.length === 0) return null;
                 let val = arr.reduce((a,b)=>a+b,0) / arr.length;
@@ -440,7 +432,6 @@
             tableHTML += `</tbody></table>`;
             document.getElementById('machine-table-wrapper').innerHTML = tableHTML;
 
-            // Update status
             const time = new Date().toLocaleTimeString('es-CL');
             const syncStatus = isCached ? '<span class="sync-indicator" title="Actualizando..."></span>' : '';
             document.getElementById('lastUpdate').innerHTML = `Última sincronización con Google Sheets: ${time} ${syncStatus}`;
@@ -466,7 +457,7 @@
             const cachedData = localStorage.getItem(CACHE_KEY);
             if (cachedData) renderizarDatos(JSON.parse(cachedData), true);
             descargarDatosJSONP();
-            setInterval(descargarDatosJSONP, 300000); // Actualiza cada 5 minutos automáticamente
+            setInterval(descargarDatosJSONP, 300000); 
         }
     </script>
 </body>
