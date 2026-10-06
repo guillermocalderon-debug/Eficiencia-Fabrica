@@ -7,83 +7,119 @@
     <style>
         :root { 
             --primary: #e6005a; 
-            --bg-light: #f4f7f6; 
+            --bg-light: #f1f5f9; 
             --card-bg: #ffffff; 
-            --text-dark: #222222;
-            --text-muted: #666666;
-            --border-color: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
             
-            --sober-m: #475569; /* Gris Pizarra - Mañana */
-            --sober-t: #64748b; /* Gris Acero - Tarde */
-            --sober-n: #0f172a; /* Gris Carbón - Noche */
-            --gold: #fbbf24; /* Color Oro para el líder */
-            --silver: #cbd5e1;
+            --sober-m: #0ea5e9; /* Azul - Mañana */
+            --sober-t: #f97316; /* Naranja - Tarde */
+            --sober-n: #334155; /* Pizarra - Noche */
+            
+            --gold: #fbbf24; 
+            --silver: #94a3b8;
             --bronze: #b45309;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: var(--text-dark); margin: 0; padding: 2vh 2vw; display: flex; flex-direction: column; height: 100vh; overflow: hidden; box-sizing: border-box;}
         
         /* CABECERA */
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5vh; margin-bottom: 2vh;}
-        .logo { height: min(40px, 5vh); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5vh; margin-bottom: 1.5vh;}
+        .logo { height: min(35px, 4.5vh); }
         .title-box { text-align: center; flex-grow: 1;}
-        .title { margin: 0; font-size: min(32px, 4vh); font-weight: 900; color: #111; letter-spacing: 1px; text-transform: uppercase;}
-        .subtitle { color: var(--primary); font-weight: bold; font-size: min(16px, 2vh); margin-top: 5px; text-transform: uppercase;}
-        .clock { font-size: min(1.5vw, 3vh); font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
+        .title { margin: 0; font-size: min(28px, 3.5vh); font-weight: 900; color: #111; letter-spacing: 1px; text-transform: uppercase;}
+        .subtitle { color: var(--primary); font-weight: bold; font-size: min(15px, 1.8vh); margin-top: 3px; text-transform: uppercase;}
+        .clock { font-size: min(1.5vw, 2.5vh); font-weight: bold; color: #fff; background: var(--text-dark); padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
 
-        /* Contenedor Elástico de Máquinas */
-        .machines-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5vw; flex-grow: 1;}
+        /* =========================================
+           NUEVA GRILLA: 3 COLUMNAS, PODIO EN EL CENTRO
+           ========================================= */
+        .machines-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1.3fr 1fr; /* Columna central ligeramente más ancha */
+            grid-template-rows: repeat(3, 1fr);
+            gap: 1.5vh 1.5vw; 
+            flex-grow: 1;
+        }
         
-        .machine-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-top: 5px solid var(--primary); display: flex; flex-direction: column; overflow: hidden; position: relative;}
-        .machine-name { text-align: center; font-size: 2vh; font-weight: 900; background: #ffffff; color: #222; padding: 1vh; margin: 0; border-bottom: 2px solid #eee;}
+        .machine-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid var(--border-color); border-top: 4px solid var(--primary); display: flex; flex-direction: column; overflow: hidden;}
+        .machine-name { text-align: center; font-size: 1.8vh; font-weight: 900; background: #ffffff; color: #222; padding: 0.8vh; margin: 0; border-bottom: 1px solid #e2e8f0; text-transform: uppercase;}
         
-        /* Lista de operadores por turno */
-        .ops-list { display: flex; flex-direction: column; flex-grow: 1; padding: 1vh 1vw; gap: 1vh; justify-content: center; background-color: #fafbfc;}
+        .ops-list { display: flex; flex-direction: column; flex-grow: 1; padding: 0.8vh 0.8vw; gap: 0.8vh; justify-content: center; background-color: #f8fafc;}
         
-        .op-row { display: flex; align-items: center; background: #ffffff; border-radius: 10px; padding: 1vh; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s ease;}
+        .op-row { display: flex; align-items: center; background: #ffffff; border-radius: 8px; padding: 0.8vh; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .op-row.m { border-left: 4px solid var(--sober-m); }
+        .op-row.t { border-left: 4px solid var(--sober-t); }
+        .op-row.n { border-left: 4px solid var(--sober-n); }
         
-        .op-row.m { border-left: 5px solid var(--sober-m); }
-        .op-row.t { border-left: 5px solid var(--sober-t); }
-        .op-row.n { border-left: 5px solid var(--sober-n); }
+        .op-row.leader { background-color: #f0fdf4; border-color: #bbf7d0; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); z-index: 5;}
         
-        /* Clase para el ganador del turno */
-        .op-row.leader { background-color: #f0fdf4; border-color: #bbf7d0; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); transform: scale(1.02); z-index: 5;}
-        
-        .op-avatar { width: 4vh; height: 4vh; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.6vh; margin-right: 1vw; color: #fff;}
+        .op-avatar { width: 3.5vh; height: 3.5vh; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.4vh; margin-right: 0.8vw; color: #fff;}
         .op-row.m .op-avatar { background-color: var(--sober-m); }
         .op-row.t .op-avatar { background-color: var(--sober-t); }
         .op-row.n .op-avatar { background-color: var(--sober-n); }
         .op-row.leader .op-avatar { background-color: var(--gold); color: #000;}
 
         .op-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: center;}
-        .op-name { font-size: 1.6vh; font-weight: 900; color: #222; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 10vw;}
-        .op-shift { font-size: 1.1vh; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-top: 2px;}
+        .op-name { font-size: 1.4vh; font-weight: 900; color: #222; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 10vw;}
+        .op-shift { font-size: 1vh; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-top: 1px;}
         
-        /* Eficiencia y Medallas */
-        .op-stats { display: flex; align-items: center; gap: 8px;}
-        .op-eff { font-size: 2.2vh; font-weight: 900; color: #222; }
-        .op-rank { font-size: 2.5vh; animation: pulseRank 2s infinite alternate;}
+        .op-stats { display: flex; align-items: center; gap: 5px;}
+        .op-eff { font-size: 1.8vh; font-weight: 900; color: #222; }
+        .op-rank { font-size: 2vh; animation: pulseRank 2s infinite alternate;}
         
         @keyframes pulseRank { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
 
+        /* ESTADO VACÍO (Sin Producción) */
+        .empty-state-box { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; opacity: 0.5;}
+        .empty-icon { font-size: 3.5vh; margin-bottom: 5px;}
+        .empty-text { font-size: 1.2vh; font-weight: bold; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px;}
+
         /* =========================================
-           TARJETA ESPECIAL: SALÓN DE LA FAMA
+           SALÓN DE LA FAMA (GIGANTE Y CENTRAL)
            ========================================= */
-        .podium-card { border-top: 5px solid var(--gold); background: #fffbeb;}
-        .podium-card .machine-name { background: var(--gold); color: #000; letter-spacing: 1px;}
-        .podium-card .ops-list { background-color: #fffbeb; }
+        .podium-card { 
+            grid-column: 2; /* Lo obliga a estar en la columna del medio */
+            grid-row: 1 / span 2; /* Ocupa la altura de 2 máquinas */
+            border-top: 5px solid var(--gold); 
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .podium-card .machine-name { background: transparent; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 2.2vh; letter-spacing: 2px;}
+        .podium-card .ops-list { background-color: transparent; padding: 2vh 1.5vw; justify-content: space-around;}
         
-        .podium-row { display: flex; align-items: center; background: #ffffff; border-radius: 10px; padding: 1vh; border: 1px solid #fde68a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 0.5vh;}
-        .podium-medal { font-size: 3vh; margin-right: 1vw;}
-        .podium-period { font-size: 1vh; font-weight: bold; color: var(--text-muted); text-transform: uppercase;}
-        .podium-name { font-size: 1.8vh; font-weight: 900; color: #222; text-transform: uppercase;}
-        .podium-score { font-size: 2.5vh; font-weight: 900; color: var(--success); margin-left: auto;}
+        /* 1er Lugar Épico */
+        .podium-first { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(251, 191, 36, 0.1); border: 2px solid var(--gold); border-radius: 15px; 
+            padding: 2.5vh; position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+        }
+        .medal-huge { font-size: 6vh; margin-bottom: 1vh; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));}
+        .name-huge { font-size: 2.5vh; font-weight: 900; color: #fff; text-transform: uppercase; text-align: center;}
+        .score-huge { font-size: 4vh; font-weight: 900; color: var(--gold); margin-top: 0.5vh;}
+        
+        .shimmer::after {
+            content: ''; position: absolute; top: -50%; left: -100%; width: 50%; height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(30deg); animation: shimmerAnim 3s infinite;
+        }
+        @keyframes shimmerAnim { 0% { left: -100%; } 100% { left: 200%; } }
+
+        /* 2do y 3er Lugar */
+        .podium-row { display: flex; align-items: center; border-radius: 10px; padding: 1.5vh 1.5vw; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);}
+        .podium-medal { font-size: 3vh; margin-right: 1.5vw;}
+        .podium-name { font-size: 1.8vh; font-weight: 900; color: #f8fafc; text-transform: uppercase;}
+        .podium-score { font-size: 2.2vh; font-weight: 900; margin-left: auto;}
+        
+        .podium-silver { border-left: 5px solid var(--silver);}
+        .podium-bronze { border-left: 5px solid var(--bronze);}
 
         #loader { text-align: center; color: var(--primary); font-weight: bold; font-size: 2vh; margin-top: 20vh; display: flex; flex-direction: column; gap: 10px;}
 
         @media (max-width: 768px) {
             body { height: auto; overflow-y: visible; padding: 15px;}
             .header { flex-direction: column; gap: 15px; text-align: center;}
-            .machines-grid { grid-template-columns: 1fr; }
+            .machines-grid { display: flex; flex-direction: column; }
             .op-name { max-width: 40vw;}
         }
     </style>
@@ -100,11 +136,11 @@
     </div>
 
     <div id="loader">
-        <span id="loadText">Conectando con base de datos maestra... ⏳</span>
+        <span id="loadText">Sincronizando Base de Datos de Producción... ⏳</span>
     </div>
     
     <div class="machines-grid" id="machinesGrid">
-        <!-- Las máquinas y el Salón de la Fama se generan dinámicamente -->
+        <!-- Generación Dinámica -->
     </div>
 
     <script>
@@ -141,14 +177,14 @@
         }
 
         function getAvatarInitials(name) {
-            if(!name || name === "Sin asignar") return "-";
+            if(!name || name === "NO ASIGNADO") return "?";
             let parts = name.trim().split(" ");
             if(parts.length >= 2) return parts[0][0] + parts[1][0];
             return parts[0][0];
         }
 
         function startEngine() {
-            document.getElementById('loadText').innerText = "Calculando Eficiencias Netas... ⏳";
+            document.getElementById('loadText').innerText = "Calculando Eficiencias en Tiempo Real... ⏳";
             
             Promise.all([
                 fetchJSONP(ROSTER_API, 'roster'),
@@ -164,7 +200,6 @@
         function renderCombinedDashboard(rosterData, effData) {
             document.getElementById('loader').style.display = 'none';
 
-            // 1. PROCESAR FECHAS
             let hoyDate = new Date();
             let dia = String(hoyDate.getDate());
             let diaPad = dia.padStart(2, '0');
@@ -192,12 +227,17 @@
                 if(colIndex !== -1) break;
             }
 
-            document.getElementById('fechaHoy').innerText = `TURNO: ${headerTitle}`;
+            document.getElementById('fechaHoy').innerText = `TURNO DEL DÍA: ${headerTitle}`;
 
+            // Añadimos el flag "hasData" para saber si hay información de eficiencia
             let maqData = {};
-            MACHINE_IDS.forEach(m => maqData[m] = { M: {name: null, eff: 0}, T: {name: null, eff: 0}, N: {name: null, eff: 0} });
+            MACHINE_IDS.forEach(m => maqData[m] = { 
+                M: {name: null, eff: 0, hasData: false}, 
+                T: {name: null, eff: 0, hasData: false}, 
+                N: {name: null, eff: 0, hasData: false} 
+            });
 
-            // 2. ASIGNACIONES
+            // 1. Cargar Asignaciones
             if (colIndex !== -1) {
                 for(let i = 1; i < rosterData.length; i++) {
                     let row = rosterData[i];
@@ -220,11 +260,11 @@
                 }
             }
 
-            // 3. EFICIENCIA NETA (Rendimiento x Calidad) Topada al 100%
             let maxEffM = { val: 0, maquina: 0, name: null };
             let maxEffT = { val: 0, maquina: 0, name: null };
             let maxEffN = { val: 0, maquina: 0, name: null };
 
+            // 2. Cargar Eficiencias y encender el flag "hasData"
             if (effData && effData.length > 0) {
                 effData.forEach(row => {
                     let rClean = {};
@@ -233,7 +273,6 @@
                         rClean[cleanKey] = row[k];
                     }
 
-                    // Se toma Disponibilidad como Rendimiento en la fórmula de la planta
                     let rendRaw = parseRobustFloat(rClean["disponibilidad"]);
                     let calRaw = parseRobustFloat(rClean["calidad"]);
                     let tno = String(rClean["turno"] || "").trim();
@@ -250,14 +289,12 @@
                             if (cal > 100) cal = 100;
                             
                             let eficienciaNeta = (rend / 100) * (cal / 100) * 100;
-
                             let letraTurno = tno === "Mañana" ? "M" : (tno === "Tarde" ? "T" : "N");
                             
                             let currentObj = maqData[maqNum][letraTurno];
-                            if(currentObj.eff === 0) currentObj.eff = eficienciaNeta;
-                            else currentObj.eff = (currentObj.eff + eficienciaNeta) / 2;
+                            currentObj.eff = eficienciaNeta; 
+                            currentObj.hasData = true; // ¡ENCONTRAMOS DATA REAL!
 
-                            // Registrar a los líderes absolutos del día
                             if(letraTurno === "M" && currentObj.eff > maxEffM.val) { maxEffM = { val: currentObj.eff, maquina: maqNum, name: currentObj.name }; }
                             if(letraTurno === "T" && currentObj.eff > maxEffT.val) { maxEffT = { val: currentObj.eff, maquina: maqNum, name: currentObj.name }; }
                             if(letraTurno === "N" && currentObj.eff > maxEffN.val) { maxEffN = { val: currentObj.eff, maquina: maqNum, name: currentObj.name }; }
@@ -266,46 +303,95 @@
                 });
             }
 
-            // Encontrar al "Mejor del Día" global entre los 3 turnos
-            let mejorDelDia = { name: "En proceso...", score: "0,0%" };
-            let maxScoreGlobal = Math.max(maxEffM.val, maxEffT.val, maxEffN.val);
-            if (maxScoreGlobal > 0) {
-                if(maxEffM.val === maxScoreGlobal) mejorDelDia = { name: maxEffM.name, score: maxScoreGlobal.toFixed(1).replace('.',',') + '%' };
-                else if(maxEffT.val === maxScoreGlobal) mejorDelDia = { name: maxEffT.name, score: maxScoreGlobal.toFixed(1).replace('.',',') + '%' };
-                else if(maxEffN.val === maxScoreGlobal) mejorDelDia = { name: maxEffN.name, score: maxScoreGlobal.toFixed(1).replace('.',',') + '%' };
-            }
-
-            // 4. RENDERIZAR TABLERO
-            let gridHtml = '';
+            // 3. Promedios exactos para el Top 3
+            let operatorStats = {};
             
             MACHINE_IDS.forEach(m => {
+                ['M', 'T', 'N'].forEach(t => {
+                    let op = maqData[m][t];
+                    // Si el operador tiene data, pero NO estaba en la planilla, lo mostramos como "NO ASIGNADO"
+                    let opName = op.name ? op.name : "NO ASIGNADO"; 
+                    
+                    if (op.hasData && op.eff > 0) {
+                        if (!operatorStats[opName]) { operatorStats[opName] = { sum: 0, count: 0 }; }
+                        operatorStats[opName].sum += op.eff;
+                        operatorStats[opName].count += 1;
+                    }
+                });
+            });
+
+            let rankingList = [];
+            for (let name in operatorStats) {
+                rankingList.push({
+                    name: name,
+                    avgEff: operatorStats[name].sum / operatorStats[name].count
+                });
+            }
+            rankingList.sort((a, b) => b.avgEff - a.avgEff);
+
+            // 4. RENDERIZACIÓN DE HTML
+            let gridHtml = '';
+            
+            // Función para generar el Salón de la Fama
+            const getPodiumRow = (rankData, placeClass, medal, color) => {
+                if(!rankData) {
+                    return `<div class="podium-row" style="opacity:0.2;"><div class="podium-medal">${medal}</div><div class="podium-name">---</div></div>`;
+                }
+                let scoreText = rankData.avgEff.toFixed(1).replace('.',',') + '%';
+                return `
+                <div class="podium-row ${placeClass}">
+                    <div class="podium-medal">${medal}</div>
+                    <div class="podium-name">${rankData.name}</div>
+                    <div class="podium-score" style="color: ${color};">${scoreText}</div>
+                </div>`;
+            };
+
+            let podiumHtml = `
+            <div class="machine-card podium-card">
+                <h3 class="machine-name">🏆 SALÓN DE LA FAMA</h3>
+                <div class="ops-list">
+                    ${rankingList[0] ? `
+                    <div class="podium-first shimmer">
+                        <div class="medal-huge">👑</div>
+                        <div class="name-huge">${rankingList[0].name}</div>
+                        <div class="score-huge">${rankingList[0].avgEff.toFixed(1).replace('.',',')}%</div>
+                    </div>` : `
+                    <div class="podium-first" style="opacity: 0.3;">
+                        <div class="medal-huge">⏳</div>
+                        <div class="name-huge">EN PROCESO</div>
+                    </div>`}
+                    
+                    ${getPodiumRow(rankingList[1], 'podium-silver', '🥈', 'var(--silver)')}
+                    ${getPodiumRow(rankingList[2], 'podium-bronze', '🥉', 'var(--bronze)')}
+                </div>
+            </div>`;
+
+            // Construir la grilla en orden para que el Podio quede exactamente en el centro (Posición 2)
+            MACHINE_IDS.forEach((m, index) => {
+                // Inyectar el podio después de la MQ 1
+                if(index === 1) { 
+                    gridHtml += podiumHtml; 
+                }
+
                 let ops = maqData[m];
                 
                 const getOpRow = (obj, tipo, colorClase, turnoLabel, leaderObj) => {
-                    let isLeader = (obj.eff > 0 && leaderObj.maquina === m);
+                    let isLeader = (obj.eff > 0 && leaderObj.maquina === m); 
                     let leaderClass = isLeader ? "leader" : "";
                     
-                    if(!obj.name) {
-                        return `
-                        <div class="op-row" style="opacity: 0.6; background: #f8fafc;">
-                            <div class="op-avatar" style="background: #cbd5e1;">-</div>
-                            <div class="op-details">
-                                <p class="op-name" style="color: #94a3b8;">Sin asignar</p>
-                                <p class="op-shift">${turnoLabel}</p>
-                            </div>
-                        </div>`;
-                    }
-                    
-                    let iniciales = getAvatarInitials(obj.name);
-                    let effText = obj.eff > 0 ? obj.eff.toFixed(1).replace('.', ',') + "%" : "0,0%";
+                    let opName = obj.name ? obj.name : "NO ASIGNADO";
+                    let iniciales = getAvatarInitials(opName);
+                    let effText = obj.eff.toFixed(1).replace('.', ',') + "%";
                     let rankIcon = isLeader ? "👑" : (obj.eff > 90 ? "🔥" : ""); 
-                    let colorEff = isLeader ? "var(--success)" : (obj.eff === 0 ? "#cbd5e1" : "#222");
+                    let colorEff = isLeader ? "var(--success)" : "#222";
+                    
+                    let nameColor = (opName === "NO ASIGNADO") ? "color: var(--primary);" : "";
 
                     return `
                     <div class="op-row ${colorClase} ${leaderClass}">
                         <div class="op-avatar">${iniciales}</div>
                         <div class="op-details">
-                            <p class="op-name" title="${obj.name}">${obj.name}</p>
+                            <p class="op-name" title="${opName}" style="${nameColor}">${opName}</p>
                             <p class="op-shift">${turnoLabel}</p>
                         </div>
                         <div class="op-stats">
@@ -315,53 +401,36 @@
                     </div>`;
                 };
 
+                // LÓGICA DE LIMPIEZA: Solo agregar los turnos que tengan 'hasData === true'
+                let listHtml = '';
+                if(ops['M'].hasData) listHtml += getOpRow(ops['M'], 'M', 'm', '☀️ MAÑANA', maxEffM);
+                if(ops['T'].hasData) listHtml += getOpRow(ops['T'], 'T', 't', '🌤 TARDE', maxEffT);
+                if(ops['N'].hasData) listHtml += getOpRow(ops['N'], 'N', 'n', '🌙 NOCHE', maxEffN);
+
+                // Si la máquina no tiene absolutamente nada de data, muestra el estado vacío
+                if(listHtml === '') {
+                    listHtml = `
+                    <div class="empty-state-box">
+                        <div class="empty-icon">⏳</div>
+                        <div class="empty-text">Esperando<br>Producción</div>
+                    </div>`;
+                }
+
                 gridHtml += `
                 <div class="machine-card">
-                    <h3 class="machine-name">INYECCIÓN ${m}</h3>
+                    <h3 class="machine-name">MQ ${m}</h3>
                     <div class="ops-list">
-                        ${getOpRow(ops['M'], 'M', 'm', '☀️ MAÑANA', maxEffM)}
-                        ${getOpRow(ops['T'], 'T', 't', '🌤 TARDE', maxEffT)}
-                        ${getOpRow(ops['N'], 'N', 'n', '🌙 NOCHE', maxEffN)}
+                        ${listHtml}
                     </div>
                 </div>`;
             });
-
-            // 5. RENDERIZAR EL "OCTAVO ESPACIO" (SALÓN DE LA FAMA)
-            gridHtml += `
-            <div class="machine-card podium-card">
-                <h3 class="machine-name">🏆 SALÓN DE LA FAMA</h3>
-                <div class="ops-list">
-                    <div class="podium-row">
-                        <div class="podium-medal">🥇</div>
-                        <div>
-                            <div class="podium-period">Líder del Día (Actual)</div>
-                            <div class="podium-name">${mejorDelDia.name}</div>
-                        </div>
-                        <div class="podium-score">${mejorDelDia.score}</div>
-                    </div>
-                    <div class="podium-row" style="opacity: 0.8;">
-                        <div class="podium-medal">📅</div>
-                        <div>
-                            <div class="podium-period">Mejor de la Semana</div>
-                            <div class="podium-name">Cálculo Histórico...</div>
-                        </div>
-                    </div>
-                    <div class="podium-row" style="opacity: 0.8;">
-                        <div class="podium-medal">🌟</div>
-                        <div>
-                            <div class="podium-period">Mejor del Mes</div>
-                            <div class="podium-name">Cálculo Histórico...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
 
             document.getElementById('machinesGrid').innerHTML = gridHtml;
         }
 
         window.onload = () => {
             startEngine();
-            setInterval(startEngine, 300000); // 5 mins
+            setInterval(startEngine, 300000); 
         };
     </script>
 </body>
