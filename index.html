@@ -324,7 +324,7 @@
             descargarDatosJSONP(); 
         }
 
-        // --- FORMATEO MATEMÁTICO (OEE LIMITADO AL 100%) ---
+        // --- FUNCIONES MATEMÁTICAS ---
         function parseRobustFloat(val) {
             if (val === undefined || val === null || val === "") return 0;
             let str = String(val).replace(/%/g, '').trim(); 
@@ -333,38 +333,32 @@
             return parseFloat(str) || 0;
         }
 
-        // Esta función formatea agregando el cohete si se superó el 100%
-        const formatPctHtml = (sum, count) => {
-            if (count === 0) return "0,0%";
-            let val = sum / count;
-            if (val <= 1.5) val = val * 100; // Lo pasamos a porcentaje
-            
-            if (val > 100) {
-                return `100,0% <span class="rocket-badge" title="¡Récord! Ciclo real más rápido que el teórico.">🚀</span>`;
+        // Función de Formateo Final para Pantalla
+        const formatPctHtml = (val, hasRecord) => {
+            if (val === null || isNaN(val)) return '<span style="color:#cbd5e1">-</span>';
+            let text = val.toFixed(1).replace('.', ',') + "%";
+            if (hasRecord) {
+                text += ` <span class="rocket-badge" title="¡Récord! Ciclo real superó al teórico.">🚀</span>`;
             }
-            return val.toFixed(1).replace('.', ',') + "%";
+            return text;
         };
 
-        // Devuelve el número plano, pero no lo "topa" aquí, para saber cuál fue el mejor turno real
-        const getAvgValNum = (sum, count) => {
-            if (count === 0) return 0;
-            let val = sum / count;
-            return (val <= 1.5) ? val * 100 : val;
-        };
+        const getAvg = (sum, count) => count === 0 ? 0 : (sum / count);
 
         const formatThous = (num) => {
             return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         };
 
-        // --- MOTOR RENDERIZADOR ---
+        // --- MOTOR RENDERIZADOR (LÓGICA PURA OEE) ---
         function renderizarDatos(data, isCached = false) {
             if(!data || data.length === 0) return;
 
-            let tEff=0, tDisp=0, tCal=0, tPzas=0, validRows=0;
+            let tEff=0, tDisp=0, tCal=0, tPzas=0, validRows=0, globalRecord = false;
+            
             let shiftsData = {
-                "Mañana": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 },
-                "Tarde": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 },
-                "Noche": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 }
+                "Mañana": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0, rec: false },
+                "Tarde": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0, rec: false },
+                "Noche": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0, rec: false }
             };
             let maquinaTurnoData = {};
 
@@ -375,36 +369,55 @@
                     rClean[cleanKey] = row[k];
                 }
 
-                let eff = parseRobustFloat(rClean["eficiencia"]);
-                let disp = parseRobustFloat(rClean["disponibilidad"]);
-                let cal = parseRobustFloat(rClean["calidad"]);
+                // Extracción de datos crudos
+                let dispRaw = parseRobustFloat(rClean["disponibilidad"]);
+                let calRaw = parseRobustFloat(rClean["calidad"]);
                 let pzas = parseRobustFloat(rClean["cantidad inyectada"] || rClean["inyectada"] || rClean["cantidad"]);
                 let tno = String(rClean["turno"] || "").trim();
                 let maq = String(rClean["maquina"] || "").trim();
 
-                tPzas += pzas;
-                
                 if(maq && tno) { 
+                    // 1. Normalizamos a escala 0-100%
+                    let disp = (dispRaw <= 1.5 && dispRaw !== 0) ? dispRaw * 100 : dispRaw;
+                    let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
+                    
+                    let isRecord = false;
+                    
+                    // 2. Aplicamos la regla estricta de Capping (Tope máximo al 100%)
+                    if (disp > 100) { disp = 100; isRecord = true; }
+                    if (cal > 100) { cal = 100; }
+                    
+                    // 3. Recalculamos la Eficiencia Pura con los valores topados
+                    let eff = (disp / 100) * (cal / 100) * 100;
+
+                    tPzas += pzas;
                     tEff += eff; tDisp += disp; tCal += cal; validRows++; 
+                    if(isRecord) globalRecord = true;
+                    
                     if(shiftsData[tno]) {
                         shiftsData[tno].eff += eff; shiftsData[tno].disp += disp;
                         shiftsData[tno].cal += cal; shiftsData[tno].pzas += pzas; shiftsData[tno].count++;
+                        if(isRecord) shiftsData[tno].rec = true;
                     }
-                    if (!maquinaTurnoData[maq]) maquinaTurnoData[maq] = { "Mañana": [], "Tarde": [], "Noche": [] };
-                    if (maquinaTurnoData[maq][tno] !== undefined) maquinaTurnoData[maq][tno].push(eff);
+                    
+                    if (!maquinaTurnoData[maq]) maquinaTurnoData[maq] = { "Mañana": {eff:[], rec:false}, "Tarde": {eff:[], rec:false}, "Noche": {eff:[], rec:false} };
+                    if (maquinaTurnoData[maq][tno] !== undefined) {
+                        maquinaTurnoData[maq][tno].eff.push(eff);
+                        if (isRecord) maquinaTurnoData[maq][tno].rec = true;
+                    }
                 }
             });
 
-            // Reemplazamos innerText por innerHTML para que renderice el cohete (emoji span)
-            document.getElementById('kpi-eff').innerHTML = formatPctHtml(tEff, validRows);
-            document.getElementById('kpi-disp').innerHTML = formatPctHtml(tDisp, validRows);
-            document.getElementById('kpi-cal').innerHTML = formatPctHtml(tCal, validRows);
-            document.getElementById('kpi-pzas').innerText = formatThous(tPzas); // El total de piezas sí es texto plano
+            // Asignación Global
+            document.getElementById('kpi-eff').innerHTML = formatPctHtml(getAvg(tEff, validRows), globalRecord);
+            document.getElementById('kpi-disp').innerHTML = formatPctHtml(getAvg(tDisp, validRows), globalRecord);
+            document.getElementById('kpi-cal').innerHTML = formatPctHtml(getAvg(tCal, validRows), false);
+            document.getElementById('kpi-pzas').innerText = formatThous(tPzas);
 
             let bestShift = "";
             let maxEff = 0;
             ["Mañana", "Tarde", "Noche"].forEach(t => {
-                let val = getAvgValNum(shiftsData[t].eff, shiftsData[t].count);
+                let val = getAvg(shiftsData[t].eff, shiftsData[t].count);
                 if(val > maxEff && val > 0) { maxEff = val; bestShift = t; }
             });
 
@@ -412,10 +425,9 @@
                 let d = shiftsData[t];
                 let prefix = t === "Mañana" ? "m" : (t === "Tarde" ? "t" : "n");
                 
-                // Aplicamos formatPctHtml a todos los KPIs de la tarjeta del turno
-                document.getElementById(`shift-${prefix}-eff`).innerHTML = formatPctHtml(d.eff, d.count);
-                document.getElementById(`shift-${prefix}-disp`).innerHTML = formatPctHtml(d.disp, d.count);
-                document.getElementById(`shift-${prefix}-cal`).innerHTML = formatPctHtml(d.cal, d.count);
+                document.getElementById(`shift-${prefix}-eff`).innerHTML = formatPctHtml(getAvg(d.eff, d.count), d.rec);
+                document.getElementById(`shift-${prefix}-disp`).innerHTML = formatPctHtml(getAvg(d.disp, d.count), d.rec);
+                document.getElementById(`shift-${prefix}-cal`).innerHTML = formatPctHtml(getAvg(d.cal, d.count), false);
                 document.getElementById(`shift-${prefix}-pzas`).innerText = formatThous(d.pzas);
 
                 let panelEl = document.getElementById(`panel-${t.toLowerCase().replace('ñ','n')}`);
@@ -425,16 +437,10 @@
                 }
             });
 
-            // Función adaptada para formatear las celdas de la tabla (Retorna HTML)
-            const formatTablePct = arr => {
-                if(arr.length === 0) return '<span style="color:#cbd5e1">-</span>';
-                let val = arr.reduce((a,b)=>a+b,0) / arr.length;
-                if (val <= 1.5) val = val * 100;
-
-                if (val > 100) {
-                    return `100,0% <span class="rocket-badge" title="Récord de Ciclo">🚀</span>`;
-                }
-                return val.toFixed(1).replace('.',',') + '%';
+            // Lógica para calcular promedios de arreglos en la tabla
+            const getAvgArr = arrObj => {
+                if(arrObj.eff.length === 0) return null;
+                return arrObj.eff.reduce((a,b)=>a+b,0) / arrObj.eff.length;
             };
 
             const maqLabels = Object.keys(maquinaTurnoData).sort();
@@ -452,11 +458,22 @@
                 <tbody>`;
 
             maqLabels.forEach(m => {
-                let txtM = formatTablePct(maquinaTurnoData[m]["Mañana"]);
-                let txtT = formatTablePct(maquinaTurnoData[m]["Tarde"]);
-                let txtN = formatTablePct(maquinaTurnoData[m]["Noche"]);
-                let allVals = [...maquinaTurnoData[m]["Mañana"], ...maquinaTurnoData[m]["Tarde"], ...maquinaTurnoData[m]["Noche"]];
-                let txtProm = formatTablePct(allVals);
+                let dM = maquinaTurnoData[m]["Mañana"];
+                let dT = maquinaTurnoData[m]["Tarde"];
+                let dN = maquinaTurnoData[m]["Noche"];
+
+                let valM = getAvgArr(dM);
+                let valT = getAvgArr(dT);
+                let valN = getAvgArr(dN);
+                
+                let allEffs = [...dM.eff, ...dT.eff, ...dN.eff];
+                let anyRec = dM.rec || dT.rec || dN.rec;
+                let valProm = allEffs.length > 0 ? (allEffs.reduce((a,b)=>a+b,0) / allEffs.length) : null;
+
+                let txtM = valM !== null ? formatPctHtml(valM, dM.rec) : '<span style="color:#cbd5e1">-</span>';
+                let txtT = valT !== null ? formatPctHtml(valT, dT.rec) : '<span style="color:#cbd5e1">-</span>';
+                let txtN = valN !== null ? formatPctHtml(valN, dN.rec) : '<span style="color:#cbd5e1">-</span>';
+                let txtProm = valProm !== null ? formatPctHtml(valProm, anyRec) : '<span style="color:#cbd5e1">-</span>';
 
                 let maqAbreviada = m.toUpperCase().replace('INYECTORA', 'MQ');
 
