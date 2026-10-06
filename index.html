@@ -28,16 +28,15 @@
         .nav-btns button:hover { background: #f1f5f9; border-color: var(--text-dark); }
         .btn-tv { background-color: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
         
-        /* GESTIÓN ESTRICTA DE VISTAS */
+        /* GESTIÓN DE VISTAS */
         .view { display: none !important; padding: 20px; max-width: 1400px; margin: auto; }
-        
-        /* Solo se muestra el que tiene la clase active */
         #form-view.active { display: block !important; animation: fadeIn 0.4s; }
         #dash-view.active { display: flex !important; flex-direction: column; animation: fadeIn 0.4s; }
-        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* FORMULARIO MÓVIL */
+        /* =========================================
+           FORMULARIO MÓVIL
+           ========================================= */
         .form-container { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 500px; margin: 40px auto; border-top: 5px solid var(--primary);}
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: var(--text-muted); text-transform: uppercase;}
@@ -45,13 +44,19 @@
         .btn-submit { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px;}
         .btn-submit:hover { background: #c20042; }
         
+        /* Grillas del formulario (Se adaptan a móvil) */
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .counter-box { background: #f1f5f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--sober-m); }
+        .counter-box .form-group { margin-bottom: 0; }
+        
         /* =========================================
-           DASHBOARD TV: ADAPTACIÓN PANTALLA ANCHA 
+           DASHBOARD TV: PANTALLA ANCHA 
            ========================================= */
         .dashboard-tv { height: 100vh; overflow: hidden; padding: 2vh 2vw; box-sizing: border-box; max-width: 100%;}
         
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1vh; border-bottom: 2px solid var(--border-color); padding-bottom: 1vh;}
-        .dash-header h2 { margin: 0; font-size: min(2.2vw, 4vh); font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase;}
+        .dash-header .logo { height: max(30px, 4vh); } /* Logo restaurado en Dashboard */
+        .dash-header h2 { margin: 0; font-size: min(2vw, 4vh); font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase; text-align: center; flex-grow: 1;}
         .clock-tv { font-size: min(1.5vw, 3vh); font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
         .btn-exit { background-color: #333; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;}
         
@@ -71,61 +76,50 @@
         .shift-stat strong { display: block; font-size: min(1.8vw, 3.5vh); color: #222; font-weight: 900;}
 
         /* 🔥 ANIMACIÓN DEL MEJOR TURNO 🔥 */
-        .best-shift { 
-            transform: scale(1.03); 
-            box-shadow: 0 10px 25px rgba(230, 0, 90, 0.2); 
-            border: 3px solid var(--primary); 
-            position: relative; 
-            z-index: 10;
-        }
+        .best-shift { transform: scale(1.03); box-shadow: 0 10px 25px rgba(230, 0, 90, 0.2); border: 3px solid var(--primary); position: relative; z-index: 10;}
         .best-shift::after {
-            content: '🏆 MEJOR TURNO';
-            position: absolute;
-            top: -2.2vh; 
-            right: 1vw;
-            background: var(--primary);
-            color: white;
-            padding: 0.5vh 1vw;
-            border-radius: 20px;
-            font-size: min(0.8vw, 1.6vh);
-            font-weight: 900;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            animation: bounce 2s infinite;
+            content: '🏆 MEJOR TURNO'; position: absolute; top: -2.2vh; right: 1vw; background: var(--primary); color: white;
+            padding: 0.5vh 1vw; border-radius: 20px; font-size: min(0.8vw, 1.6vh); font-weight: 900; letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); animation: bounce 2s infinite;
         }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.8vh); } }
 
         /* TABLA ELÁSTICA (TV) */
         .table-container { 
-            flex-grow: 1; 
-            min-height: 0; 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05); 
-            border: 1px solid var(--border-color); 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column;
+            flex-grow: 1; min-height: 0; background: var(--card-bg); border-radius: 12px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column;
         }
         .machine-table { width: 100%; border-collapse: collapse; text-align: center; height: 100%; display: table;}
         .machine-table th { padding: 1vh 1vw; color: white; font-size: min(1vw, 2vh); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; height: 1%;}
         .machine-table td { padding: 0.2vh 1vw; font-size: min(1.6vw, 3.5vh); font-weight: 900; color: #222; border-bottom: 1px solid #f1f5f9; }
         .machine-table tr:hover { background-color: #f8fafc; }
-        .col-maq { background-color: #1e293b; color: white !important; font-size: min(1.4vw, 3vh) !important; text-align: left; padding-left: 2vw !important; border-right: 4px solid var(--primary);}
+        
+        /* Columna Máquina (Con Sticky para móvil preparado) */
+        .col-maq { 
+            background-color: #1e293b; color: white !important; font-size: min(1.4vw, 3vh) !important; 
+            text-align: left; padding-left: 2vw !important; border-right: 4px solid var(--primary);
+            position: sticky; left: 0; z-index: 2; /* Fija la columna al hacer scroll */
+        }
+        .machine-table th.col-maq { z-index: 3; } /* El encabezado fijo sobre los demás */
         
         .footer-update { text-align: center; font-size: min(0.9vw, 2vh); color: #777; margin-top: 1vh; font-weight: bold; height: auto;}
         .sync-indicator { display: inline-block; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; animation: pulseSync 1s infinite; margin-left: 5px; }
         @keyframes pulseSync { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
         
         /* =========================================
-           AJUSTES MÓVILES Y PANTALLAS PEQUEÑAS
+           AJUSTES MÓVILES (Celulares)
            ========================================= */
         @media (max-width: 768px) {
-            #dash-view.active { display: block !important; } /* En móvil se apila hacia abajo normal */
+            /* Coloca todos los campos del formulario uno debajo del otro para evitar solapamientos */
+            .grid-2-col { grid-template-columns: 1fr; gap: 0px; }
+            .counter-box .form-group { margin-bottom: 10px; }
             
+            /* Ajustes Dashboard en Celular */
+            #dash-view.active { display: block !important; }
             .dashboard-tv { height: auto; min-height: 100vh; overflow-y: visible; padding: 20px 15px; display: block;}
             
-            .dash-header h2 { font-size: 18px; text-align: center;}
+            .dash-header { flex-direction: column; gap: 10px; text-align: center;}
+            .dash-header h2 { font-size: 16px; }
             .clock-tv { font-size: 12px; }
             .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .kpi-card h3 { font-size: 10px; }
@@ -139,9 +133,9 @@
             .best-shift { transform: scale(1.02); }
             .best-shift::after { font-size: 10px; top: -15px; right: 10px; padding: 4px 10px;}
             
-            /* La tabla hace scroll horizontal (Swipe) para que no se aprieten las letras */
+            /* Swipe Horizontal activado para la tabla */
             .table-container { overflow-x: auto; display: block; height: auto; }
-            .machine-table { min-width: 600px; }
+            .machine-table { min-width: 500px; }
             .machine-table th { font-size: 11px; padding: 10px; height: auto;}
             .machine-table td { font-size: 14px; padding: 10px; }
             .col-maq { font-size: 13px !important; padding-left: 10px !important; }
@@ -173,7 +167,7 @@
         <div class="form-container">
             <h2 style="text-align: center; margin-top: 0; color: #111; border-bottom: 2px solid #eee; padding-bottom: 15px; font-size: 22px; font-weight: 900; text-transform: uppercase;">Registro de Máquina</h2>
             <form id="prodForm" onsubmit="submitForm(event)">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="grid-2-col">
                     <div class="form-group"><label>Fecha</label><input type="date" id="fecha" required></div>
                     <div class="form-group"><label>Turno</label>
                         <select id="turno" required>
@@ -191,11 +185,11 @@
                         <option value="Inyectora 7">Inyectora 7</option>
                     </select>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--sober-m);">
-                    <div class="form-group" style="margin-bottom: 0;"><label>Contador Inicio</label><input type="number" id="contIn" required step="1"></div>
-                    <div class="form-group" style="margin-bottom: 0;"><label>Contador Fin</label><input type="number" id="contFin" required step="1"></div>
+                <div class="grid-2-col counter-box">
+                    <div class="form-group"><label>Contador Inicio</label><input type="number" id="contIn" required step="1"></div>
+                    <div class="form-group"><label>Contador Fin</label><input type="number" id="contFin" required step="1"></div>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="grid-2-col">
                     <div class="form-group"><label>Cavidades</label><input type="number" id="cavidades" required step="1" min="1"></div>
                     <div class="form-group"><label>Ciclo Real (s)</label><input type="number" id="ciclo" required step="0.01"></div>
                 </div>
@@ -211,6 +205,7 @@
     <!-- VISTA 2: DASHBOARD TV ELÁSTICO -->
     <div id="dash-view" class="view dashboard-tv">
         <div class="dash-header">
+            <img src="libus_positivo_CMYK.jpg" alt="Libus" class="logo" onerror="this.src='https://latam.libus.com/imagenes/logo_libus.png'">
             <h2>TABLERO DE EFICIENCIA DE PRODUCCIÓN</h2>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="clock-tv" id="liveClock">00:00:00</div>
@@ -456,9 +451,12 @@
                 let txtN = valN !== null ? valN.toFixed(1).replace('.',',') + '%' : '<span style="color:#cbd5e1">-</span>';
                 let txtProm = valProm !== null ? valProm.toFixed(1).replace('.',',') + '%' : '<span style="color:#cbd5e1">-</span>';
 
+                // Abreviar el nombre de Inyectora a MQ
+                let maqAbreviada = m.toUpperCase().replace('INYECTORA', 'MQ');
+
                 tableHTML += `
                     <tr>
-                        <td class="col-maq">${m.toUpperCase()}</td>
+                        <td class="col-maq">${maqAbreviada}</td>
                         <td style="color: var(--sober-m);">${txtM}</td>
                         <td style="color: var(--sober-t);">${txtT}</td>
                         <td style="color: var(--sober-n);">${txtN}</td>
