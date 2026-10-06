@@ -3,183 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking y Asignación - Libus</title>
+    <title>Ranking Dinámico - Libus</title>
     <style>
-        :root { 
-            --primary: #e6005a; 
-            --bg-light: #f1f5f9; 
-            --card-bg: #ffffff; 
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #cbd5e1;
+        :root {
+            --bg-main: #0b1120;
+            --bg-panel: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #e6005a;
             
-            --sober-m: #0ea5e9; 
-            --sober-t: #f97316; 
-            --sober-n: #334155; 
-            
-            --gold: #fbbf24; 
+            --gold: #fbbf24;
             --silver: #cbd5e1;
-            --bronze: #d97706;
-            --success: #16a34a;
+            --bronze: #b45309;
+            --bar-4: #38bdf8;
+            --bar-5: #818cf8;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: var(--text-dark); margin: 0; padding: 2vh 2vw; display: flex; flex-direction: column; height: 100vh; overflow: hidden; box-sizing: border-box;}
-        
-        /* CABECERA */
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5vh; margin-bottom: 1.5vh;}
-        .logo { height: min(35px, 4.5vh); }
-        .title-box { text-align: center; flex-grow: 1;}
-        .title { margin: 0; font-size: min(28px, 3.5vh); font-weight: 900; color: #111; letter-spacing: 1px; text-transform: uppercase;}
-        .subtitle { color: var(--primary); font-weight: bold; font-size: min(15px, 1.8vh); margin-top: 3px; text-transform: uppercase;}
-        .clock { font-size: min(1.5vw, 2.5vh); font-weight: bold; color: #fff; background: var(--text-dark); padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
 
-        /* LAYOUT GRILLA 3x3 ENVOLVENTE */
-        .machines-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1.3fr 1fr; 
-            grid-template-rows: repeat(3, 1fr);
-            gap: 1.5vh 1.5vw; 
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2vh 2vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 1.5vh;
+            margin-bottom: 2vh;
+        }
+        .logo { height: min(40px, 5vh); filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));}
+        .title-box { text-align: center; flex-grow: 1; }
+        .title { margin: 0; font-size: 3.5vh; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #fff;}
+        .subtitle { color: var(--accent); font-weight: bold; font-size: 1.8vh; margin-top: 4px; letter-spacing: 1px;}
+        .clock { font-size: 2.5vh; font-weight: bold; color: #fff; background: rgba(255,255,255,0.1); padding: 0.8vh 1.5vw; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);}
+
+        /* LAYOUT PRINCIPAL (60% / 40%) */
+        .main-container {
+            display: flex;
+            gap: 2vw;
             flex-grow: 1;
+            height: calc(100% - 10vh);
         }
-        
-        .machine-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid var(--border-color); border-top: 4px solid var(--primary); display: flex; flex-direction: column; overflow: hidden;}
-        .machine-name { text-align: center; font-size: 1.8vh; font-weight: 900; background: #ffffff; color: #222; padding: 0.8vh; margin: 0; border-bottom: 1px solid #e2e8f0; text-transform: uppercase;}
-        
-        .ops-list { display: flex; flex-direction: column; flex-grow: 1; padding: 0.8vh 0.8vw; gap: 0.8vh; justify-content: center; background-color: #f8fafc;}
-        
-        .op-row { display: flex; align-items: center; background: #ffffff; border-radius: 8px; padding: 0.8vh; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
-        .op-row.m { border-left: 4px solid var(--sober-m); }
-        .op-row.t { border-left: 4px solid var(--sober-t); }
-        .op-row.n { border-left: 4px solid var(--sober-n); }
-        
-        .op-row.leader { background-color: #f0fdf4; border-color: #bbf7d0; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); z-index: 5;}
-        
-        .op-avatar { width: 3.5vh; height: 3.5vh; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.4vh; margin-right: 0.8vw; color: #fff;}
-        .op-row.m .op-avatar { background-color: var(--sober-m); }
-        .op-row.t .op-avatar { background-color: var(--sober-t); }
-        .op-row.n .op-avatar { background-color: var(--sober-n); }
-        .op-row.leader .op-avatar { background-color: var(--gold); color: #000;}
 
-        .op-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: center;}
-        .op-name { font-size: 1.4vh; font-weight: 900; color: #222; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 10vw;}
-        .op-shift { font-size: 1vh; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-top: 1px;}
-        
-        .op-stats { display: flex; align-items: center; gap: 5px;}
-        .op-eff { font-size: 1.8vh; font-weight: 900; color: #222; }
-        .op-rank { font-size: 2vh; animation: pulseRank 2s infinite alternate;}
-        
-        @keyframes pulseRank { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
-
-        .empty-state-box { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; opacity: 0.5;}
-        .empty-icon { font-size: 3.5vh; margin-bottom: 5px;}
-        .empty-text { font-size: 1.2vh; font-weight: bold; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px;}
-
-        /* SALÓN DE LA FAMA EN EL CENTRO */
-        .podium-card { 
-            grid-column: 2; 
-            grid-row: 1 / span 2; 
-            border-top: 5px solid var(--gold); 
-            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        /* PANEL IZQUIERDO: TOP 5 CARRUSEL */
+        .ranking-panel {
+            flex: 6;
+            background: var(--bg-panel);
             border-radius: 16px;
+            border-top: 5px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
-        .podium-card .machine-name { background: transparent; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 2vh; letter-spacing: 2px;}
-        .podium-card .ops-list { background-color: transparent; padding: 1.5vh 1vw; justify-content: space-around; gap: 1.2vh;}
         
-        .podium-item {
+        .ranking-header {
+            background: rgba(0,0,0,0.2);
+            padding: 2vh;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .ranking-title {
+            font-size: 3vh;
+            font-weight: 900;
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .ranking-subtitle {
+            font-size: 1.5vh;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .ranking-body {
+            flex-grow: 1;
+            padding: 2vh 3vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            position: relative;
+        }
+
+        /* Vistas del Carrusel */
+        .carousel-view {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            padding: 2vh 3vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease-in-out;
+        }
+        .carousel-view.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Barras del Ranking */
+        .bar-row {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .bar-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .bar-rank-name {
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1.2vh 1vw;
+            gap: 1vw;
+            font-size: 2.2vh;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .bar-medal { font-size: 3vh; width: 4vh; text-align: center; }
+        .bar-score { font-size: 2.5vh; font-weight: 900; }
+        
+        .bar-track {
+            width: 100%;
+            height: 2vh;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .bar-fill {
+            height: 100%;
+            width: 0%; /* Inicia en 0 para animación */
+            border-radius: 10px;
+            transition: width 1.5s cubic-bezier(0.1, 0.7, 0.1, 1);
             position: relative;
             overflow: hidden;
         }
 
-        .medallion {
-            width: 5vh;
-            height: 5vh;
-            border-radius: 50%;
+        /* Colores Top 5 */
+        .fill-1 { background: linear-gradient(90deg, #fef08a, #d97706); box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);}
+        .fill-2 { background: linear-gradient(90deg, #f1f5f9, #64748b); }
+        .fill-3 { background: linear-gradient(90deg, #fde68a, #9a3412); }
+        .fill-4 { background: linear-gradient(90deg, #bae6fd, #0284c7); }
+        .fill-5 { background: linear-gradient(90deg, #c7d2fe, #4f46e5); }
+
+        .fill-1::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg); animation: shimmer 2.5s infinite;
+        }
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
+
+        /* PANEL DERECHO: CARRUSEL DE MÁQUINAS EN VIVO */
+        .machines-panel {
+            flex: 4;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .m-carousel-header {
+            text-align: center;
+            padding: 1.5vh;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 2vh;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #38bdf8;
+        }
+
+        .m-carousel-container {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .machine-slide {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            padding: 2vh;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.6s ease-out;
+        }
+        .machine-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .m-card-title {
+            text-align: center;
+            font-size: 3.5vh;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 1vh;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .m-op-row {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5vh;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 2.8vh;
-            margin-right: 1vw;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            flex-shrink: 0;
-            border: 2px solid #fff;
+            backdrop-filter: blur(5px);
         }
-        .medallion.gold { background: radial-gradient(circle, #fef08a 0%, #eab308 100%); border-color: var(--gold); }
-        .medallion.silver { background: radial-gradient(circle, #f1f5f9 0%, #94a3b8 100%); border-color: var(--silver); }
-        .medallion.bronze { background: radial-gradient(circle, #fde68a 0%, #b45309 100%); border-color: var(--bronze); }
+        .m-op-row.m { border-left: 5px solid #0ea5e9; }
+        .m-op-row.t { border-left: 5px solid #f97316; }
+        .m-op-row.n { border-left: 5px solid #8b5cf6; }
 
-        .podium-body { flex-grow: 1; display: flex; flex-direction: column; gap: 3px; }
-        .podium-meta { display: flex; justify-content: space-between; align-items: center; }
-        .podium-tag { font-size: 1.1vh; font-weight: bold; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
-        .podium-score-val { font-size: 1.9vh; font-weight: 900; color: #fff; }
-        .podium-user { font-size: 1.5vh; font-weight: 900; color: #f8fafc; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 11vw;}
-
-        /* BARRAS DE PROGRESO */
-        .bar-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 2px;
+        .m-avatar {
+            width: 5vh; height: 5vh;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2vh; font-weight: bold; margin-right: 1.5vw;
         }
-        .bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 1.5s ease-in-out;
-        }
-        .bar-fill.gold { background: linear-gradient(90deg, #fef08a, #eab308); }
-        .bar-fill.silver { background: linear-gradient(90deg, #f1f5f9, #94a3b8); }
-        .bar-fill.bronze { background: linear-gradient(90deg, #fde68a, #b45309); }
+        .m-details { flex-grow: 1; }
+        .m-name { font-size: 2vh; font-weight: 900; margin: 0; text-transform: uppercase;}
+        .m-shift { font-size: 1.2vh; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin-top: 2px;}
+        .m-eff { font-size: 3vh; font-weight: 900; color: #10b981; }
 
-        .shimmer-card { position: relative; }
-        .shimmer-card::after {
-            content: ''; position: absolute; top: -50%; left: -100%; width: 50%; height: 200%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
-            transform: rotate(30deg); animation: shimmerAnim 3.5s infinite;
-        }
-        @keyframes shimmerAnim { 0% { left: -100%; } 100% { left: 200%; } }
+        /* Loader & Empty States */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-main); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: var(--accent); font-size: 3vh; font-weight: bold;}
+        
+        .empty-machine { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; opacity: 0.5; text-align: center;}
+        .empty-machine span { font-size: 5vh; margin-bottom: 10px;}
+        .empty-machine p { font-size: 2vh; font-weight: bold;}
 
-        #loader { text-align: center; color: var(--primary); font-weight: bold; font-size: 2vh; margin-top: 20vh; display: flex; flex-direction: column; gap: 10px;}
-
-        @media (max-width: 768px) {
-            body { height: auto; overflow-y: visible; padding: 15px;}
-            .header { flex-direction: column; gap: 15px; text-align: center;}
-            .machines-grid { display: flex; flex-direction: column; }
-            .op-name { max-width: 40vw;}
-            .podium-user { max-width: 40vw; }
-        }
     </style>
 </head>
 <body>
 
+    <div id="loader">
+        <span>Sincronizando Matrices de Producción... ⏳</span>
+    </div>
+
     <div class="header">
         <img src="libus_positivo_CMYK.jpg" alt="Libus" class="logo" onerror="this.src='https://latam.libus.com/imagenes/logo_libus.png'">
         <div class="title-box">
-            <h1 class="title">🏆 EFICIENCIA EFECTIVA Y ASIGNACIÓN</h1>
-            <div class="subtitle" id="fechaHoy">Sincronizando...</div>
+            <h1 class="title">Desempeño Operativo</h1>
+            <div class="subtitle" id="fechaHoy">Calculando...</div>
         </div>
         <div class="clock" id="liveClock">00:00:00</div>
     </div>
 
-    <div id="loader">
-        <span id="loadText">Sincronizando Base de Datos Maestra... ⏳</span>
+    <div class="main-container">
+        <!-- PANEL IZQUIERDO: TOP 5 CARRUSEL -->
+        <div class="ranking-panel">
+            <div class="ranking-header">
+                <h2 class="ranking-title" id="rkTitle">TOP 5 - CARGANDO...</h2>
+                <div class="ranking-subtitle">Evaluación de Eficiencia Neta</div>
+            </div>
+            <div class="ranking-body" id="rankingBody">
+                <!-- Vistas inyectadas por JS -->
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: MÁQUINAS EN VIVO -->
+        <div class="machines-panel">
+            <div class="m-carousel-header">🟢 MÁQUINAS EN LÍNEA (HOY)</div>
+            <div class="m-carousel-container" id="machinesContainer">
+                <!-- Slides inyectados por JS -->
+            </div>
+        </div>
     </div>
-    
-    <div class="machines-grid" id="machinesGrid"></div>
 
     <script>
         const ROSTER_API = 'https://script.google.com/macros/s/AKfycbzxBhGp2oElpCW6YzacSbDhqGvbih0X0dBZmnipIkscPp2uJx2CqRQstESXu7M0iZ1gLA/exec';
         const EFF_API = 'https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec';
 
-        setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL'); }, 1000);
+        // Variables Globales Carruseles
+        let rkInterval, mqInterval;
+        let currentRkIndex = 0;
+        let currentMqIndex = 0;
 
-        const MACHINE_IDS = [1, 2, 3, 4, 5, 6, 7];
+        setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL'); }, 1000);
 
         function fetchJSONP(url, prefix) {
             return new Promise((resolve, reject) => {
@@ -193,128 +317,114 @@
                 const script = document.createElement('script');
                 script.id = callbackName;
                 script.src = `${url}?callback=${callbackName}&_t=${Date.now()}`;
-                script.onerror = () => reject(`Error conectando a ${prefix}`);
+                script.onerror = () => reject(`Error`);
                 document.body.appendChild(script);
             });
         }
 
         function parseRobustFloat(val) {
-            if (val === undefined || val === null || val === "") return 0;
+            if (!val) return 0;
             let str = String(val).replace(/%/g, '').trim(); 
-            if (str.includes(',') && !str.includes('.')) { str = str.replace(',', '.'); } 
-            else if (str.includes('.') && str.includes(',')) { str = str.replace(/\./g, '').replace(',', '.'); }
+            if (str.includes(',') && !str.includes('.')) str = str.replace(',', '.');
+            else if (str.includes('.') && str.includes(',')) str = str.replace(/\./g, '').replace(',', '.');
             return parseFloat(str) || 0;
         }
 
-        function parseDateRobust(dateStr) {
-            if(!dateStr) return null;
-            let str = String(dateStr).trim();
-            if(str.includes('T')) return new Date(str);
-            let parts = str.split('/');
-            if(parts.length === 3) {
-                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-            }
-            return new Date(str);
-        }
-
-        function formatZeroPad(num) {
-            return String(num).padStart(2, '0');
+        // Parsea fechas de Google Sheets de forma segura a "DD/MM/YYYY" para cruzar con el Roster
+        function getStandardDateStr(dateInput) {
+            if(!dateInput) return null;
+            let d;
+            let str = String(dateInput).trim();
+            if(str.includes('T')) { d = new Date(str); }
+            else if(str.includes('/')) {
+                let parts = str.split('/');
+                if(parts.length === 3) d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            } else { d = new Date(str); }
+            
+            if(isNaN(d.getTime())) return null;
+            let dia = String(d.getDate()).padStart(2, '0');
+            let mes = String(d.getMonth() + 1).padStart(2, '0');
+            return `${dia}/${mes}/${d.getFullYear()}`;
         }
 
         function getAvatarInitials(name) {
-            if(!name || name === "NO ASIGNADO") return "?";
+            if(!name || name === "NO ASIGNADO" || name === "OPERADOR") return "?";
             let parts = name.trim().split(" ");
             if(parts.length >= 2) return parts[0][0] + parts[1][0];
             return parts[0][0];
         }
 
         function startEngine() {
-            document.getElementById('loadText').innerText = "Analizando Cierre del Día Anterior, Semana y Mes... ⏳";
-            
-            Promise.all([
-                fetchJSONP(ROSTER_API, 'roster'),
-                fetchJSONP(EFF_API, 'eff')
-            ]).then(([rosterData, effData]) => {
-                renderCombinedDashboard(rosterData, effData);
+            Promise.all([fetchJSONP(ROSTER_API, 'roster'), fetchJSONP(EFF_API, 'eff')])
+            .then(([rosterData, effData]) => {
+                processData(rosterData, effData);
             }).catch(err => {
-                document.getElementById('loadText').innerText = "❌ Error de conexión. Reintentando...";
-                console.error(err);
+                document.getElementById('loader').innerHTML = "❌ Error de conexión. Recargue la página.";
             });
         }
 
-        function renderCombinedDashboard(rosterData, effData) {
-            document.getElementById('loader').style.display = 'none';
-
-            let hoyDate = new Date();
-            let dia = String(hoyDate.getDate());
-            let diaPad = formatZeroPad(dia);
-            let mesPad = formatZeroPad(hoyDate.getMonth() + 1);
-            let anio = hoyDate.getFullYear();
+        function processData(rosterData, effData) {
+            // 1. DICCIONARIO DE ASIGNACIONES: rosterMap["DD/MM/YYYY"][maquina][turno] = Nombre
+            let rosterMap = {};
+            let headers = rosterData[0];
             
-            let isoFormat = `${anio}-${mesPad}-${diaPad}`; 
-            let format1 = `${diaPad}/${mesPad}/${anio}`;   
-
-            let colIndex = -1;
-            let headerTitle = `${diaPad}/${mesPad}/${anio}`;
-            
-            for(let r=0; r<=1; r++) {
-                if(!rosterData[r]) continue;
-                for(let i=0; i<rosterData[r].length; i++) {
-                    let cell = String(rosterData[r][i]).trim();
-                    if(cell.includes(isoFormat) || cell === dia || cell.includes(format1)) {
-                        colIndex = i; 
-                        headerTitle = cell.substring(0, 10);
-                        break;
+            // Buscar todas las columnas que sean fecha
+            let dateCols = {}; // colIndex -> "DD/MM/YYYY"
+            for(let i=2; i<headers.length; i++) {
+                let hStr = String(headers[i]).trim();
+                if(hStr.includes('/')) {
+                    // Normalizar a DD/MM/YYYY por si acaso en el excel dice 6/10/2026
+                    let parts = hStr.split('/');
+                    if(parts.length === 3) {
+                        let cleanDate = `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`;
+                        dateCols[i] = cleanDate;
                     }
                 }
-                if(colIndex !== -1) break;
             }
 
-            document.getElementById('fechaHoy').innerText = `TURNO DEL DÍA: ${headerTitle}`;
-
-            let maqData = {};
-            MACHINE_IDS.forEach(m => maqData[m] = { 
-                M: {name: null, eff: 0, hasData: false}, 
-                T: {name: null, eff: 0, hasData: false}, 
-                N: {name: null, eff: 0, hasData: false} 
-            });
-
-            // 1. CARGAR ASIGNACIONES
-            if (colIndex !== -1) {
-                for(let i = 1; i < rosterData.length; i++) {
-                    let row = rosterData[i];
-                    let operario = row[1];
-                    let asignacion = row[colIndex]; 
+            for(let i = 1; i < rosterData.length; i++) {
+                let operario = rosterData[i][1];
+                for(let col in dateCols) {
+                    let dateStr = dateCols[col];
+                    let asignacion = rosterData[i][col];
 
                     if(asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
                         let parts = String(asignacion).split("(");
                         let maqStr = parts[0].replace('M', '').trim(); 
                         let turnoLetra = parts[1].replace(')', '').trim(); 
 
+                        if(!rosterMap[dateStr]) rosterMap[dateStr] = {};
+                        
                         let numeros = maqStr.split('-');
                         numeros.forEach(num => {
                             let n = parseInt(num);
-                            if(maqData[n] && maqData[n][turnoLetra] !== undefined) {
-                                maqData[n][turnoLetra].name = operario;
-                            }
+                            if(!rosterMap[dateStr][n]) rosterMap[dateStr][n] = {};
+                            rosterMap[dateStr][n][turnoLetra] = operario;
                         });
                     }
                 }
             }
 
-            // 2. FILTROS TEMPORALES
-            let hoyStart = new Date(anio, hoyDate.getMonth(), hoyDate.getDate());
-            
-            let hace7Dias = new Date(hoyStart);
-            hace7Dias.setDate(hace7Dias.getDate() - 7);
+            // Fechas de referencia
+            let hoyDate = new Date();
+            let diaPad = String(hoyDate.getDate()).padStart(2, '0');
+            let mesPad = String(hoyDate.getMonth() + 1).padStart(2, '0');
+            let hoyStr = `${diaPad}/${mesPad}/${hoyDate.getFullYear()}`;
+            document.getElementById('fechaHoy').innerText = `DATA EN VIVO: ${hoyStr}`;
 
-            let statsAyer = {};
-            let statsSemana = {};
-            let statsMes = {};
+            let hoyObj = new Date(hoyDate.getFullYear(), hoyDate.getMonth(), hoyDate.getDate());
+            let hace7Dias = new Date(hoyObj); hace7Dias.setDate(hace7Dias.getDate() - 7);
 
-            let maxEffM = { val: 0, maquina: 0 };
-            let maxEffT = { val: 0, maquina: 0 };
-            let maxEffN = { val: 0, maquina: 0 };
+            // Estructuras de datos
+            let statsHoy = {}; // Para el carrusel de máquinas (Solo info de hoy)
+            let rankAyer = {};
+            let rankSemana = {};
+            let rankMes = {};
+            let rankGlobal = {};
+
+            // 2. PROCESAR EFICIENCIAS
+            let ultimaFechaCerradaStr = null;
+            let fechasConData = new Set();
 
             if (effData && effData.length > 0) {
                 effData.forEach(row => {
@@ -328,185 +438,249 @@
                     let calRaw = parseRobustFloat(rClean["calidad"]);
                     let tno = String(rClean["turno"] || "").trim();
                     let maqStr = String(rClean["maquina"] || "").trim(); 
-                    let fechaFila = parseDateRobust(rClean["fecha"]);
+                    let recordDateStr = getStandardDateStr(rClean["fecha"]);
 
-                    if(maqStr && tno) {
-                        let nStr = maqStr.replace(/\D/g,'');
-                        let maqNum = parseInt(nStr);
+                    if(maqStr && tno && recordDateStr) {
+                        fechasConData.add(recordDateStr);
+                        let maqNum = parseInt(maqStr.replace(/\D/g,''));
+                        let letraTurno = tno === "Mañana" ? "M" : (tno === "Tarde" ? "T" : "N");
+                        
+                        // Buscar el nombre usando el Roster. Si no existe en esa fecha específica, "NO ASIGNADO"
+                        let opNombre = "NO ASIGNADO";
+                        if(rosterMap[recordDateStr] && rosterMap[recordDateStr][maqNum] && rosterMap[recordDateStr][maqNum][letraTurno]) {
+                            opNombre = rosterMap[recordDateStr][maqNum][letraTurno];
+                        }
 
                         let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
                         let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
                         if (rend > 100) rend = 100;
                         if (cal > 100) cal = 100;
-                        let eficienciaNeta = (rend / 100) * (cal / 100) * 100;
+                        let eff = (rend / 100) * (cal / 100) * 100;
 
-                        let letraTurno = tno === "Mañana" ? "M" : (tno === "Tarde" ? "T" : "N");
-                        let opNombre = (maqData[maqNum] && maqData[maqNum][letraTurno].name) ? maqData[maqNum][letraTurno].name : "OPERADOR";
+                        let rowDateObj = new Date(recordDateStr.split('/')[2], parseInt(recordDateStr.split('/')[1])-1, recordDateStr.split('/')[0]);
 
-                        // Carga en vivo para tarjetas HOY
-                        let esHoy = false;
-                        if(fechaFila && fechaFila.toDateString() === hoyStart.toDateString()) esHoy = true;
-                        else if(!fechaFila) esHoy = true;
-
-                        if(esHoy && maqData[maqNum]) {
-                            let currentObj = maqData[maqNum][letraTurno];
-                            currentObj.eff = eficienciaNeta; 
-                            currentObj.hasData = true;
-
-                            if(letraTurno === "M" && currentObj.eff > maxEffM.val) { maxEffM = { val: currentObj.eff, maquina: maqNum }; }
-                            if(letraTurno === "T" && currentObj.eff > maxEffT.val) { maxEffT = { val: currentObj.eff, maquina: maqNum }; }
-                            if(letraTurno === "N" && currentObj.eff > maxEffN.val) { maxEffN = { val: currentObj.eff, maquina: maqNum }; }
+                        // --- Acumular para Máquinas de Hoy ---
+                        if(recordDateStr === hoyStr) {
+                            if(!statsHoy[maqNum]) statsHoy[maqNum] = { M:null, T:null, N:null };
+                            statsHoy[maqNum][letraTurno] = { name: opNombre, eff: eff };
                         }
 
-                        // Carga para DÍA ANTERIOR (Excluye hoy para tomar el consolidado de ayer o el último cerrado)
-                        if(fechaFila && fechaFila < hoyStart) {
-                            let keyFecha = fechaFila.toDateString();
-                            if(!statsAyer[keyFecha]) statsAyer[keyFecha] = {};
-                            if(!statsAyer[keyFecha][opNombre]) statsAyer[keyFecha][opNombre] = { sum: 0, count: 0 };
-                            statsAyer[keyFecha][opNombre].sum += eficienciaNeta;
-                            statsAyer[keyFecha][opNombre].count++;
-                        }
+                        // --- Acumular para Rankings de Personas ---
+                        if(opNombre !== "NO ASIGNADO") {
+                            // Acumulador Helper
+                            const addStat = (dict, name, val) => {
+                                if(!dict[name]) dict[name] = {sum:0, count:0};
+                                dict[name].sum += val; dict[name].count++;
+                            };
 
-                        // Carga SEMANAL
-                        if(fechaFila && fechaFila >= hace7Dias) {
-                            if (!statsSemana[opNombre]) statsSemana[opNombre] = { sum: 0, count: 0 };
-                            statsSemana[opNombre].sum += eficienciaNeta; statsSemana[opNombre].count++;
-                        }
+                            // Global
+                            addStat(rankGlobal, opNombre, eff);
+                            
+                            // Mes
+                            if(rowDateObj.getMonth() === hoyDate.getMonth() && rowDateObj.getFullYear() === hoyDate.getFullYear()) {
+                                addStat(rankMes, opNombre, eff);
+                            }
+                            
+                            // Semana
+                            if(rowDateObj >= hace7Dias) {
+                                addStat(rankSemana, opNombre, eff);
+                            }
 
-                        // Carga MENSUAL
-                        if(fechaFila && fechaFila.getMonth() === hoyDate.getMonth() && fechaFila.getFullYear() === anio) {
-                            if (!statsMes[opNombre]) statsMes[opNombre] = { sum: 0, count: 0 };
-                            statsMes[opNombre].sum += eficienciaNeta; statsMes[opNombre].count++;
+                            // Ayer (Se calculará encontrando la fecha más reciente anterior a hoy)
+                            if(rowDateObj < hoyObj) {
+                                if(!rankAyer[recordDateStr]) rankAyer[recordDateStr] = {};
+                                addStat(rankAyer[recordDateStr], opNombre, eff);
+                            }
                         }
                     }
                 });
             }
 
-            // Calcular al ganador del Día Anterior (Busca la fecha más reciente con datos cerrados)
-            let topAyer = { name: "Consolidando...", score: 0 };
-            let fechasOrdenadas = Object.keys(statsAyer).sort((a,b) => new Date(b) - new Date(a));
-            if(fechasOrdenadas.length > 0) {
-                let ultimaFecha = fechasOrdenadas[0]; // La fecha cerrada más reciente
-                let maxAvg = 0;
-                for(let op in statsAyer[ultimaFecha]) {
-                    let avg = statsAyer[ultimaFecha][op].sum / statsAyer[ultimaFecha][op].count;
-                    if(avg > maxAvg && op !== "NO ASIGNADO" && op !== "OPERADOR") {
-                        maxAvg = avg;
-                        topAyer = { name: op, score: avg };
-                    }
-                }
+            // Encontrar la data del "Día Anterior" (La fecha más cercana antes de hoy con data)
+            let bestAyerData = {};
+            let sortedFechas = Object.keys(rankAyer).sort((a,b) => {
+                let da = new Date(a.split('/')[2], parseInt(a.split('/')[1])-1, a.split('/')[0]);
+                let db = new Date(b.split('/')[2], parseInt(b.split('/')[1])-1, b.split('/')[0]);
+                return db - da; // Descendente
+            });
+            if(sortedFechas.length > 0) {
+                bestAyerData = rankAyer[sortedFechas[0]];
+                ultimaFechaCerradaStr = sortedFechas[0];
             }
 
-            const getTop1 = (statsObj) => {
-                let best = { name: "En evaluación", score: 0 };
-                let max = 0;
-                for(let name in statsObj) {
-                    let avg = statsObj[name].sum / statsObj[name].count;
-                    if(avg > max && name !== "NO ASIGNADO" && name !== "OPERADOR") {
-                        max = avg;
-                        best = { name: name, score: avg };
-                    }
+            // 3. GENERAR LISTAS TOP 5
+            const getTop5 = (dict) => {
+                let arr = [];
+                for(let name in dict) {
+                    arr.push({ name: name, eff: dict[name].sum / dict[name].count });
                 }
-                return best;
+                return arr.sort((a,b) => b.eff - a.eff).slice(0, 5);
             };
 
-            let topSemana = getTop1(statsSemana);
-            let topMes = getTop1(statsMes);
+            let listAyer = getTop5(bestAyerData);
+            let listSemana = getTop5(rankSemana);
+            let listMes = getTop5(rankMes);
+            let listGlobal = getTop5(rankGlobal);
 
-            // 3. RENDERIZADO DEL SALÓN DE LA FAMA
-            const getPodiumHtml = (dataObj, title, medal, colorClass) => {
-                let name = dataObj.name;
-                let scoreVal = dataObj.score;
-                let scoreText = scoreVal > 0 ? scoreVal.toFixed(1).replace('.',',') + '%' : '0,0%';
-                let barWidth = Math.min(100, Math.max(0, scoreVal)) + '%';
+            renderLeaderboards(listAyer, listSemana, listMes, listGlobal, ultimaFechaCerradaStr);
+            renderMachines(statsHoy);
 
-                return `
-                <div class="podium-item ${colorClass === 'gold' ? 'shimmer-card' : ''}">
-                    <div class="medallion ${colorClass}">${medal}</div>
-                    <div class="podium-body">
-                        <div class="podium-meta">
-                            <span class="podium-tag">${title}</span>
-                            <span class="podium-score-val">${scoreText}</span>
-                        </div>
-                        <div class="podium-user">${name}</div>
-                        <div class="bar-container">
-                            <div class="bar-fill ${colorClass}" style="width: ${barWidth};"></div>
-                        </div>
-                    </div>
-                </div>`;
-            };
-
-            let podiumHtml = `
-            <div class="machine-card podium-card">
-                <h3 class="machine-name">🏆 SALÓN DE LA FAMA</h3>
-                <div class="ops-list">
-                    ${getPodiumHtml(topAyer, 'Día Anterior Consolidado', '🥇', 'gold')}
-                    ${getPodiumHtml(topSemana, 'Líder de la Semana', '🥈', 'silver')}
-                    ${getPodiumHtml(topMes, 'Empleado del Mes', '🥉', 'bronze')}
-                </div>
-            </div>`;
-
-            let gridHtml = '';
-
-            // Se intercalan exactamente 7 inyectoras + 1 Salón de la Fama
-            MACHINE_IDS.forEach((m, index) => {
-                if(index === 1) { gridHtml += podiumHtml; } // Inserta el podio exactamente en la casilla 2
-
-                let ops = maqData[m];
-                
-                const getOpRow = (obj, tipo, colorClase, turnoLabel, leaderObj) => {
-                    let isLeader = (obj.eff > 0 && leaderObj.maquina === m); 
-                    let leaderClass = isLeader ? "leader" : "";
-                    let opName = obj.name ? obj.name : "NO ASIGNADO";
-                    let iniciales = getAvatarInitials(opName);
-                    let effText = obj.eff.toFixed(1).replace('.', ',') + "%";
-                    let rankIcon = isLeader ? "👑" : (obj.eff > 90 ? "🔥" : ""); 
-                    let colorEff = isLeader ? "var(--success)" : "#222";
-                    let nameColor = (opName === "NO ASIGNADO") ? "color: var(--primary);" : "";
-
-                    return `
-                    <div class="op-row ${colorClase} ${leaderClass}">
-                        <div class="op-avatar">${iniciales}</div>
-                        <div class="op-details">
-                            <p class="op-name" title="${opName}" style="${nameColor}">${opName}</p>
-                            <p class="op-shift">${turnoLabel}</p>
-                        </div>
-                        <div class="op-stats">
-                            <span class="op-eff" style="color: ${colorEff};">${effText}</span>
-                            <span class="op-rank">${rankIcon}</span>
-                        </div>
-                    </div>`;
-                };
-
-                let listHtml = '';
-                if(ops['M'].hasData) listHtml += getOpRow(ops['M'], 'M', 'm', '☀️ MAÑANA', maxEffM);
-                if(ops['T'].hasData) listHtml += getOpRow(ops['T'], 'T', 't', '🌤 TARDE', maxEffT);
-                if(ops['N'].hasData) listHtml += getOpRow(ops['N'], 'N', 'n', '🌙 NOCHE', maxEffN);
-
-                if(listHtml === '') {
-                    listHtml = `
-                    <div class="empty-state-box">
-                        <div class="empty-icon">⏳</div>
-                        <div class="empty-text">Esperando<br>Producción</div>
-                    </div>`;
-                }
-
-                gridHtml += `
-                <div class="machine-card">
-                    <h3 class="machine-name">MQ ${m}</h3>
-                    <div class="ops-list">
-                        ${listHtml}
-                    </div>
-                </div>`;
-            });
-
-            document.getElementById('machinesGrid').innerHTML = gridHtml;
+            document.getElementById('loader').style.display = 'none';
         }
 
-        window.onload = () => {
-            startEngine();
-            setInterval(startEngine, 300000); 
-        };
+        // ==========================================
+        // RENDERIZADO: PANEL IZQUIERDO (TOP 5)
+        // ==========================================
+        function renderLeaderboards(lAyer, lSemana, lMes, lGlobal, fechaAyer) {
+            let container = document.getElementById('rankingBody');
+            container.innerHTML = '';
+
+            const createView = (id, list, title) => {
+                let html = `<div class="carousel-view" id="rk-${id}" data-title="${title}">`;
+                if(list.length === 0) {
+                    html += `<div class="empty-machine" style="opacity:0.3;"><span>📊</span><p>Sin suficientes datos</p></div>`;
+                } else {
+                    let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
+                    list.forEach((item, index) => {
+                        let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
+                        let colorClass = `fill-${index+1}`;
+                        let med = medals[index];
+                        let colorNombre = index === 0 ? 'var(--gold)' : (index === 1 ? 'var(--silver)' : (index===2 ? 'var(--bronze)' : '#fff'));
+                        
+                        html += `
+                        <div class="bar-row">
+                            <div class="bar-info">
+                                <div class="bar-rank-name">
+                                    <span class="bar-medal">${med}</span>
+                                    <span style="color: ${colorNombre};">${item.name}</span>
+                                </div>
+                                <div class="bar-score" style="color: ${colorNombre};">${scoreText}</div>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill ${colorClass}" data-width="${item.eff}"></div>
+                            </div>
+                        </div>`;
+                    });
+                }
+                html += `</div>`;
+                return html;
+            };
+
+            let strAyer = fechaAyer ? `DÍA ANTERIOR (${fechaAyer})` : "DÍA ANTERIOR";
+            
+            container.innerHTML += createView(0, lAyer, `TOP 5 - ${strAyer}`);
+            container.innerHTML += createView(1, lSemana, "TOP 5 - ÚLTIMOS 7 DÍAS");
+            container.innerHTML += createView(2, lMes, "TOP 5 - MES ACTUAL");
+            container.innerHTML += createView(3, lGlobal, "TOP 5 - HISTÓRICO GLOBAL");
+
+            // Carrusel Logic
+            clearInterval(rkInterval);
+            let views = document.querySelectorAll('.carousel-view');
+            
+            const showRk = (index) => {
+                views.forEach(v => {
+                    v.classList.remove('active');
+                    // Resetear barras
+                    v.querySelectorAll('.bar-fill').forEach(b => b.style.width = '0%');
+                });
+                
+                let activeView = document.getElementById(`rk-${index}`);
+                activeView.classList.add('active');
+                document.getElementById('rkTitle').innerText = activeView.getAttribute('data-title');
+                
+                // Animar barras con un pequeño delay
+                setTimeout(() => {
+                    activeView.querySelectorAll('.bar-fill').forEach(b => {
+                        b.style.width = b.getAttribute('data-width') + '%';
+                    });
+                }, 100);
+            };
+
+            showRk(0);
+            rkInterval = setInterval(() => {
+                currentRkIndex = (currentRkIndex + 1) % 4;
+                showRk(currentRkIndex);
+            }, 10000); // Cambia cada 10 segundos
+        }
+
+        // ==========================================
+        // RENDERIZADO: PANEL DERECHO (MÁQUINAS)
+        // ==========================================
+        function renderMachines(statsHoy) {
+            let container = document.getElementById('machinesContainer');
+            container.innerHTML = '';
+            
+            // Solo crearemos slides para las máquinas que SÍ tengan datos hoy
+            let validMachines = [];
+            for(let m in statsHoy) {
+                if(statsHoy[m].M || statsHoy[m].T || statsHoy[m].N) validMachines.push(m);
+            }
+
+            if(validMachines.length === 0) {
+                container.innerHTML = `
+                <div class="machine-slide active" style="justify-content:center;">
+                    <div class="empty-machine">
+                        <span>⏳</span>
+                        <p>ESPERANDO REGISTROS<br>DEL TURNO ACTUAL</p>
+                    </div>
+                </div>`;
+                return;
+            }
+
+            const getOpHtml = (opData, shiftLabel, cls) => {
+                if(!opData) return ''; // No ensucia si no hay dato
+                let init = getAvatarInitials(opData.name);
+                let colorName = opData.name === "NO ASIGNADO" ? "var(--accent)" : "#fff";
+                let effStr = opData.eff.toFixed(1).replace('.',',') + '%';
+                return `
+                <div class="m-op-row ${cls}">
+                    <div class="m-avatar">${init}</div>
+                    <div class="m-details">
+                        <p class="m-name" style="color: ${colorName};">${opData.name}</p>
+                        <p class="m-shift">${shiftLabel}</p>
+                    </div>
+                    <div class="m-eff">${effStr}</div>
+                </div>`;
+            };
+
+            validMachines.forEach((m, idx) => {
+                let obj = statsHoy[m];
+                let html = `
+                <div class="machine-slide" id="mq-${idx}">
+                    <div class="m-card-title">MÁQUINA ${m}</div>
+                    ${getOpHtml(obj.M, '☀️ TURNO MAÑANA', 'm')}
+                    ${getOpHtml(obj.T, '🌤 TURNO TARDE', 't')}
+                    ${getOpHtml(obj.N, '🌙 TURNO NOCHE', 'n')}
+                </div>`;
+                container.innerHTML += html;
+            });
+
+            // Carrusel Logic
+            clearInterval(mqInterval);
+            let slides = document.querySelectorAll('.machine-slide');
+            
+            if(slides.length === 1) {
+                slides[0].classList.add('active'); // Si hay solo 1, se queda fija
+                return;
+            }
+
+            const showMq = (index) => {
+                slides.forEach(s => s.classList.remove('active'));
+                slides[index].classList.add('active');
+            };
+
+            currentMqIndex = 0;
+            showMq(0);
+            mqInterval = setInterval(() => {
+                currentMqIndex = (currentMqIndex + 1) % slides.length;
+                showMq(currentMqIndex);
+            }, 6000); // Cambia de máquina cada 6 segundos
+        }
+
+        window.onload = startEngine;
+        // Recargar la data maestra cada 5 minutos
+        setInterval(startEngine, 300000); 
+
     </script>
 </body>
 </html>
