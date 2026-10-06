@@ -28,9 +28,13 @@
         .nav-btns button:hover { background: #f1f5f9; border-color: var(--text-dark); }
         .btn-tv { background-color: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
         
-        /* GESTIÓN DE VISTAS */
-        .view { display: none; padding: 20px; max-width: 1400px; margin: auto; }
-        .view.active { display: block; animation: fadeIn 0.4s; }
+        /* GESTIÓN ESTRICTA DE VISTAS */
+        .view { display: none !important; padding: 20px; max-width: 1400px; margin: auto; }
+        
+        /* Solo se muestra el que tiene la clase active */
+        #form-view.active { display: block !important; animation: fadeIn 0.4s; }
+        #dash-view.active { display: flex !important; flex-direction: column; animation: fadeIn 0.4s; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         /* FORMULARIO MÓVIL */
@@ -44,7 +48,7 @@
         /* =========================================
            DASHBOARD TV: ADAPTACIÓN PANTALLA ANCHA 
            ========================================= */
-        .dashboard-tv { display: flex; flex-direction: column; height: 100vh; overflow: hidden; padding: 2vh 2vw; box-sizing: border-box; max-width: 100%;}
+        .dashboard-tv { height: 100vh; overflow: hidden; padding: 2vh 2vw; box-sizing: border-box; max-width: 100%;}
         
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1vh; border-bottom: 2px solid var(--border-color); padding-bottom: 1vh;}
         .dash-header h2 { margin: 0; font-size: min(2.2vw, 4vh); font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase;}
@@ -117,7 +121,8 @@
            AJUSTES MÓVILES Y PANTALLAS PEQUEÑAS
            ========================================= */
         @media (max-width: 768px) {
-            /* Desbloqueamos la altura estricta para permitir scroll vertical en el celular */
+            #dash-view.active { display: block !important; } /* En móvil se apila hacia abajo normal */
+            
             .dashboard-tv { height: auto; min-height: 100vh; overflow-y: visible; padding: 20px 15px; display: block;}
             
             .dash-header h2 { font-size: 18px; text-align: center;}
@@ -136,7 +141,7 @@
             
             /* La tabla hace scroll horizontal (Swipe) para que no se aprieten las letras */
             .table-container { overflow-x: auto; display: block; height: auto; }
-            .machine-table { min-width: 600px; /* Forzamos un ancho mínimo para habilitar el swipe */ }
+            .machine-table { min-width: 600px; }
             .machine-table th { font-size: 11px; padding: 10px; height: auto;}
             .machine-table td { font-size: 14px; padding: 10px; }
             .col-maq { font-size: 13px !important; padding-left: 10px !important; }
@@ -203,7 +208,7 @@
         </div>
     </div>
 
-    <!-- VISTA 2: DASHBOARD TV -->
+    <!-- VISTA 2: DASHBOARD TV ELÁSTICO -->
     <div id="dash-view" class="view dashboard-tv">
         <div class="dash-header">
             <h2>TABLERO DE EFICIENCIA DE PRODUCCIÓN</h2>
