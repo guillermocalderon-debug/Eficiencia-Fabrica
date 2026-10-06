@@ -44,7 +44,6 @@
         .btn-submit { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px;}
         .btn-submit:hover { background: #c20042; }
         
-        /* Grillas del formulario (Se adaptan a móvil) */
         .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .counter-box { background: #f1f5f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--sober-m); }
         .counter-box .form-group { margin-bottom: 0; }
@@ -55,7 +54,7 @@
         .dashboard-tv { height: 100vh; overflow: hidden; padding: 2vh 2vw; box-sizing: border-box; max-width: 100%;}
         
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1vh; border-bottom: 2px solid var(--border-color); padding-bottom: 1vh;}
-        .dash-header .logo { height: max(30px, 4vh); } /* Logo restaurado en Dashboard */
+        .dash-header .logo { height: max(30px, 4vh); } 
         .dash-header h2 { margin: 0; font-size: min(2vw, 4vh); font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase; text-align: center; flex-grow: 1;}
         .clock-tv { font-size: min(1.5vw, 3vh); font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
         .btn-exit { background-color: #333; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;}
@@ -64,7 +63,7 @@
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1vw; margin-bottom: 1vh; }
         .kpi-card { background: var(--card-bg); padding: 1vh 1vw; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-top: 5px solid var(--primary);}
         .kpi-card h3 { margin: 0; font-size: min(0.9vw, 1.8vh); color: var(--text-muted); text-transform: uppercase; font-weight: bold;}
-        .kpi-card p { margin: 0.5vh 0 0; font-size: min(2.8vw, 5vh); font-weight: 900; color: #111;}
+        .kpi-card p { margin: 0.5vh 0 0; font-size: min(2.8vw, 5vh); font-weight: 900; color: #111; display: flex; justify-content: center; align-items: center; gap: 5px;}
 
         /* Tarjetas por Turno */
         .shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1vw; margin-top: 2vh; margin-bottom: 1.5vh;}
@@ -73,7 +72,11 @@
         .shift-body { padding: 1vh; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw; background-color: #fafbfc; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; flex-grow: 1;}
         .shift-stat { background: white; padding: 0.8vh; border-radius: 8px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center;}
         .shift-stat span { display: block; font-size: min(0.7vw, 1.5vh); color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.2vh; font-weight: bold;}
-        .shift-stat strong { display: block; font-size: min(1.8vw, 3.5vh); color: #222; font-weight: 900;}
+        .shift-stat strong { display: flex; justify-content: center; align-items: center; gap: 4px; font-size: min(1.8vw, 3.5vh); color: #222; font-weight: 900;}
+
+        /* 🔥 ANIMACIÓN DE RÉCORD (CICLO SUPERADO) 🔥 */
+        .rocket-badge { font-size: 0.8em; animation: rocketPulse 1.5s infinite alternate; display: inline-block; cursor: help;}
+        @keyframes rocketPulse { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-3px) scale(1.2); } }
 
         /* 🔥 ANIMACIÓN DEL MEJOR TURNO 🔥 */
         .best-shift { transform: scale(1.03); box-shadow: 0 10px 25px rgba(230, 0, 90, 0.2); border: 3px solid var(--primary); position: relative; z-index: 10;}
@@ -94,27 +97,23 @@
         .machine-table td { padding: 0.2vh 1vw; font-size: min(1.6vw, 3.5vh); font-weight: 900; color: #222; border-bottom: 1px solid #f1f5f9; }
         .machine-table tr:hover { background-color: #f8fafc; }
         
-        /* Columna Máquina (Con Sticky para móvil preparado) */
+        /* Columna Máquina */
         .col-maq { 
             background-color: #1e293b; color: white !important; font-size: min(1.4vw, 3vh) !important; 
             text-align: left; padding-left: 2vw !important; border-right: 4px solid var(--primary);
-            position: sticky; left: 0; z-index: 2; /* Fija la columna al hacer scroll */
+            position: sticky; left: 0; z-index: 2; 
         }
-        .machine-table th.col-maq { z-index: 3; } /* El encabezado fijo sobre los demás */
+        .machine-table th.col-maq { z-index: 3; }
         
         .footer-update { text-align: center; font-size: min(0.9vw, 2vh); color: #777; margin-top: 1vh; font-weight: bold; height: auto;}
         .sync-indicator { display: inline-block; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; animation: pulseSync 1s infinite; margin-left: 5px; }
         @keyframes pulseSync { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
         
-        /* =========================================
-           AJUSTES MÓVILES (Celulares)
-           ========================================= */
+        /* AJUSTES MÓVILES (Celulares) */
         @media (max-width: 768px) {
-            /* Coloca todos los campos del formulario uno debajo del otro para evitar solapamientos */
             .grid-2-col { grid-template-columns: 1fr; gap: 0px; }
             .counter-box .form-group { margin-bottom: 10px; }
             
-            /* Ajustes Dashboard en Celular */
             #dash-view.active { display: block !important; }
             .dashboard-tv { height: auto; min-height: 100vh; overflow-y: visible; padding: 20px 15px; display: block;}
             
@@ -133,7 +132,6 @@
             .best-shift { transform: scale(1.02); }
             .best-shift::after { font-size: 10px; top: -15px; right: 10px; padding: 4px 10px;}
             
-            /* Swipe Horizontal activado para la tabla */
             .table-container { overflow-x: auto; display: block; height: auto; }
             .machine-table { min-width: 500px; }
             .machine-table th { font-size: 11px; padding: 10px; height: auto;}
@@ -326,7 +324,7 @@
             descargarDatosJSONP(); 
         }
 
-        // --- FORMATEO MATEMÁTICO ---
+        // --- FORMATEO MATEMÁTICO (OEE LIMITADO AL 100%) ---
         function parseRobustFloat(val) {
             if (val === undefined || val === null || val === "") return 0;
             let str = String(val).replace(/%/g, '').trim(); 
@@ -335,13 +333,19 @@
             return parseFloat(str) || 0;
         }
 
-        const formatPct = (sum, count) => {
+        // Esta función formatea agregando el cohete si se superó el 100%
+        const formatPctHtml = (sum, count) => {
             if (count === 0) return "0,0%";
             let val = sum / count;
-            if (val <= 1.5) val = val * 100;
+            if (val <= 1.5) val = val * 100; // Lo pasamos a porcentaje
+            
+            if (val > 100) {
+                return `100,0% <span class="rocket-badge" title="¡Récord! Ciclo real más rápido que el teórico.">🚀</span>`;
+            }
             return val.toFixed(1).replace('.', ',') + "%";
         };
 
+        // Devuelve el número plano, pero no lo "topa" aquí, para saber cuál fue el mejor turno real
         const getAvgValNum = (sum, count) => {
             if (count === 0) return 0;
             let val = sum / count;
@@ -391,10 +395,11 @@
                 }
             });
 
-            document.getElementById('kpi-eff').innerText = formatPct(tEff, validRows);
-            document.getElementById('kpi-disp').innerText = formatPct(tDisp, validRows);
-            document.getElementById('kpi-cal').innerText = formatPct(tCal, validRows);
-            document.getElementById('kpi-pzas').innerText = formatThous(tPzas);
+            // Reemplazamos innerText por innerHTML para que renderice el cohete (emoji span)
+            document.getElementById('kpi-eff').innerHTML = formatPctHtml(tEff, validRows);
+            document.getElementById('kpi-disp').innerHTML = formatPctHtml(tDisp, validRows);
+            document.getElementById('kpi-cal').innerHTML = formatPctHtml(tCal, validRows);
+            document.getElementById('kpi-pzas').innerText = formatThous(tPzas); // El total de piezas sí es texto plano
 
             let bestShift = "";
             let maxEff = 0;
@@ -407,9 +412,10 @@
                 let d = shiftsData[t];
                 let prefix = t === "Mañana" ? "m" : (t === "Tarde" ? "t" : "n");
                 
-                document.getElementById(`shift-${prefix}-eff`).innerText = formatPct(d.eff, d.count);
-                document.getElementById(`shift-${prefix}-disp`).innerText = formatPct(d.disp, d.count);
-                document.getElementById(`shift-${prefix}-cal`).innerText = formatPct(d.cal, d.count);
+                // Aplicamos formatPctHtml a todos los KPIs de la tarjeta del turno
+                document.getElementById(`shift-${prefix}-eff`).innerHTML = formatPctHtml(d.eff, d.count);
+                document.getElementById(`shift-${prefix}-disp`).innerHTML = formatPctHtml(d.disp, d.count);
+                document.getElementById(`shift-${prefix}-cal`).innerHTML = formatPctHtml(d.cal, d.count);
                 document.getElementById(`shift-${prefix}-pzas`).innerText = formatThous(d.pzas);
 
                 let panelEl = document.getElementById(`panel-${t.toLowerCase().replace('ñ','n')}`);
@@ -419,10 +425,16 @@
                 }
             });
 
-            const getAvgArr = arr => {
-                if(arr.length === 0) return null;
+            // Función adaptada para formatear las celdas de la tabla (Retorna HTML)
+            const formatTablePct = arr => {
+                if(arr.length === 0) return '<span style="color:#cbd5e1">-</span>';
                 let val = arr.reduce((a,b)=>a+b,0) / arr.length;
-                return (val <= 1.5) ? val * 100 : val;
+                if (val <= 1.5) val = val * 100;
+
+                if (val > 100) {
+                    return `100,0% <span class="rocket-badge" title="Récord de Ciclo">🚀</span>`;
+                }
+                return val.toFixed(1).replace('.',',') + '%';
             };
 
             const maqLabels = Object.keys(maquinaTurnoData).sort();
@@ -440,18 +452,12 @@
                 <tbody>`;
 
             maqLabels.forEach(m => {
-                let valM = getAvgArr(maquinaTurnoData[m]["Mañana"]);
-                let valT = getAvgArr(maquinaTurnoData[m]["Tarde"]);
-                let valN = getAvgArr(maquinaTurnoData[m]["Noche"]);
+                let txtM = formatTablePct(maquinaTurnoData[m]["Mañana"]);
+                let txtT = formatTablePct(maquinaTurnoData[m]["Tarde"]);
+                let txtN = formatTablePct(maquinaTurnoData[m]["Noche"]);
                 let allVals = [...maquinaTurnoData[m]["Mañana"], ...maquinaTurnoData[m]["Tarde"], ...maquinaTurnoData[m]["Noche"]];
-                let valProm = getAvgArr(allVals);
+                let txtProm = formatTablePct(allVals);
 
-                let txtM = valM !== null ? valM.toFixed(1).replace('.',',') + '%' : '<span style="color:#cbd5e1">-</span>';
-                let txtT = valT !== null ? valT.toFixed(1).replace('.',',') + '%' : '<span style="color:#cbd5e1">-</span>';
-                let txtN = valN !== null ? valN.toFixed(1).replace('.',',') + '%' : '<span style="color:#cbd5e1">-</span>';
-                let txtProm = valProm !== null ? valProm.toFixed(1).replace('.',',') + '%' : '<span style="color:#cbd5e1">-</span>';
-
-                // Abreviar el nombre de Inyectora a MQ
                 let maqAbreviada = m.toUpperCase().replace('INYECTORA', 'MQ');
 
                 tableHTML += `
