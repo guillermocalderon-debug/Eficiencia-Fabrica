@@ -18,7 +18,7 @@
             --sober-n: #334155; /* Pizarra - Noche */
             
             --gold: #fbbf24; 
-            --silver: #94a3b8;
+            --silver: #cbd5e1;
             --bronze: #b45309;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: var(--text-dark); margin: 0; padding: 2vh 2vw; display: flex; flex-direction: column; height: 100vh; overflow: hidden; box-sizing: border-box;}
@@ -31,12 +31,10 @@
         .subtitle { color: var(--primary); font-weight: bold; font-size: min(15px, 1.8vh); margin-top: 3px; text-transform: uppercase;}
         .clock { font-size: min(1.5vw, 2.5vh); font-weight: bold; color: #fff; background: var(--text-dark); padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
 
-        /* =========================================
-           NUEVA GRILLA: 3 COLUMNAS, PODIO EN EL CENTRO
-           ========================================= */
+        /* GRILLA 3x3 CON PODIO CENTRAL */
         .machines-grid { 
             display: grid; 
-            grid-template-columns: 1fr 1.3fr 1fr; /* Columna central ligeramente más ancha */
+            grid-template-columns: 1fr 1.3fr 1fr; 
             grid-template-rows: repeat(3, 1fr);
             gap: 1.5vh 1.5vw; 
             flex-grow: 1;
@@ -70,17 +68,14 @@
         
         @keyframes pulseRank { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
 
-        /* ESTADO VACÍO (Sin Producción) */
         .empty-state-box { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; opacity: 0.5;}
         .empty-icon { font-size: 3.5vh; margin-bottom: 5px;}
         .empty-text { font-size: 1.2vh; font-weight: bold; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px;}
 
-        /* =========================================
-           SALÓN DE LA FAMA (GIGANTE Y CENTRAL)
-           ========================================= */
+        /* SALÓN DE LA FAMA HISTÓRICO */
         .podium-card { 
-            grid-column: 2; /* Lo obliga a estar en la columna del medio */
-            grid-row: 1 / span 2; /* Ocupa la altura de 2 máquinas */
+            grid-column: 2; 
+            grid-row: 1 / span 2; 
             border-top: 5px solid var(--gold); 
             background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -88,31 +83,23 @@
         .podium-card .machine-name { background: transparent; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 2.2vh; letter-spacing: 2px;}
         .podium-card .ops-list { background-color: transparent; padding: 2vh 1.5vw; justify-content: space-around;}
         
-        /* 1er Lugar Épico */
-        .podium-first { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(251, 191, 36, 0.1); border: 2px solid var(--gold); border-radius: 15px; 
-            padding: 2.5vh; position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+        .podium-row { 
+            display: flex; align-items: center; border-radius: 10px; padding: 1.2vh 1.2vw; 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden;
         }
-        .medal-huge { font-size: 6vh; margin-bottom: 1vh; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));}
-        .name-huge { font-size: 2.5vh; font-weight: 900; color: #fff; text-transform: uppercase; text-align: center;}
-        .score-huge { font-size: 4vh; font-weight: 900; color: var(--gold); margin-top: 0.5vh;}
-        
+        .podium-medal { font-size: 3.5vh; margin-right: 1vw; z-index: 2;}
+        .podium-info { display: flex; flex-direction: column; z-index: 2;}
+        .podium-title { font-size: 1.1vh; font-weight: bold; color: var(--gold); text-transform: uppercase; letter-spacing: 1px;}
+        .podium-name { font-size: 1.8vh; font-weight: 900; color: #fff; text-transform: uppercase;}
+        .podium-score { font-size: 2.5vh; font-weight: 900; margin-left: auto; z-index: 2; color: #34d399;}
+
+        .podium-gold { background: rgba(251, 191, 36, 0.1); border: 2px solid var(--gold); }
         .shimmer::after {
             content: ''; position: absolute; top: -50%; left: -100%; width: 50%; height: 200%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
             transform: rotate(30deg); animation: shimmerAnim 3s infinite;
         }
         @keyframes shimmerAnim { 0% { left: -100%; } 100% { left: 200%; } }
-
-        /* 2do y 3er Lugar */
-        .podium-row { display: flex; align-items: center; border-radius: 10px; padding: 1.5vh 1.5vw; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);}
-        .podium-medal { font-size: 3vh; margin-right: 1.5vw;}
-        .podium-name { font-size: 1.8vh; font-weight: 900; color: #f8fafc; text-transform: uppercase;}
-        .podium-score { font-size: 2.2vh; font-weight: 900; margin-left: auto;}
-        
-        .podium-silver { border-left: 5px solid var(--silver);}
-        .podium-bronze { border-left: 5px solid var(--bronze);}
 
         #loader { text-align: center; color: var(--primary); font-weight: bold; font-size: 2vh; margin-top: 20vh; display: flex; flex-direction: column; gap: 10px;}
 
@@ -130,13 +117,13 @@
         <img src="libus_positivo_CMYK.jpg" alt="Libus" class="logo" onerror="this.src='https://latam.libus.com/imagenes/logo_libus.png'">
         <div class="title-box">
             <h1 class="title">🏆 EFICIENCIA EFECTIVA Y ASIGNACIÓN</h1>
-            <div class="subtitle" id="fechaHoy">Buscando fecha actual...</div>
+            <div class="subtitle" id="fechaHoy">Sincronizando...</div>
         </div>
         <div class="clock" id="liveClock">00:00:00</div>
     </div>
 
     <div id="loader">
-        <span id="loadText">Sincronizando Base de Datos de Producción... ⏳</span>
+        <span id="loadText">Sincronizando Histórico de Producción... ⏳</span>
     </div>
     
     <div class="machines-grid" id="machinesGrid">
@@ -176,6 +163,17 @@
             return parseFloat(str) || 0;
         }
 
+        function parseDateRobust(dateStr) {
+            if(!dateStr) return null;
+            let str = String(dateStr).trim();
+            if(str.includes('T')) return new Date(str);
+            let parts = str.split('/');
+            if(parts.length === 3) {
+                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+            return new Date(str);
+        }
+
         function getAvatarInitials(name) {
             if(!name || name === "NO ASIGNADO") return "?";
             let parts = name.trim().split(" ");
@@ -184,7 +182,7 @@
         }
 
         function startEngine() {
-            document.getElementById('loadText').innerText = "Calculando Eficiencias en Tiempo Real... ⏳";
+            document.getElementById('loadText').innerText = "Analizando Histórico Diario, Semanal y Mensual... ⏳";
             
             Promise.all([
                 fetchJSONP(ROSTER_API, 'roster'),
@@ -208,8 +206,6 @@
             
             let isoFormat = `${anio}-${mes}-${diaPad}`; 
             let format1 = `${diaPad}/${mes}/${anio}`;   
-            let format2 = `${dia}/${mes}/${anio}`;      
-            let format3 = `${diaPad}/${mes}`;           
 
             let colIndex = -1;
             let headerTitle = "Hoy no encontrado";
@@ -218,7 +214,7 @@
                 if(!rosterData[r]) continue;
                 for(let i=0; i<rosterData[r].length; i++) {
                     let cell = String(rosterData[r][i]).trim();
-                    if(cell.includes(isoFormat) || cell === dia || cell.includes(format1) || cell.includes(format2) || cell.includes(format3)) {
+                    if(cell.includes(isoFormat) || cell === dia || cell.includes(format1)) {
                         colIndex = i; 
                         headerTitle = cell.substring(0, 10);
                         break;
@@ -229,7 +225,6 @@
 
             document.getElementById('fechaHoy').innerText = `TURNO DEL DÍA: ${headerTitle}`;
 
-            // Añadimos el flag "hasData" para saber si hay información de eficiencia
             let maqData = {};
             MACHINE_IDS.forEach(m => maqData[m] = { 
                 M: {name: null, eff: 0, hasData: false}, 
@@ -237,7 +232,7 @@
                 N: {name: null, eff: 0, hasData: false} 
             });
 
-            // 1. Cargar Asignaciones
+            // 1. CARGAR ASIGNACIONES
             if (colIndex !== -1) {
                 for(let i = 1; i < rosterData.length; i++) {
                     let row = rosterData[i];
@@ -260,11 +255,18 @@
                 }
             }
 
-            let maxEffM = { val: 0, maquina: 0, name: null };
-            let maxEffT = { val: 0, maquina: 0, name: null };
-            let maxEffN = { val: 0, maquina: 0, name: null };
+            // 2. ESTRUCTURAS HISTÓRICAS (HOY, SEMANA, MES)
+            let statsHoy = {};
+            let statsSemana = {};
+            let statsMes = {};
 
-            // 2. Cargar Eficiencias y encender el flag "hasData"
+            let maxEffM = { val: 0, maquina: 0 };
+            let maxEffT = { val: 0, maquina: 0 };
+            let maxEffN = { val: 0, maquina: 0 };
+
+            let hoyStart = new Date(anio, hoyDate.getMonth(), hoyDate.getDate());
+            let hace7Dias = new Date(hoyStart); hace7Dias.setDate(hace7Dias.getDate() - 7);
+
             if (effData && effData.length > 0) {
                 effData.forEach(row => {
                     let rClean = {};
@@ -277,114 +279,123 @@
                     let calRaw = parseRobustFloat(rClean["calidad"]);
                     let tno = String(rClean["turno"] || "").trim();
                     let maqStr = String(rClean["maquina"] || "").trim(); 
-                    
+                    let fechaFila = parseDateRobust(rClean["fecha"]);
+
                     if(maqStr && tno) {
                         let nStr = maqStr.replace(/\D/g,'');
                         let maqNum = parseInt(nStr);
 
-                        if(maqData[maqNum]) {
-                            let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
-                            let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
-                            if (rend > 100) rend = 100;
-                            if (cal > 100) cal = 100;
-                            
-                            let eficienciaNeta = (rend / 100) * (cal / 100) * 100;
-                            let letraTurno = tno === "Mañana" ? "M" : (tno === "Tarde" ? "T" : "N");
-                            
+                        let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
+                        let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
+                        if (rend > 100) rend = 100;
+                        if (cal > 100) cal = 100;
+                        let eficienciaNeta = (rend / 100) * (cal / 100) * 100;
+
+                        let letraTurno = tno === "Mañana" ? "M" : (tno === "Tarde" ? "T" : "N");
+                        let opNombre = (maqData[maqNum] && maqData[maqNum][letraTurno].name) ? maqData[maqNum][letraTurno].name : "OPERADOR";
+
+                        // Evaluar si es HOY
+                        let esHoy = false;
+                        if(fechaFila && fechaFila.toDateString() === hoyStart.toDateString()) {
+                            esHoy = true;
+                        } else if(!fechaFila) {
+                            // Fallback si no hay columna fecha limpia: asumimos datos de hoy
+                            esHoy = true;
+                        }
+
+                        if(esHoy && maqData[maqNum]) {
                             let currentObj = maqData[maqNum][letraTurno];
                             currentObj.eff = eficienciaNeta; 
-                            currentObj.hasData = true; // ¡ENCONTRAMOS DATA REAL!
+                            currentObj.hasData = true;
 
-                            if(letraTurno === "M" && currentObj.eff > maxEffM.val) { maxEffM = { val: currentObj.eff, maquina: maqNum, name: currentObj.name }; }
-                            if(letraTurno === "T" && currentObj.eff > maxEffT.val) { maxEffT = { val: currentObj.eff, maquina: maqNum, name: currentObj.name }; }
-                            if(letraTurno === "N" && currentObj.eff > maxEffN.val) { maxEffN = { val: currentObj.eff, maquina: maqNum, name: currentObj.name }; }
+                            if(letraTurno === "M" && currentObj.eff > maxEffM.val) { maxEffM = { val: currentObj.eff, maquina: maqNum }; }
+                            if(letraTurno === "T" && currentObj.eff > maxEffT.val) { maxEffT = { val: currentObj.eff, maquina: maqNum }; }
+                            if(letraTurno === "N" && currentObj.eff > maxEffN.val) { maxEffN = { val: currentObj.eff, maquina: maqNum }; }
+
+                            if (!statsHoy[opNombre]) statsHoy[opNombre] = { sum: 0, count: 0 };
+                            statsHoy[opNombre].sum += eficienciaNeta; statsHoy[opNombre].count++;
+                        }
+
+                        // Acumular para SEMANA (últimos 7 días)
+                        if(fechaFila && fechaFila >= hace7Dias) {
+                            if (!statsSemana[opNombre]) statsSemana[opNombre] = { sum: 0, count: 0 };
+                            statsSemana[opNombre].sum += eficienciaNeta; statsSemana[opNombre].count++;
+                        }
+
+                        // Acumular para MES (mismo mes y año)
+                        if(fechaFila && fechaFila.getMonth() === hoyDate.getMonth() && fechaFila.getFullYear() === anio) {
+                            if (!statsMes[opNombre]) statsMes[opNombre] = { sum: 0, count: 0 };
+                            statsMes[opNombre].sum += eficienciaNeta; statsMes[opNombre].count++;
                         }
                     }
                 });
             }
 
-            // 3. Promedios exactos para el Top 3
-            let operatorStats = {};
-            
-            MACHINE_IDS.forEach(m => {
-                ['M', 'T', 'N'].forEach(t => {
-                    let op = maqData[m][t];
-                    // Si el operador tiene data, pero NO estaba en la planilla, lo mostramos como "NO ASIGNADO"
-                    let opName = op.name ? op.name : "NO ASIGNADO"; 
-                    
-                    if (op.hasData && op.eff > 0) {
-                        if (!operatorStats[opName]) { operatorStats[opName] = { sum: 0, count: 0 }; }
-                        operatorStats[opName].sum += op.eff;
-                        operatorStats[opName].count += 1;
+            // Función para obtener al #1 de un objeto de estadísticas
+            const getTop1 = (statsObj) => {
+                let best = { name: "En evaluación", score: "0,0%" };
+                let max = 0;
+                for(let name in statsObj) {
+                    let avg = statsObj[name].sum / statsObj[name].count;
+                    if(avg > max && name !== "NO ASIGNADO" && name !== "OPERADOR") {
+                        max = avg;
+                        best = { name: name, score: avg.toFixed(1).replace('.',',') + '%' };
                     }
-                });
-            });
-
-            let rankingList = [];
-            for (let name in operatorStats) {
-                rankingList.push({
-                    name: name,
-                    avgEff: operatorStats[name].sum / operatorStats[name].count
-                });
-            }
-            rankingList.sort((a, b) => b.avgEff - a.avgEff);
-
-            // 4. RENDERIZACIÓN DE HTML
-            let gridHtml = '';
-            
-            // Función para generar el Salón de la Fama
-            const getPodiumRow = (rankData, placeClass, medal, color) => {
-                if(!rankData) {
-                    return `<div class="podium-row" style="opacity:0.2;"><div class="podium-medal">${medal}</div><div class="podium-name">---</div></div>`;
                 }
-                let scoreText = rankData.avgEff.toFixed(1).replace('.',',') + '%';
-                return `
-                <div class="podium-row ${placeClass}">
-                    <div class="podium-medal">${medal}</div>
-                    <div class="podium-name">${rankData.name}</div>
-                    <div class="podium-score" style="color: ${color};">${scoreText}</div>
-                </div>`;
+                return best;
             };
 
+            let topHoy = getTop1(statsHoy);
+            let topSemana = getTop1(statsSemana);
+            let topMes = getTop1(statsMes);
+
+            // 3. RENDERIZADO
+            let gridHtml = '';
+            
             let podiumHtml = `
             <div class="machine-card podium-card">
                 <h3 class="machine-name">🏆 SALÓN DE LA FAMA</h3>
                 <div class="ops-list">
-                    ${rankingList[0] ? `
-                    <div class="podium-first shimmer">
-                        <div class="medal-huge">👑</div>
-                        <div class="name-huge">${rankingList[0].name}</div>
-                        <div class="score-huge">${rankingList[0].avgEff.toFixed(1).replace('.',',')}%</div>
-                    </div>` : `
-                    <div class="podium-first" style="opacity: 0.3;">
-                        <div class="medal-huge">⏳</div>
-                        <div class="name-huge">EN PROCESO</div>
-                    </div>`}
-                    
-                    ${getPodiumRow(rankingList[1], 'podium-silver', '🥈', 'var(--silver)')}
-                    ${getPodiumRow(rankingList[2], 'podium-bronze', '🥉', 'var(--bronze)')}
+                    <div class="podium-row podium-gold shimmer">
+                        <div class="podium-medal">🥇</div>
+                        <div class="podium-info">
+                            <div class="podium-title">Líder del Día (Hoy)</div>
+                            <div class="podium-name">${topHoy.name}</div>
+                        </div>
+                        <div class="podium-score">${topHoy.score}</div>
+                    </div>
+                    <div class="podium-row podium-silver">
+                        <div class="podium-medal">📅</div>
+                        <div class="podium-info">
+                            <div class="podium-title">Líder de la Semana</div>
+                            <div class="podium-name">${topSemana.name}</div>
+                        </div>
+                        <div class="podium-score">${topSemana.score}</div>
+                    </div>
+                    <div class="podium-row podium-bronze">
+                        <div class="podium-medal">🌟</div>
+                        <div class="podium-info">
+                            <div class="podium-title">Empleado del Mes</div>
+                            <div class="podium-name">${topMes.name}</div>
+                        </div>
+                        <div class="podium-score">${topMes.score}</div>
+                    </div>
                 </div>
             </div>`;
 
-            // Construir la grilla en orden para que el Podio quede exactamente en el centro (Posición 2)
             MACHINE_IDS.forEach((m, index) => {
-                // Inyectar el podio después de la MQ 1
-                if(index === 1) { 
-                    gridHtml += podiumHtml; 
-                }
+                if(index === 1) { gridHtml += podiumHtml; }
 
                 let ops = maqData[m];
                 
                 const getOpRow = (obj, tipo, colorClase, turnoLabel, leaderObj) => {
                     let isLeader = (obj.eff > 0 && leaderObj.maquina === m); 
                     let leaderClass = isLeader ? "leader" : "";
-                    
                     let opName = obj.name ? obj.name : "NO ASIGNADO";
                     let iniciales = getAvatarInitials(opName);
                     let effText = obj.eff.toFixed(1).replace('.', ',') + "%";
                     let rankIcon = isLeader ? "👑" : (obj.eff > 90 ? "🔥" : ""); 
                     let colorEff = isLeader ? "var(--success)" : "#222";
-                    
                     let nameColor = (opName === "NO ASIGNADO") ? "color: var(--primary);" : "";
 
                     return `
@@ -401,13 +412,11 @@
                     </div>`;
                 };
 
-                // LÓGICA DE LIMPIEZA: Solo agregar los turnos que tengan 'hasData === true'
                 let listHtml = '';
                 if(ops['M'].hasData) listHtml += getOpRow(ops['M'], 'M', 'm', '☀️ MAÑANA', maxEffM);
                 if(ops['T'].hasData) listHtml += getOpRow(ops['T'], 'T', 't', '🌤 TARDE', maxEffT);
                 if(ops['N'].hasData) listHtml += getOpRow(ops['N'], 'N', 'n', '🌙 NOCHE', maxEffN);
 
-                // Si la máquina no tiene absolutamente nada de data, muestra el estado vacío
                 if(listHtml === '') {
                     listHtml = `
                     <div class="empty-state-box">
