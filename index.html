@@ -63,7 +63,7 @@
         .shift-stat span { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; font-weight: bold;}
         .shift-stat strong { display: block; font-size: 26px; color: #222; font-weight: 900;}
 
-        /* Tabla Comparativa de Máquinas (Reemplaza al gráfico) */
+        /* Tabla Comparativa de Máquinas */
         .table-container { background: var(--card-bg); border-radius: 12px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); overflow: hidden; margin-top: 10px;}
         .machine-table { width: 100%; border-collapse: collapse; text-align: center; }
         .machine-table th { padding: 15px; color: white; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
@@ -72,14 +72,19 @@
         .machine-table tr:hover { background-color: #f8fafc; }
         .col-maq { background-color: #1e293b; color: white !important; font-size: 18px !important; text-align: left; padding-left: 25px !important;}
         
+        .footer-update { text-align: center; font-size: 13px; color: #777; margin-top: 15px; font-weight: bold; }
+        .sync-indicator { display: inline-block; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulse 1s infinite; margin-left: 5px; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        
         #loader { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--primary); font-size: 18px;}
     </style>
 </head>
 <body>
 
     <script>
-        // API Correcta de Google Apps Script
-        const API_URL = "https://script.google.com/macros/s/AKfycbzhxrJFETIu7Dvc8C5CB_ZRVHG-j7MhlQZ9OxdyWmuAvbQmfzCKjJ9dYEQ3TIt4q7wE/exec";
+        // API Correcta de Google Apps Script con motor JSONP
+        const API_URL = "https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec";
+        const CACHE_KEY = "libus_eficiencia_data";
     </script>
 
     <!-- HEADER INGRESO OPERADOR -->
@@ -89,7 +94,7 @@
         </div>
         <div class="nav-btns">
             <button onclick="switchView('form-view')">📱 Ingreso Producción</button>
-            <button class="btn-tv" onclick="switchView('dash-view'); loadDashboard();">📺 Pantalla TV (Yodeck)</button>
+            <button class="btn-tv" onclick="switchView('dash-view'); initDashboard();">📺 Pantalla TV (Yodeck)</button>
         </div>
     </header>
 
@@ -190,10 +195,12 @@
             </div>
         </div>
 
-        <!-- TABLA COMPARATIVA DE MÁQUINAS (Reemplazo del Gráfico) -->
+        <!-- TABLA COMPARATIVA DE MÁQUINAS -->
         <div class="table-container" id="machine-table-wrapper">
             <!-- La tabla se inyectará aquí con JavaScript -->
         </div>
+
+        <div class="footer-update" id="lastUpdate">Actualizando datos...</div>
 
     </div>
 
@@ -204,8 +211,7 @@
             if(urlParams.get('view') === 'tv') {
                 document.getElementById('main-header').style.display = 'none'; // Oculta header
                 switchView('dash-view');
-                loadDashboard();
-                setInterval(loadDashboard, 300000); // Auto-refresco 5 mins
+                initDashboard();
             }
         };
 
@@ -240,151 +246,161 @@
                 alert("✅ Registro guardado con éxito.");
                 document.getElementById('prodForm').reset();
                 document.getElementById('fecha').valueAsDate = new Date();
+                descargarDatosJSONP(); // Actualiza la caché en background si enviamos un dato
             }).catch(err => {
                 document.getElementById('loader').style.display = 'none';
                 alert("✅ Registro guardado en Google Sheets.");
                 document.getElementById('prodForm').reset();
                 document.getElementById('fecha').valueAsDate = new Date();
+                descargarDatosJSONP();
             });
         }
 
-        // --- LEER DATOS Y ASIGNAR A TARJETAS Y TABLA ---
-        async function loadDashboard() {
-            try {
-                document.getElementById('loader').style.display = 'block';
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                document.getElementById('loader').style.display = 'none';
-                
-                if(data.length === 0) return;
+        // --- MOTOR DE ALTA VELOCIDAD (JSONP + CACHÉ) ---
+        function renderizarDatos(data, isCached = false) {
+            if(!data || data.length === 0) return;
 
-                let tEff=0, tDisp=0, tCal=0, tPzas=0, validRows=0;
-                
-                // Objeto para los paneles por turno
-                let shiftsData = {
-                    "Mañana": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 },
-                    "Tarde": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 },
-                    "Noche": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 }
-                };
+            let tEff=0, tDisp=0, tCal=0, tPzas=0, validRows=0;
+            
+            let shiftsData = {
+                "Mañana": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 },
+                "Tarde": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 },
+                "Noche": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0 }
+            };
 
-                // Objeto para la tabla de Máquinas
-                let maquinaTurnoData = {};
+            let maquinaTurnoData = {};
 
-                data.forEach(row => {
-                    let rLower = {};
-                    for(let k in row) rLower[k.toLowerCase()] = row[k];
+            data.forEach(row => {
+                let rLower = {};
+                for(let k in row) rLower[k.toLowerCase()] = row[k];
 
-                    let eff = parseFloat(rLower["eficiencia"]) || 0;
-                    let disp = parseFloat(rLower["disponibilidad"]) || 0;
-                    let cal = parseFloat(rLower["calidad"]) || 0;
-                    let pzas = parseFloat(rLower["cantidad inyectada"] || rLower["inyectada"] || rLower["cantidad"]) || 0; 
-                    let tno = rLower["turno"];
-                    let maq = rLower["máquina"] || rLower["maquina"];
+                let eff = parseFloat(rLower["eficiencia"]) || 0;
+                let disp = parseFloat(rLower["disponibilidad"]) || 0;
+                let cal = parseFloat(rLower["calidad"]) || 0;
+                let pzas = parseFloat(rLower["cantidad inyectada"] || rLower["inyectada"] || rLower["cantidad"]) || 0; 
+                let tno = rLower["turno"];
+                let maq = rLower["máquina"] || rLower["maquina"];
 
-                    // Globales
-                    tPzas += pzas;
-                    if(eff > 0 || disp > 0) { 
-                        tEff += eff; tDisp += disp; tCal += cal; validRows++; 
-                        
-                        // Por Turno
-                        if(tno && shiftsData[tno]) {
-                            shiftsData[tno].eff += eff;
-                            shiftsData[tno].disp += disp;
-                            shiftsData[tno].cal += cal;
-                            shiftsData[tno].pzas += pzas;
-                            shiftsData[tno].count++;
-                        }
-
-                        // Por Máquina y Turno (Para la Tabla)
-                        if (maq && tno) {
-                            if (!maquinaTurnoData[maq]) {
-                                maquinaTurnoData[maq] = { "Mañana": [], "Tarde": [], "Noche": [] };
-                            }
-                            if (maquinaTurnoData[maq][tno] !== undefined) {
-                                maquinaTurnoData[maq][tno].push(eff);
-                            }
-                        }
+                // Globales
+                tPzas += pzas;
+                if(eff > 0 || disp > 0) { 
+                    tEff += eff; tDisp += disp; tCal += cal; validRows++; 
+                    
+                    if(tno && shiftsData[tno]) {
+                        shiftsData[tno].eff += eff;
+                        shiftsData[tno].disp += disp;
+                        shiftsData[tno].cal += cal;
+                        shiftsData[tno].pzas += pzas;
+                        shiftsData[tno].count++;
                     }
-                });
 
-                // Función segura de conversión a Porcentaje
-                const formatPct = (sum, count) => {
-                    if (count === 0) return "0.0%";
-                    let val = sum / count;
-                    if (val <= 1.5) val = val * 100;
-                    return val.toFixed(1) + "%";
-                };
+                    if (maq && tno) {
+                        if (!maquinaTurnoData[maq]) maquinaTurnoData[maq] = { "Mañana": [], "Tarde": [], "Noche": [] };
+                        if (maquinaTurnoData[maq][tno] !== undefined) maquinaTurnoData[maq][tno].push(eff);
+                    }
+                }
+            });
 
-                // Promedio de un array de datos para la tabla
-                const getAvgVal = arr => {
-                    if(arr.length === 0) return null;
-                    let val = arr.reduce((a,b)=>a+b,0) / arr.length;
-                    return (val <= 1.5) ? val * 100 : val;
-                };
+            const formatPct = (sum, count) => {
+                if (count === 0) return "0.0%";
+                let val = sum / count;
+                if (val <= 1.5) val = val * 100;
+                return val.toFixed(1) + "%";
+            };
 
-                // 1. Asignar Globales
-                document.getElementById('kpi-eff').innerText = formatPct(tEff, validRows);
-                document.getElementById('kpi-disp').innerText = formatPct(tDisp, validRows);
-                document.getElementById('kpi-cal').innerText = formatPct(tCal, validRows);
-                document.getElementById('kpi-pzas').innerText = tPzas.toLocaleString('es-ES');
+            const getAvgVal = arr => {
+                if(arr.length === 0) return null;
+                let val = arr.reduce((a,b)=>a+b,0) / arr.length;
+                return (val <= 1.5) ? val * 100 : val;
+            };
 
-                // 2. Asignar Tarjetas por Turno
-                ["Mañana", "Tarde", "Noche"].forEach(t => {
-                    let d = shiftsData[t];
-                    let prefix = t === "Mañana" ? "m" : (t === "Tarde" ? "t" : "n");
-                    
-                    document.getElementById(`shift-${prefix}-eff`).innerText = formatPct(d.eff, d.count);
-                    document.getElementById(`shift-${prefix}-disp`).innerText = formatPct(d.disp, d.count);
-                    document.getElementById(`shift-${prefix}-cal`).innerText = formatPct(d.cal, d.count);
-                    document.getElementById(`shift-${prefix}-pzas`).innerText = d.pzas.toLocaleString('es-ES');
-                });
+            // 1. Asignar Globales
+            document.getElementById('kpi-eff').innerText = formatPct(tEff, validRows);
+            document.getElementById('kpi-disp').innerText = formatPct(tDisp, validRows);
+            document.getElementById('kpi-cal').innerText = formatPct(tCal, validRows);
+            document.getElementById('kpi-pzas').innerText = tPzas.toLocaleString('es-ES');
 
-                // 3. Crear TABLA COMPARATIVA DE MÁQUINAS
-                const maqLabels = Object.keys(maquinaTurnoData).sort();
-                
-                let tableHTML = `
-                <table class="machine-table">
-                    <thead>
-                        <tr>
-                            <th class="col-maq">MÁQUINA</th>
-                            <th style="background-color: var(--sober-m);">☀️ EFICIENCIA MAÑANA</th>
-                            <th style="background-color: var(--sober-t);">🌤 EFICIENCIA TARDE</th>
-                            <th style="background-color: var(--sober-n);">🌙 EFICIENCIA NOCHE</th>
-                            <th style="background-color: var(--primary);">🎯 PROMEDIO TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+            // 2. Asignar Tarjetas por Turno
+            ["Mañana", "Tarde", "Noche"].forEach(t => {
+                let d = shiftsData[t];
+                let prefix = t === "Mañana" ? "m" : (t === "Tarde" ? "t" : "n");
+                document.getElementById(`shift-${prefix}-eff`).innerText = formatPct(d.eff, d.count);
+                document.getElementById(`shift-${prefix}-disp`).innerText = formatPct(d.disp, d.count);
+                document.getElementById(`shift-${prefix}-cal`).innerText = formatPct(d.cal, d.count);
+                document.getElementById(`shift-${prefix}-pzas`).innerText = d.pzas.toLocaleString('es-ES');
+            });
 
-                maqLabels.forEach(m => {
-                    let valM = getAvgVal(maquinaTurnoData[m]["Mañana"]);
-                    let valT = getAvgVal(maquinaTurnoData[m]["Tarde"]);
-                    let valN = getAvgVal(maquinaTurnoData[m]["Noche"]);
-                    
-                    let allVals = [...maquinaTurnoData[m]["Mañana"], ...maquinaTurnoData[m]["Tarde"], ...maquinaTurnoData[m]["Noche"]];
-                    let valProm = getAvgVal(allVals);
+            // 3. Crear TABLA COMPARATIVA
+            const maqLabels = Object.keys(maquinaTurnoData).sort();
+            let tableHTML = `
+            <table class="machine-table">
+                <thead>
+                    <tr>
+                        <th class="col-maq">MÁQUINA</th>
+                        <th style="background-color: var(--sober-m);">☀️ EFICIENCIA MAÑANA</th>
+                        <th style="background-color: var(--sober-t);">🌤 EFICIENCIA TARDE</th>
+                        <th style="background-color: var(--sober-n);">🌙 EFICIENCIA NOCHE</th>
+                        <th style="background-color: #111;">🎯 PROMEDIO DIARIO</th>
+                    </tr>
+                </thead>
+                <tbody>`;
 
-                    let txtM = valM !== null ? valM.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
-                    let txtT = valT !== null ? valT.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
-                    let txtN = valN !== null ? valN.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
-                    let txtProm = valProm !== null ? valProm.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
+            maqLabels.forEach(m => {
+                let valM = getAvgVal(maquinaTurnoData[m]["Mañana"]);
+                let valT = getAvgVal(maquinaTurnoData[m]["Tarde"]);
+                let valN = getAvgVal(maquinaTurnoData[m]["Noche"]);
+                let allVals = [...maquinaTurnoData[m]["Mañana"], ...maquinaTurnoData[m]["Tarde"], ...maquinaTurnoData[m]["Noche"]];
+                let valProm = getAvgVal(allVals);
 
-                    tableHTML += `
-                        <tr>
-                            <td class="col-maq">${m.toUpperCase()}</td>
-                            <td style="color: var(--sober-m);">${txtM}</td>
-                            <td style="color: var(--sober-t);">${txtT}</td>
-                            <td style="color: var(--sober-n);">${txtN}</td>
-                            <td style="color: var(--primary);">${txtProm}</td>
-                        </tr>`;
-                });
+                let txtM = valM !== null ? valM.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
+                let txtT = valT !== null ? valT.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
+                let txtN = valN !== null ? valN.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
+                let txtProm = valProm !== null ? valProm.toFixed(1) + '%' : '<span style="color:#cbd5e1">-</span>';
 
-                tableHTML += `</tbody></table>`;
-                
-                document.getElementById('machine-table-wrapper').innerHTML = tableHTML;
+                tableHTML += `
+                    <tr>
+                        <td class="col-maq">${m.toUpperCase()}</td>
+                        <td style="color: var(--sober-m);">${txtM}</td>
+                        <td style="color: var(--sober-t);">${txtT}</td>
+                        <td style="color: var(--sober-n);">${txtN}</td>
+                        <td style="color: #111;">${txtProm}</td>
+                    </tr>`;
+            });
 
-            } catch(e) {
-                console.error("Error al cargar datos del Dashboard", e);
+            tableHTML += `</tbody></table>`;
+            document.getElementById('machine-table-wrapper').innerHTML = tableHTML;
+
+            // Actualizar indicador de hora
+            const time = new Date().toLocaleTimeString('es-ES');
+            const syncStatus = isCached ? '<span class="sync-indicator" title="Actualizando en segundo plano..."></span>' : '';
+            document.getElementById('lastUpdate').innerHTML = `Última sincronización: ${time} ${syncStatus}`;
+        }
+
+        function descargarDatosJSONP() {
+            const callbackName = 'jsonpCallback_' + Math.round(100000 * Math.random());
+            
+            window[callbackName] = function(data) {
+                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                renderizarDatos(data, false);
+                delete window[callbackName];
+                const scriptEl = document.getElementById(callbackName);
+                if(scriptEl) scriptEl.remove();
+            };
+
+            const script = document.createElement('script');
+            script.id = callbackName;
+            script.src = `${API_URL}?callback=${callbackName}&_t=${Date.now()}`;
+            document.body.appendChild(script);
+        }
+
+        function initDashboard() {
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            if (cachedData) {
+                renderizarDatos(JSON.parse(cachedData), true);
             }
+            descargarDatosJSONP();
+            // Recargar automáticamente cada 5 minutos
+            setInterval(descargarDatosJSONP, 300000); 
         }
     </script>
 </body>
