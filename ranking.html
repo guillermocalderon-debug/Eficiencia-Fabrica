@@ -13,13 +13,14 @@
             --text-muted: #64748b;
             --border-color: #cbd5e1;
             
-            --sober-m: #0ea5e9; /* Azul - Mañana */
-            --sober-t: #f97316; /* Naranja - Tarde */
-            --sober-n: #334155; /* Pizarra - Noche */
+            --sober-m: #0ea5e9; 
+            --sober-t: #f97316; 
+            --sober-n: #334155; 
             
             --gold: #fbbf24; 
             --silver: #cbd5e1;
-            --bronze: #b45309;
+            --bronze: #d97706;
+            --success: #16a34a;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: var(--text-dark); margin: 0; padding: 2vh 2vw; display: flex; flex-direction: column; height: 100vh; overflow: hidden; box-sizing: border-box;}
         
@@ -31,7 +32,7 @@
         .subtitle { color: var(--primary); font-weight: bold; font-size: min(15px, 1.8vh); margin-top: 3px; text-transform: uppercase;}
         .clock { font-size: min(1.5vw, 2.5vh); font-weight: bold; color: #fff; background: var(--text-dark); padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
 
-        /* GRILLA 3x3 CON PODIO CENTRAL */
+        /* LAYOUT GRILLA 3x3 ENVOLVENTE */
         .machines-grid { 
             display: grid; 
             grid-template-columns: 1fr 1.3fr 1fr; 
@@ -72,32 +73,75 @@
         .empty-icon { font-size: 3.5vh; margin-bottom: 5px;}
         .empty-text { font-size: 1.2vh; font-weight: bold; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px;}
 
-        /* SALÓN DE LA FAMA HISTÓRICO */
+        /* SALÓN DE LA FAMA EN EL CENTRO */
         .podium-card { 
             grid-column: 2; 
             grid-row: 1 / span 2; 
             border-top: 5px solid var(--gold); 
             background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 16px;
         }
-        .podium-card .machine-name { background: transparent; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 2.2vh; letter-spacing: 2px;}
-        .podium-card .ops-list { background-color: transparent; padding: 2vh 1.5vw; justify-content: space-around;}
+        .podium-card .machine-name { background: transparent; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 2vh; letter-spacing: 2px;}
+        .podium-card .ops-list { background-color: transparent; padding: 1.5vh 1vw; justify-content: space-around; gap: 1.2vh;}
         
-        .podium-row { 
-            display: flex; align-items: center; border-radius: 10px; padding: 1.2vh 1.2vw; 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden;
+        .podium-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.2vh 1vw;
+            position: relative;
+            overflow: hidden;
         }
-        .podium-medal { font-size: 3.5vh; margin-right: 1vw; z-index: 2;}
-        .podium-info { display: flex; flex-direction: column; z-index: 2;}
-        .podium-title { font-size: 1.1vh; font-weight: bold; color: var(--gold); text-transform: uppercase; letter-spacing: 1px;}
-        .podium-name { font-size: 1.8vh; font-weight: 900; color: #fff; text-transform: uppercase;}
-        .podium-score { font-size: 2.5vh; font-weight: 900; margin-left: auto; z-index: 2; color: #34d399;}
 
-        .podium-gold { background: rgba(251, 191, 36, 0.1); border: 2px solid var(--gold); }
-        .shimmer::after {
+        .medallion {
+            width: 5vh;
+            height: 5vh;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8vh;
+            margin-right: 1vw;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+            border: 2px solid #fff;
+        }
+        .medallion.gold { background: radial-gradient(circle, #fef08a 0%, #eab308 100%); border-color: var(--gold); }
+        .medallion.silver { background: radial-gradient(circle, #f1f5f9 0%, #94a3b8 100%); border-color: var(--silver); }
+        .medallion.bronze { background: radial-gradient(circle, #fde68a 0%, #b45309 100%); border-color: var(--bronze); }
+
+        .podium-body { flex-grow: 1; display: flex; flex-direction: column; gap: 3px; }
+        .podium-meta { display: flex; justify-content: space-between; align-items: center; }
+        .podium-tag { font-size: 1.1vh; font-weight: bold; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .podium-score-val { font-size: 1.9vh; font-weight: 900; color: #fff; }
+        .podium-user { font-size: 1.5vh; font-weight: 900; color: #f8fafc; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 11vw;}
+
+        /* BARRAS DE PROGRESO */
+        .bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1.5s ease-in-out;
+        }
+        .bar-fill.gold { background: linear-gradient(90deg, #fef08a, #eab308); }
+        .bar-fill.silver { background: linear-gradient(90deg, #f1f5f9, #94a3b8); }
+        .bar-fill.bronze { background: linear-gradient(90deg, #fde68a, #b45309); }
+
+        .shimmer-card { position: relative; }
+        .shimmer-card::after {
             content: ''; position: absolute; top: -50%; left: -100%; width: 50%; height: 200%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
-            transform: rotate(30deg); animation: shimmerAnim 3s infinite;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(30deg); animation: shimmerAnim 3.5s infinite;
         }
         @keyframes shimmerAnim { 0% { left: -100%; } 100% { left: 200%; } }
 
@@ -108,6 +152,7 @@
             .header { flex-direction: column; gap: 15px; text-align: center;}
             .machines-grid { display: flex; flex-direction: column; }
             .op-name { max-width: 40vw;}
+            .podium-user { max-width: 40vw; }
         }
     </style>
 </head>
@@ -123,12 +168,10 @@
     </div>
 
     <div id="loader">
-        <span id="loadText">Sincronizando Histórico de Producción... ⏳</span>
+        <span id="loadText">Sincronizando Base de Datos Maestra... ⏳</span>
     </div>
     
-    <div class="machines-grid" id="machinesGrid">
-        <!-- Generación Dinámica -->
-    </div>
+    <div class="machines-grid" id="machinesGrid"></div>
 
     <script>
         const ROSTER_API = 'https://script.google.com/macros/s/AKfycbzxBhGp2oElpCW6YzacSbDhqGvbih0X0dBZmnipIkscPp2uJx2CqRQstESXu7M0iZ1gLA/exec';
@@ -174,6 +217,10 @@
             return new Date(str);
         }
 
+        function formatZeroPad(num) {
+            return String(num).padStart(2, '0');
+        }
+
         function getAvatarInitials(name) {
             if(!name || name === "NO ASIGNADO") return "?";
             let parts = name.trim().split(" ");
@@ -182,7 +229,7 @@
         }
 
         function startEngine() {
-            document.getElementById('loadText').innerText = "Analizando Histórico Diario, Semanal y Mensual... ⏳";
+            document.getElementById('loadText').innerText = "Analizando Cierre del Día Anterior, Semana y Mes... ⏳";
             
             Promise.all([
                 fetchJSONP(ROSTER_API, 'roster'),
@@ -200,15 +247,15 @@
 
             let hoyDate = new Date();
             let dia = String(hoyDate.getDate());
-            let diaPad = dia.padStart(2, '0');
-            let mes = String(hoyDate.getMonth() + 1).padStart(2, '0');
+            let diaPad = formatZeroPad(dia);
+            let mesPad = formatZeroPad(hoyDate.getMonth() + 1);
             let anio = hoyDate.getFullYear();
             
-            let isoFormat = `${anio}-${mes}-${diaPad}`; 
-            let format1 = `${diaPad}/${mes}/${anio}`;   
+            let isoFormat = `${anio}-${mesPad}-${diaPad}`; 
+            let format1 = `${diaPad}/${mesPad}/${anio}`;   
 
             let colIndex = -1;
-            let headerTitle = "Hoy no encontrado";
+            let headerTitle = `${diaPad}/${mesPad}/${anio}`;
             
             for(let r=0; r<=1; r++) {
                 if(!rosterData[r]) continue;
@@ -255,17 +302,19 @@
                 }
             }
 
-            // 2. ESTRUCTURAS HISTÓRICAS (HOY, SEMANA, MES)
-            let statsHoy = {};
+            // 2. FILTROS TEMPORALES
+            let hoyStart = new Date(anio, hoyDate.getMonth(), hoyDate.getDate());
+            
+            let hace7Dias = new Date(hoyStart);
+            hace7Dias.setDate(hace7Dias.getDate() - 7);
+
+            let statsAyer = {};
             let statsSemana = {};
             let statsMes = {};
 
             let maxEffM = { val: 0, maquina: 0 };
             let maxEffT = { val: 0, maquina: 0 };
             let maxEffN = { val: 0, maquina: 0 };
-
-            let hoyStart = new Date(anio, hoyDate.getMonth(), hoyDate.getDate());
-            let hace7Dias = new Date(hoyStart); hace7Dias.setDate(hace7Dias.getDate() - 7);
 
             if (effData && effData.length > 0) {
                 effData.forEach(row => {
@@ -294,14 +343,10 @@
                         let letraTurno = tno === "Mañana" ? "M" : (tno === "Tarde" ? "T" : "N");
                         let opNombre = (maqData[maqNum] && maqData[maqNum][letraTurno].name) ? maqData[maqNum][letraTurno].name : "OPERADOR";
 
-                        // Evaluar si es HOY
+                        // Carga en vivo para tarjetas HOY
                         let esHoy = false;
-                        if(fechaFila && fechaFila.toDateString() === hoyStart.toDateString()) {
-                            esHoy = true;
-                        } else if(!fechaFila) {
-                            // Fallback si no hay columna fecha limpia: asumimos datos de hoy
-                            esHoy = true;
-                        }
+                        if(fechaFila && fechaFila.toDateString() === hoyStart.toDateString()) esHoy = true;
+                        else if(!fechaFila) esHoy = true;
 
                         if(esHoy && maqData[maqNum]) {
                             let currentObj = maqData[maqNum][letraTurno];
@@ -311,18 +356,24 @@
                             if(letraTurno === "M" && currentObj.eff > maxEffM.val) { maxEffM = { val: currentObj.eff, maquina: maqNum }; }
                             if(letraTurno === "T" && currentObj.eff > maxEffT.val) { maxEffT = { val: currentObj.eff, maquina: maqNum }; }
                             if(letraTurno === "N" && currentObj.eff > maxEffN.val) { maxEffN = { val: currentObj.eff, maquina: maqNum }; }
-
-                            if (!statsHoy[opNombre]) statsHoy[opNombre] = { sum: 0, count: 0 };
-                            statsHoy[opNombre].sum += eficienciaNeta; statsHoy[opNombre].count++;
                         }
 
-                        // Acumular para SEMANA (últimos 7 días)
+                        // Carga para DÍA ANTERIOR (Excluye hoy para tomar el consolidado de ayer o el último cerrado)
+                        if(fechaFila && fechaFila < hoyStart) {
+                            let keyFecha = fechaFila.toDateString();
+                            if(!statsAyer[keyFecha]) statsAyer[keyFecha] = {};
+                            if(!statsAyer[keyFecha][opNombre]) statsAyer[keyFecha][opNombre] = { sum: 0, count: 0 };
+                            statsAyer[keyFecha][opNombre].sum += eficienciaNeta;
+                            statsAyer[keyFecha][opNombre].count++;
+                        }
+
+                        // Carga SEMANAL
                         if(fechaFila && fechaFila >= hace7Dias) {
                             if (!statsSemana[opNombre]) statsSemana[opNombre] = { sum: 0, count: 0 };
                             statsSemana[opNombre].sum += eficienciaNeta; statsSemana[opNombre].count++;
                         }
 
-                        // Acumular para MES (mismo mes y año)
+                        // Carga MENSUAL
                         if(fechaFila && fechaFila.getMonth() === hoyDate.getMonth() && fechaFila.getFullYear() === anio) {
                             if (!statsMes[opNombre]) statsMes[opNombre] = { sum: 0, count: 0 };
                             statsMes[opNombre].sum += eficienciaNeta; statsMes[opNombre].count++;
@@ -331,60 +382,75 @@
                 });
             }
 
-            // Función para obtener al #1 de un objeto de estadísticas
+            // Calcular al ganador del Día Anterior (Busca la fecha más reciente con datos cerrados)
+            let topAyer = { name: "Consolidando...", score: 0 };
+            let fechasOrdenadas = Object.keys(statsAyer).sort((a,b) => new Date(b) - new Date(a));
+            if(fechasOrdenadas.length > 0) {
+                let ultimaFecha = fechasOrdenadas[0]; // La fecha cerrada más reciente
+                let maxAvg = 0;
+                for(let op in statsAyer[ultimaFecha]) {
+                    let avg = statsAyer[ultimaFecha][op].sum / statsAyer[ultimaFecha][op].count;
+                    if(avg > maxAvg && op !== "NO ASIGNADO" && op !== "OPERADOR") {
+                        maxAvg = avg;
+                        topAyer = { name: op, score: avg };
+                    }
+                }
+            }
+
             const getTop1 = (statsObj) => {
-                let best = { name: "En evaluación", score: "0,0%" };
+                let best = { name: "En evaluación", score: 0 };
                 let max = 0;
                 for(let name in statsObj) {
                     let avg = statsObj[name].sum / statsObj[name].count;
                     if(avg > max && name !== "NO ASIGNADO" && name !== "OPERADOR") {
                         max = avg;
-                        best = { name: name, score: avg.toFixed(1).replace('.',',') + '%' };
+                        best = { name: name, score: avg };
                     }
                 }
                 return best;
             };
 
-            let topHoy = getTop1(statsHoy);
             let topSemana = getTop1(statsSemana);
             let topMes = getTop1(statsMes);
 
-            // 3. RENDERIZADO
-            let gridHtml = '';
-            
+            // 3. RENDERIZADO DEL SALÓN DE LA FAMA
+            const getPodiumHtml = (dataObj, title, medal, colorClass) => {
+                let name = dataObj.name;
+                let scoreVal = dataObj.score;
+                let scoreText = scoreVal > 0 ? scoreVal.toFixed(1).replace('.',',') + '%' : '0,0%';
+                let barWidth = Math.min(100, Math.max(0, scoreVal)) + '%';
+
+                return `
+                <div class="podium-item ${colorClass === 'gold' ? 'shimmer-card' : ''}">
+                    <div class="medallion ${colorClass}">${medal}</div>
+                    <div class="podium-body">
+                        <div class="podium-meta">
+                            <span class="podium-tag">${title}</span>
+                            <span class="podium-score-val">${scoreText}</span>
+                        </div>
+                        <div class="podium-user">${name}</div>
+                        <div class="bar-container">
+                            <div class="bar-fill ${colorClass}" style="width: ${barWidth};"></div>
+                        </div>
+                    </div>
+                </div>`;
+            };
+
             let podiumHtml = `
             <div class="machine-card podium-card">
                 <h3 class="machine-name">🏆 SALÓN DE LA FAMA</h3>
                 <div class="ops-list">
-                    <div class="podium-row podium-gold shimmer">
-                        <div class="podium-medal">🥇</div>
-                        <div class="podium-info">
-                            <div class="podium-title">Líder del Día (Hoy)</div>
-                            <div class="podium-name">${topHoy.name}</div>
-                        </div>
-                        <div class="podium-score">${topHoy.score}</div>
-                    </div>
-                    <div class="podium-row podium-silver">
-                        <div class="podium-medal">📅</div>
-                        <div class="podium-info">
-                            <div class="podium-title">Líder de la Semana</div>
-                            <div class="podium-name">${topSemana.name}</div>
-                        </div>
-                        <div class="podium-score">${topSemana.score}</div>
-                    </div>
-                    <div class="podium-row podium-bronze">
-                        <div class="podium-medal">🌟</div>
-                        <div class="podium-info">
-                            <div class="podium-title">Empleado del Mes</div>
-                            <div class="podium-name">${topMes.name}</div>
-                        </div>
-                        <div class="podium-score">${topMes.score}</div>
-                    </div>
+                    ${getPodiumHtml(topAyer, 'Día Anterior Consolidado', '🥇', 'gold')}
+                    ${getPodiumHtml(topSemana, 'Líder de la Semana', '🥈', 'silver')}
+                    ${getPodiumHtml(topMes, 'Empleado del Mes', '🥉', 'bronze')}
                 </div>
             </div>`;
 
+            let gridHtml = '';
+
+            // Se intercalan exactamente 7 inyectoras + 1 Salón de la Fama
             MACHINE_IDS.forEach((m, index) => {
-                if(index === 1) { gridHtml += podiumHtml; }
+                if(index === 1) { gridHtml += podiumHtml; } // Inserta el podio exactamente en la casilla 2
 
                 let ops = maqData[m];
                 
