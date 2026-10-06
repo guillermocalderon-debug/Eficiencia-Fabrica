@@ -5,55 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ranking y Asignación - Libus</title>
     <style>
-        :root {
-            --primary: #e6005a;
-            --bg: #0f172a; /* Fondo oscuro elegante para TV */
-            --card-bg: #1e293b;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
+        :root { 
+            --primary: #e6005a; 
+            --bg-light: #f4f7f6; 
+            --card-bg: #ffffff; 
+            --text-dark: #222222;
+            --text-muted: #666666;
+            --border-color: #e2e8f0;
             
-            --sober-m: #38bdf8; /* Celeste Mañana */
-            --sober-t: #fb923c; /* Naranja Tarde */
-            --sober-n: #818cf8; /* Indigo Noche */
+            --sober-m: #475569; /* Gris Pizarra - Mañana */
+            --sober-t: #64748b; /* Gris Acero - Tarde */
+            --sober-n: #0f172a; /* Gris Carbón - Noche */
+            --gold: #fbbf24; /* Color Oro para el líder */
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text-light); margin: 0; padding: 2vh 2vw; display: flex; flex-direction: column; height: 100vh; overflow: hidden; box-sizing: border-box;}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: var(--text-dark); margin: 0; padding: 2vh 2vw; display: flex; flex-direction: column; height: 100vh; overflow: hidden; box-sizing: border-box;}
         
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 1.5vh; margin-bottom: 2vh;}
-        .logo { height: min(40px, 5vh); filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        /* CABECERA */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5vh; margin-bottom: 2vh;}
+        .logo { height: min(40px, 5vh); }
         .title-box { text-align: center; flex-grow: 1;}
-        .title { margin: 0; font-size: min(35px, 4vh); font-weight: 900; color: #fff; letter-spacing: 2px; text-transform: uppercase;}
-        .subtitle { color: var(--primary); font-weight: bold; font-size: min(18px, 2vh); margin-top: 5px; text-transform: uppercase;}
-        .clock { font-size: min(20px, 2.5vh); font-weight: bold; color: var(--primary); background: #334155; padding: 0.5vh 1.5vw; border-radius: 20px;}
+        .title { margin: 0; font-size: min(32px, 4vh); font-weight: 900; color: #111; letter-spacing: 1px; text-transform: uppercase;}
+        .subtitle { color: var(--primary); font-weight: bold; font-size: min(16px, 2vh); margin-top: 5px; text-transform: uppercase;}
+        .clock { font-size: min(1.5vw, 3vh); font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
 
         /* Contenedor Elástico de Máquinas */
         .machines-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5vw; flex-grow: 1;}
         
-        .machine-card { background: var(--card-bg); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 5px solid var(--primary); display: flex; flex-direction: column; overflow: hidden; position: relative;}
-        .machine-name { text-align: center; font-size: 2.5vh; font-weight: 900; background: #0f172a; padding: 1vh; margin: 0; border-bottom: 1px solid #334155;}
+        .machine-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-top: 5px solid var(--primary); display: flex; flex-direction: column; overflow: hidden; position: relative;}
+        .machine-name { text-align: center; font-size: 2vh; font-weight: 900; background: #ffffff; color: #222; padding: 1vh; margin: 0; border-bottom: 2px solid #eee;}
         
         /* Lista de operadores por turno */
-        .ops-list { display: flex; flex-direction: column; flex-grow: 1; padding: 1vh 1vw; gap: 1vh; justify-content: center;}
+        .ops-list { display: flex; flex-direction: column; flex-grow: 1; padding: 1vh 1vw; gap: 1vh; justify-content: center; background-color: #fafbfc;}
         
-        .op-row { display: flex; align-items: center; background: #334155; border-radius: 10px; padding: 1vh; border-left: 5px solid #64748b;}
-        .op-row.m { border-left-color: var(--sober-m); }
-        .op-row.t { border-left-color: var(--sober-t); }
-        .op-row.n { border-left-color: var(--sober-n); }
+        .op-row { display: flex; align-items: center; background: #ffffff; border-radius: 10px; padding: 1vh; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s ease;}
         
-        .op-avatar { width: 4vh; height: 4vh; background: #475569; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.8vh; margin-right: 1vw; color: #fff;}
-        .op-details { flex-grow: 1;}
-        .op-name { font-size: 1.8vh; font-weight: bold; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 15vw;}
-        .op-shift { font-size: 1.3vh; font-weight: 900; color: var(--text-muted); text-transform: uppercase;}
+        .op-row.m { border-left: 5px solid var(--sober-m); }
+        .op-row.t { border-left: 5px solid var(--sober-t); }
+        .op-row.n { border-left: 5px solid var(--sober-n); }
         
-        /* Simulación de Rango/Medalla (Para cruzar con eficiencia después) */
-        .op-rank { font-size: 2vh; }
+        /* Clase para el ganador del turno */
+        .op-row.leader { background-color: #f0fdf4; border-color: #bbf7d0; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); transform: scale(1.02); z-index: 5;}
+        
+        .op-avatar { width: 4vh; height: 4vh; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.6vh; margin-right: 1vw; color: #fff;}
+        .op-row.m .op-avatar { background-color: var(--sober-m); }
+        .op-row.t .op-avatar { background-color: var(--sober-t); }
+        .op-row.n .op-avatar { background-color: var(--sober-n); }
+        .op-row.leader .op-avatar { background-color: var(--gold); color: #000;}
 
-        #loader { text-align: center; color: var(--primary); font-weight: bold; font-size: 2vh; margin-top: 20vh;}
+        .op-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: center;}
+        .op-name { font-size: 1.6vh; font-weight: 900; color: #222; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 10vw;}
+        .op-shift { font-size: 1.1vh; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-top: 2px;}
+        
+        /* OEE y Medallas */
+        .op-stats { display: flex; align-items: center; gap: 8px;}
+        .op-oee { font-size: 2.2vh; font-weight: 900; color: #222; }
+        .op-rank { font-size: 2.5vh; animation: pulseRank 2s infinite alternate;}
+        
+        @keyframes pulseRank { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+
+        #loader { text-align: center; color: var(--primary); font-weight: bold; font-size: 2vh; margin-top: 20vh; display: flex; flex-direction: column; gap: 10px;}
 
         @media (max-width: 768px) {
             body { height: auto; overflow-y: visible; padding: 15px;}
-            .header { flex-direction: column; gap: 15px;}
+            .header { flex-direction: column; gap: 15px; text-align: center;}
             .machines-grid { grid-template-columns: 1fr; }
-            .op-name { max-width: 50vw;}
+            .op-name { max-width: 40vw;}
         }
     </style>
 </head>
@@ -62,116 +78,239 @@
     <div class="header">
         <img src="libus_positivo_CMYK.jpg" alt="Libus" class="logo" onerror="this.src='https://latam.libus.com/imagenes/logo_libus.png'">
         <div class="title-box">
-            <h1 class="title">📋 ASIGNACIÓN DE PLANTA</h1>
-            <div class="subtitle" id="fechaHoy">Buscando fecha...</div>
+            <h1 class="title">🏆 RANKING OEE Y ASIGNACIÓN</h1>
+            <div class="subtitle" id="fechaHoy">Buscando fecha actual...</div>
         </div>
         <div class="clock" id="liveClock">00:00:00</div>
     </div>
 
-    <div id="loader">Conectando con matriz de turnos... ⏳</div>
+    <div id="loader">
+        <span id="loadText">Conectando con base de datos maestra... ⏳</span>
+    </div>
     
     <div class="machines-grid" id="machinesGrid">
         <!-- Las máquinas se generan dinámicamente -->
     </div>
 
     <script>
-        // API de tu matriz de turnos
+        // LAS DOS APIs TRABAJANDO JUNTAS
         const ROSTER_API = 'https://script.google.com/macros/s/AKfycbzxBhGp2oElpCW6YzacSbDhqGvbih0X0dBZmnipIkscPp2uJx2CqRQstESXu7M0iZ1gLA/exec';
+        const EFF_API = 'https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec';
 
-        // Reloj
         setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL'); }, 1000);
 
-        // Nombres de las máquinas a mostrar
         const MACHINE_IDS = [1, 2, 3, 4, 5, 6, 7];
 
+        // Función para encapsular JSONP en Promesas
+        function fetchJSONP(url, prefix) {
+            return new Promise((resolve, reject) => {
+                const callbackName = prefix + '_' + Math.round(100000 * Math.random());
+                window[callbackName] = function(data) {
+                    resolve(data);
+                    delete window[callbackName];
+                    const scriptEl = document.getElementById(callbackName);
+                    if(scriptEl) scriptEl.remove();
+                };
+                const script = document.createElement('script');
+                script.id = callbackName;
+                script.src = `${url}?callback=${callbackName}&_t=${Date.now()}`;
+                script.onerror = () => reject(`Error conectando a ${prefix}`);
+                document.body.appendChild(script);
+            });
+        }
+
+        // Matemáticas para el OEE (Misma regla de tope 100% del Dashboard de Eficiencia)
+        function parseRobustFloat(val) {
+            if (val === undefined || val === null || val === "") return 0;
+            let str = String(val).replace(/%/g, '').trim(); 
+            if (str.includes(',') && !str.includes('.')) { str = str.replace(',', '.'); } 
+            else if (str.includes('.') && str.includes(',')) { str = str.replace(/\./g, '').replace(',', '.'); }
+            return parseFloat(str) || 0;
+        }
+
         function getAvatarInitials(name) {
-            if(!name) return "?";
+            if(!name || name === "Sin asignar") return "-";
             let parts = name.trim().split(" ");
             if(parts.length >= 2) return parts[0][0] + parts[1][0];
             return parts[0][0];
         }
 
-        function renderRoster(data) {
-            document.getElementById('loader').style.display = 'none';
-            if(!data || data.length < 2) return;
+        function startEngine() {
+            document.getElementById('loadText').innerText = "Descargando Asignaciones y Eficiencias... ⏳";
+            
+            // Descargar AMBAS bases de datos simultáneamente
+            Promise.all([
+                fetchJSONP(ROSTER_API, 'roster'),
+                fetchJSONP(EFF_API, 'eff')
+            ]).then(([rosterData, effData]) => {
+                renderCombinedDashboard(rosterData, effData);
+            }).catch(err => {
+                document.getElementById('loadText').innerText = "❌ Error de conexión. Reintentando...";
+                console.error(err);
+            });
+        }
 
-            // 1. Obtener la fecha de hoy en formato DD/MM/YYYY para buscar la columna
+        function renderCombinedDashboard(rosterData, effData) {
+            document.getElementById('loader').style.display = 'none';
+
+            // ==========================================
+            // 1. PROCESAR ASIGNACIONES DE OPERADORES
+            // ==========================================
             let hoyDate = new Date();
-            let dia = String(hoyDate.getDate()).padStart(2, '0');
+            let dia = String(hoyDate.getDate());
+            let diaPad = dia.padStart(2, '0');
             let mes = String(hoyDate.getMonth() + 1).padStart(2, '0');
             let anio = hoyDate.getFullYear();
-            let fechaStrBusqueda = `${dia}/${mes}/${anio}`; 
             
-            document.getElementById('fechaHoy').innerText = `TURNO DEL DÍA: ${fechaStrBusqueda}`;
+            // Textos posibles de fecha en el Google Sheet
+            let isoFormat = `${anio}-${mes}-${diaPad}`; // 2026-10-06
+            let format1 = `${diaPad}/${mes}/${anio}`;   // 06/10/2026
+            let format2 = `${dia}/${mes}/${anio}`;      // 6/10/2026
+            let format3 = `${diaPad}/${mes}`;           // 06/10
 
-            let headers = data[0];
-            let colIndex = headers.indexOf(fechaStrBusqueda);
+            let colIndex = -1;
+            let headerTitle = "Hoy no encontrado";
             
-            // Si por algún motivo no encuentra el día exacto (ej. error de tipografía en el Excel), forzamos una columna de prueba para que no se vea vacío
-            if(colIndex === -1) {
-                // Buscamos alguna columna que parezca fecha
-                for(let i=2; i<headers.length; i++) {
-                    if(headers[i].includes('/')) { colIndex = i; break; }
+            // Escáner de Fechas Indestructible
+            for(let r=0; r<=1; r++) {
+                if(!rosterData[r]) continue;
+                for(let i=0; i<rosterData[r].length; i++) {
+                    let cell = String(rosterData[r][i]).trim();
+                    if(cell.includes(isoFormat) || cell === dia || cell.includes(format1) || cell.includes(format2) || cell.includes(format3)) {
+                        colIndex = i; 
+                        headerTitle = cell.substring(0, 10);
+                        break;
+                    }
                 }
-                document.getElementById('fechaHoy').innerText = `Mostrando datos de: ${headers[colIndex]} (Hoy no encontrado)`;
+                if(colIndex !== -1) break;
             }
 
-            // 2. Estructura para agrupar operarios por Máquina y por Turno
+            document.getElementById('fechaHoy').innerText = `TURNO: ${headerTitle}`;
+
             let maqData = {};
-            MACHINE_IDS.forEach(m => maqData[m] = { M: null, T: null, N: null });
+            MACHINE_IDS.forEach(m => maqData[m] = { M: {name: null, eff: 0}, T: {name: null, eff: 0}, N: {name: null, eff: 0} });
 
-            // 3. Procesar las filas de los operarios
-            for(let i = 1; i < data.length; i++) {
-                let row = data[i];
-                let operario = row[1];
-                let asignacion = row[colIndex]; // Ej: "M1-3-4 (T)", "M2-6 (N)", "Libre"
+            if (colIndex !== -1) {
+                for(let i = 1; i < rosterData.length; i++) {
+                    let row = rosterData[i];
+                    let operario = row[1];
+                    let asignacion = row[colIndex]; 
 
-                if(asignacion && asignacion !== "Libre" && asignacion !== "-" && asignacion.includes("(")) {
-                    // Separar máquinas del turno. Ej: "M1-3-4" y "(T)"
-                    let parts = asignacion.split("(");
-                    let maqStr = parts[0].replace('M', '').trim(); // "1-3-4"
-                    let turnoLetra = parts[1].replace(')', '').trim(); // "T"
+                    if(asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
+                        let parts = String(asignacion).split("(");
+                        let maqStr = parts[0].replace('M', '').trim(); 
+                        let turnoLetra = parts[1].replace(')', '').trim(); 
 
-                    // Extraer los números de las máquinas
-                    let numeros = maqStr.split('-');
-                    numeros.forEach(num => {
-                        let n = parseInt(num);
-                        if(maqData[n]) {
-                            maqData[n][turnoLetra] = operario;
-                        }
-                    });
+                        let numeros = maqStr.split('-');
+                        numeros.forEach(num => {
+                            let n = parseInt(num);
+                            if(maqData[n]) {
+                                maqData[n][turnoLetra].name = operario;
+                            }
+                        });
+                    }
                 }
             }
 
-            // 4. Dibujar las tarjetas de las máquinas
+            // ==========================================
+            // 2. PROCESAR EFICIENCIAS (OEE REAL)
+            // ==========================================
+            // Variables para determinar al Rey absoluto del turno
+            let maxEffM = { val: 0, maquina: 0 };
+            let maxEffT = { val: 0, maquina: 0 };
+            let maxEffN = { val: 0, maquina: 0 };
+
+            if (effData && effData.length > 0) {
+                effData.forEach(row => {
+                    let rClean = {};
+                    for(let k in row) {
+                        let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                        rClean[cleanKey] = row[k];
+                    }
+
+                    let dispRaw = parseRobustFloat(rClean["disponibilidad"]);
+                    let calRaw = parseRobustFloat(rClean["calidad"]);
+                    let tno = String(rClean["turno"] || "").trim();
+                    let maqStr = String(rClean["maquina"] || "").trim(); // "Inyectora 1"
+                    
+                    if(maqStr && tno) {
+                        let nStr = maqStr.replace(/\D/g,'');
+                        let maqNum = parseInt(nStr);
+
+                        if(maqData[maqNum]) {
+                            // Cálculo exacto del OEE (topado al 100%)
+                            let disp = (dispRaw <= 1.5 && dispRaw !== 0) ? dispRaw * 100 : dispRaw;
+                            let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
+                            if (disp > 100) disp = 100;
+                            if (cal > 100) cal = 100;
+                            let eff = (disp / 100) * (cal / 100) * 100;
+
+                            let letraTurno = tno === "Mañana" ? "M" : (tno === "Tarde" ? "T" : "N");
+                            
+                            // Guardamos el promedio (en caso de varios registros de la misma máquina en el día)
+                            let currentObj = maqData[maqNum][letraTurno];
+                            if(currentObj.eff === 0) currentObj.eff = eff;
+                            else currentObj.eff = (currentObj.eff + eff) / 2;
+
+                            // Actualizar Líderes
+                            if(letraTurno === "M" && currentObj.eff > maxEffM.val) { maxEffM = { val: currentObj.eff, maquina: maqNum }; }
+                            if(letraTurno === "T" && currentObj.eff > maxEffT.val) { maxEffT = { val: currentObj.eff, maquina: maqNum }; }
+                            if(letraTurno === "N" && currentObj.eff > maxEffN.val) { maxEffN = { val: currentObj.eff, maquina: maqNum }; }
+                        }
+                    }
+                });
+            }
+
+            // ==========================================
+            // 3. RENDERIZAR TABLERO COMBINADO
+            // ==========================================
             let gridHtml = '';
             
             MACHINE_IDS.forEach(m => {
                 let ops = maqData[m];
                 
-                // Función interna para dibujar la fila de un operador
-                const getOpRow = (nombre, tipo, colorClase, turnoLabel) => {
-                    if(!nombre) return `<div class="op-row" style="opacity: 0.3;"><div class="op-avatar">-</div><div class="op-details"><p class="op-name">Sin asignar</p><p class="op-shift">${turnoLabel}</p></div></div>`;
+                const getOpRow = (obj, tipo, colorClase, turnoLabel, leaderObj) => {
+                    let isLeader = (obj.eff > 0 && leaderObj.maquina === m);
+                    let leaderClass = isLeader ? "leader" : "";
                     
-                    let iniciales = getAvatarInitials(nombre);
+                    // Si no hay nadie asignado
+                    if(!obj.name) {
+                        return `
+                        <div class="op-row" style="opacity: 0.6; background: #f8fafc;">
+                            <div class="op-avatar" style="background: #cbd5e1;">-</div>
+                            <div class="op-details">
+                                <p class="op-name" style="color: #94a3b8;">Sin asignar</p>
+                                <p class="op-shift">${turnoLabel}</p>
+                            </div>
+                        </div>`;
+                    }
+                    
+                    let iniciales = getAvatarInitials(obj.name);
+                    let effText = obj.eff > 0 ? obj.eff.toFixed(1).replace('.', ',') + "%" : "0,0%";
+                    let rankIcon = isLeader ? "👑" : (obj.eff > 90 ? "🔥" : ""); // Corona al mejor, Fuego si pasa del 90%
+                    let colorEff = isLeader ? "var(--success)" : (obj.eff === 0 ? "#cbd5e1" : "#222");
+
                     return `
-                    <div class="op-row ${colorClase}">
-                        <div class="op-avatar" style="background-color: var(--sober-${colorClase});">${iniciales}</div>
+                    <div class="op-row ${colorClase} ${leaderClass}">
+                        <div class="op-avatar">${iniciales}</div>
                         <div class="op-details">
-                            <p class="op-name">${nombre}</p>
+                            <p class="op-name" title="${obj.name}">${obj.name}</p>
                             <p class="op-shift">${turnoLabel}</p>
                         </div>
-                        <div class="op-rank">💪</div>
+                        <div class="op-stats">
+                            <span class="op-oee" style="color: ${colorEff};">${effText}</span>
+                            <span class="op-rank">${rankIcon}</span>
+                        </div>
                     </div>`;
                 };
 
                 gridHtml += `
                 <div class="machine-card">
-                    <h3 class="machine-name">MÁQUINA ${m}</h3>
+                    <h3 class="machine-name">INYECCIÓN ${m}</h3>
                     <div class="ops-list">
-                        ${getOpRow(ops['M'], 'M', 'm', '☀️ MAÑANA')}
-                        ${getOpRow(ops['T'], 'T', 't', '🌤 TARDE')}
-                        ${getOpRow(ops['N'], 'N', 'n', '🌙 NOCHE')}
+                        ${getOpRow(ops['M'], 'M', 'm', '☀️ MAÑANA', maxEffM)}
+                        ${getOpRow(ops['T'], 'T', 't', '🌤 TARDE', maxEffT)}
+                        ${getOpRow(ops['N'], 'N', 'n', '🌙 NOCHE', maxEffN)}
                     </div>
                 </div>`;
             });
@@ -179,22 +318,9 @@
             document.getElementById('machinesGrid').innerHTML = gridHtml;
         }
 
-        function loadData() {
-            const callbackName = 'jsonpCallback_' + Math.round(100000 * Math.random());
-            window[callbackName] = function(data) {
-                renderRoster(data);
-                delete window[callbackName];
-                document.getElementById(callbackName).remove();
-            };
-            const script = document.createElement('script');
-            script.id = callbackName;
-            script.src = `${ROSTER_API}?callback=${callbackName}&_t=${Date.now()}`;
-            document.body.appendChild(script);
-        }
-
         window.onload = () => {
-            loadData();
-            setInterval(loadData, 300000); // 5 mins
+            startEngine();
+            setInterval(startEngine, 300000); // 5 mins
         };
     </script>
 </body>
