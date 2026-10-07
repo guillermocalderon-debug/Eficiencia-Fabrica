@@ -5,140 +5,316 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablero de Producción - Libus</title>
     <style>
+        /* =========================================================
+           SISTEMA DE DISEÑO - HIGH END INDUSTRIAL CLARO
+           ========================================================= */
         :root { 
             --primary: #e6005a; 
             --bg-light: #f4f7f6; 
             --card-bg: #ffffff; 
-            --text-dark: #222222;
-            --text-muted: #666666;
-            --border-color: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
             
-            /* Paleta Sobria para Turnos */
-            --sober-m: #475569; /* Gris Pizarra - Mañana */
-            --sober-t: #64748b; /* Gris Acero - Tarde */
-            --sober-n: #0f172a; /* Gris Carbón - Noche */
+            /* Colores de Equipos */
+            --team-a: #0284c7; /* Azul Dilan */
+            --team-b: #ea580c; /* Naranja Miguel */
+            --team-c: #10b981; /* Verde Nilson */
+            
+            /* Metales naturales */
+            --gold-1: #b45309;
+            --gold-2: #fcd34d;
+            --gold-3: #fffbeb;
+            --gold-shadow: rgba(180, 83, 9, 0.4);
+
+            --silver-1: #475569;
+            --silver-2: #cbd5e1;
+            --silver-3: #ffffff;
+            --silver-shadow: rgba(71, 85, 105, 0.25);
+
+            --bronze-1: #9a3412;
+            --bronze-2: #fb923c;
+            --bronze-3: #fff7ed;
+            --bronze-shadow: rgba(154, 52, 18, 0.3);
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg-light); color: var(--text-dark); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-light); 
+            color: var(--text-dark); 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(rgba(0,0,0,0.012) 1px, transparent 1px),
+                linear-gradient(to right, rgba(230,0,90,0.005) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
         
         /* HEADER PRINCIPAL */
-        header { background: #ffffff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: 3px solid var(--primary);}
+        header { 
+            background: #ffffff; 
+            padding: 1vh 2vw; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            border-bottom: 3.5px solid var(--primary);
+            height: 8vh;
+            flex-shrink: 0;
+            z-index: 10;
+        }
         .logo-box { display: inline-flex; align-items: center;}
-        .logo { height: 40px; }
-        .nav-btns button { background: white; border: 1px solid #ccc; color: var(--text-dark); padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-left: 10px; font-weight: bold; transition: 0.3s; }
+        .logo { height: 4.5vh; max-height: 40px; object-fit: contain; }
+        .nav-btns button { 
+            background: white; 
+            border: 1px solid #ccc; 
+            color: var(--text-dark); 
+            padding: 8px 15px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin-left: 10px; 
+            font-weight: bold; 
+            transition: 0.2s; 
+            font-size: min(1vw, 2vh);
+        }
         .nav-btns button:hover { background: #f1f5f9; border-color: var(--text-dark); }
         .btn-tv { background-color: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
         
         /* GESTIÓN DE VISTAS */
-        .view { display: none !important; padding: 20px; max-width: 1400px; margin: auto; }
-        #form-view.active { display: block !important; animation: fadeIn 0.4s; }
-        #dash-view.active { display: flex !important; flex-direction: column; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .view { display: none !important; padding: 2vh 2vw; flex-grow: 1; height: calc(100vh - 8vh); box-sizing: border-box;}
+        #form-view.active { display: block !important; overflow-y: auto; }
+        #dash-view.active { display: flex !important; flex-direction: column; }
         
         /* =========================================
-           FORMULARIO MÓVIL
+            FORMULARIO MÓVIL
            ========================================= */
-        .form-container { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 500px; margin: 40px auto; border-top: 5px solid var(--primary);}
+        .form-container { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 500px; margin: 20px auto; border-top: 5px solid var(--primary);}
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: var(--text-muted); text-transform: uppercase;}
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; background-color: #f8fafc; color: var(--text-dark);}
         .btn-submit { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px;}
         .btn-submit:hover { background: #c20042; }
-        
         .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .counter-box { background: #f1f5f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--sober-m); }
+        .counter-box { background: #f1f5f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--team-a); }
         .counter-box .form-group { margin-bottom: 0; }
         
         /* =========================================
-           DASHBOARD TV: PANTALLA ANCHA 
+            DASHBOARD TV ELÁSTICO & ROTATIVO
            ========================================= */
-        .dashboard-tv { height: 100vh; overflow: hidden; padding: 2vh 2vw; box-sizing: border-box; max-width: 100%;}
+        .dash-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 1.5vh; 
+            border-bottom: 2.5px solid var(--border-color); 
+            padding-bottom: 1vh;
+            height: 6vh;
+            flex-shrink: 0;
+        }
+        .dash-header h2 { 
+            margin: 0; 
+            font-size: min(1.8vw, 3.5vh); 
+            font-weight: 900; 
+            letter-spacing: 0.5px; 
+            color: #111; 
+            text-transform: uppercase; 
+            flex-grow: 1;
+            padding-left: 2vw;
+        }
         
-        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1vh; border-bottom: 2px solid var(--border-color); padding-bottom: 1vh;}
-        .dash-header .logo { height: max(30px, 4vh); } 
-        .dash-header h2 { margin: 0; font-size: min(2vw, 4vh); font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase; text-align: center; flex-grow: 1;}
-        .clock-tv { font-size: min(1.5vw, 3vh); font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
-        .btn-exit { background-color: #333; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;}
+        /* SELECTOR / CAROUSEL DE TIEMPO */
+        .timeframe-selector {
+            display: flex;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 30px;
+            gap: 5px;
+            margin-right: 1.5vw;
+        }
+        .time-btn {
+            background: transparent; border: none; padding: 6px 18px; border-radius: 20px;
+            font-weight: 900; font-size: min(0.8vw, 1.8vh); text-transform: uppercase; color: var(--text-muted);
+            cursor: pointer; transition: 0.3s;
+        }
+        .time-btn.active {
+            background: var(--primary); color: white; box-shadow: 0 4px 8px rgba(230,0,90,0.2);
+        }
+
+        .clock-tv { font-size: min(1.3vw, 2.5vh); font-weight: bold; color: var(--text-muted); background: #ffffff; padding: 0.6vh 1.2vw; border-radius: 20px; border: 1px solid var(--border-color); letter-spacing: 1px;}
+        .btn-exit { background-color: #334155; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 10px; font-size: min(0.9vw, 1.8vh);}
         
         /* Tarjetas Globales */
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1vw; margin-bottom: 1vh; }
-        .kpi-card { background: var(--card-bg); padding: 1vh 1vw; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-top: 5px solid var(--primary);}
-        .kpi-card h3 { margin: 0; font-size: min(0.9vw, 1.8vh); color: var(--text-muted); text-transform: uppercase; font-weight: bold;}
-        .kpi-card p { margin: 0.5vh 0 0; font-size: min(2.8vw, 5vh); font-weight: 900; color: #111; display: flex; justify-content: center; align-items: center; gap: 5px;}
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1vw; margin-bottom: 1.5vh; flex-shrink: 0; }
+        .kpi-card { 
+            background: var(--card-bg); 
+            padding: 1vh 1.2vw; 
+            border-radius: 12px; 
+            text-align: left; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+            border: 1px solid var(--border-color); 
+            border-top: 5px solid var(--primary);
+            position: relative;
+        }
+        .kpi-card::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 6px; height: 6px;
+            border-top: 1.5px solid var(--primary); border-right: 1.5px solid var(--primary);
+        }
+        .kpi-card h3 { margin: 0; font-size: min(0.80vw, 1.6vh); color: var(--text-muted); text-transform: uppercase; font-weight: bold;}
+        .kpi-card p { margin: 0.2vh 0 0; font-size: min(2.5vw, 4.5vh); font-weight: 900; color: #111; }
 
         /* Tarjetas por Turno */
-        .shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1vw; margin-top: 2vh; margin-bottom: 1.5vh;}
-        .shift-panel { background: var(--card-bg); border-radius: 12px; overflow: visible; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.4s ease; display: flex; flex-direction: column;}
-        .shift-header { padding: 0.8vh; text-align: center; font-weight: 900; font-size: min(1.2vw, 2.5vh); color: white; letter-spacing: 1px; text-transform: uppercase; border-top-left-radius: 11px; border-top-right-radius: 11px;}
-        .shift-body { padding: 1vh; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw; background-color: #fafbfc; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; flex-grow: 1;}
-        .shift-stat { background: white; padding: 0.8vh; border-radius: 8px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center;}
-        .shift-stat span { display: block; font-size: min(0.7vw, 1.5vh); color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.2vh; font-weight: bold;}
-        .shift-stat strong { display: flex; justify-content: center; align-items: center; gap: 4px; font-size: min(1.8vw, 3.5vh); color: #222; font-weight: 900;}
-
-        /* 🔥 ANIMACIÓN DE RÉCORD (CICLO SUPERADO) 🔥 */
-        .rocket-badge { font-size: 0.8em; animation: rocketPulse 1.5s infinite alternate; display: inline-block; cursor: help;}
-        @keyframes rocketPulse { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-3px) scale(1.2); } }
-
-        /* 🔥 ANIMACIÓN DEL MEJOR TURNO 🔥 */
-        .best-shift { transform: scale(1.03); box-shadow: 0 10px 25px rgba(230, 0, 90, 0.2); border: 3px solid var(--primary); position: relative; z-index: 10;}
-        .best-shift::after {
-            content: '🏆 MEJOR TURNO'; position: absolute; top: -2.2vh; right: 1vw; background: var(--primary); color: white;
-            padding: 0.5vh 1vw; border-radius: 20px; font-size: min(0.8vw, 1.6vh); font-weight: 900; letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); animation: bounce 2s infinite;
+        .shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1vw; margin-bottom: 1.5vh; flex-shrink: 0;}
+        .shift-panel { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            overflow: visible; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02); 
+            border: 1px solid var(--border-color); 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            display: flex; 
+            flex-direction: column;
         }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.8vh); } }
+        .shift-header { 
+            padding: 0.8vh; text-align: center; font-weight: 900; 
+            font-size: min(1.0vw, 2.2vh); color: white; letter-spacing: 0.5px; 
+            text-transform: uppercase; border-top-left-radius: 11px; border-top-right-radius: 11px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .shift-leader-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: min(0.65vw, 1.4vh);
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .shift-body { padding: 0.8vh; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5vw; background-color: #f8fafc; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; flex-grow: 1;}
+        .shift-stat { background: white; padding: 0.6vh; border-radius: 8px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 1px 3px rgba(0,0,0,0.01); display: flex; flex-direction: column; justify-content: center;}
+        .shift-stat span { display: block; font-size: min(0.6vw, 1.4vh); color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.1vh; font-weight: bold;}
+        .shift-stat strong { display: flex; justify-content: center; align-items: center; gap: 4px; font-size: min(1.5vw, 3.2vh); color: #222; font-weight: 900;}
+
+        /* RECURSOS 3D INDUSTRIAL NATURAL (MEDALLAS / TROFEOS) */
+        .best-shift { 
+            transform: translateY(-2px); 
+            box-shadow: 0 12px 25px rgba(230, 0, 90, 0.12), 0 0 0 3px var(--primary); 
+            position: relative; 
+            z-index: 2;
+        }
+        
+        .best-shift::after {
+            content: '🏆 MEJOR DESEMPEÑO'; position: absolute; top: -1.8vh; right: 1vw; background: var(--primary); color: white;
+            padding: 0.3vh 1.2vw; border-radius: 20px; font-size: min(0.6vw, 1.3vh); font-weight: 900; letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(230, 0, 90, 0.3); animation: bounce 3s infinite;
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.5vh); } }
+
+        /* Medalla Metálica Natural 3D (Cilindro pulido en relieve) */
+        .medal-3d {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 2.5vh; height: 2.5vh;
+            border-radius: 50%;
+            font-size: min(0.6vw, 1.3vh); font-weight: 900;
+            border: 1.5px solid rgba(255,255,255,0.45);
+            box-shadow: inset 0 -1.5px 1px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.15);
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+            transform: scale(0.95);
+        }
+        .gold-3d {
+            background: radial-gradient(circle at 35% 35%, var(--gold-3) 0%, var(--gold-2) 40%, var(--gold-1) 100%);
+            color: #5b2123; border-color: #fef08a; box-shadow: 0 0 6px var(--gold-shadow);
+        }
+        .silver-3d {
+            background: radial-gradient(circle at 35% 35%, var(--silver-3) 0%, var(--silver-2) 40%, var(--silver-1) 100%);
+            color: #1e293b; border-color: #e2e8f0; box-shadow: 0 0 6px var(--silver-shadow);
+        }
+        .bronze-3d {
+            background: radial-gradient(circle at 35% 35%, var(--bronze-3) 0%, var(--bronze-2) 40%, var(--bronze-1) 100%);
+            color: #fff; border-color: #ffedd5; box-shadow: 0 0 6px var(--bronze-shadow);
+        }
+
+        /* 🚀 Badge de Desempeño Récord (Metálico sutil) */
+        .rocket-badge {
+            background: linear-gradient(135deg, #e0f2fe, #38bdf8);
+            border: 1px solid #7dd3fc;
+            color: #0369a1;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-size: 0.55em;
+            margin-left: 4px;
+            display: inline-block;
+            vertical-align: middle;
+            font-weight: 900;
+            text-transform: uppercase;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
 
         /* TABLA ELÁSTICA (TV) */
         .table-container { 
-            flex-grow: 1; min-height: 0; background: var(--card-bg); border-radius: 12px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); 
+            flex-grow: 1; min-height: 0; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
             border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column;
         }
         .machine-table { width: 100%; border-collapse: collapse; text-align: center; height: 100%; display: table;}
-        .machine-table th { padding: 1vh 1vw; color: white; font-size: min(1vw, 2vh); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; height: 1%;}
-        .machine-table td { padding: 0.2vh 1vw; font-size: min(1.6vw, 3.5vh); font-weight: 900; color: #222; border-bottom: 1px solid #f1f5f9; }
+        .machine-table th { padding: 0.8vh 1vw; color: white; font-size: min(0.9vw, 1.8vh); text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; height: 1%;}
+        .machine-table td { padding: 0.2vh 1vw; font-size: min(1.4vw, 3vh); font-weight: 900; color: #222; border-bottom: 1px solid #f1f5f9; }
         .machine-table tr:hover { background-color: #f8fafc; }
         
-        /* Columna Máquina */
+        /* Columna Máquina (Aspecto de Control) */
         .col-maq { 
-            background-color: #1e293b; color: white !important; font-size: min(1.4vw, 3vh) !important; 
+            background-color: #0f172a; color: white !important; font-size: min(1.2vw, 2.5vh) !important; 
             text-align: left; padding-left: 2vw !important; border-right: 4px solid var(--primary);
             position: sticky; left: 0; z-index: 2; 
         }
-        .machine-table th.col-maq { z-index: 3; }
+        .machine-table th.col-maq { z-index: 3; background-color: #020617; }
         
-        .footer-update { text-align: center; font-size: min(0.9vw, 2vh); color: #777; margin-top: 1vh; font-weight: bold; height: auto;}
+        .footer-update { text-align: center; font-size: min(0.8vw, 1.6vh); color: #777; margin-top: 1vh; font-weight: bold; height: auto;}
         .sync-indicator { display: inline-block; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; animation: pulseSync 1s infinite; margin-left: 5px; }
         @keyframes pulseSync { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
         
         /* AJUSTES MÓVILES (Celulares) */
-        @media (max-width: 768px) {
-            .grid-2-col { grid-template-columns: 1fr; gap: 0px; }
+        @media (max-width: 1024px) {
+            body { height: auto; min-height: 100vh; overflow-y: visible; padding: 10px 15px; }
+            header { height: auto; flex-direction: column; gap: 15px; text-align: center; padding: 15px; }
+            .logo { height: 35px; }
+            .nav-btns button { font-size: 13px; padding: 6px 12px; }
+
+            .view { height: auto; padding: 10px 0; }
+            .form-container { max-width: 100%; margin: 15px 0; }
+            .grid-2-col { grid-template-columns: 1fr; gap: 0; }
             .counter-box .form-group { margin-bottom: 10px; }
             
             #dash-view.active { display: block !important; }
-            .dashboard-tv { height: auto; min-height: 100vh; overflow-y: visible; padding: 20px 15px; display: block;}
             
-            .dash-header { flex-direction: column; gap: 10px; text-align: center;}
-            .dash-header h2 { font-size: 16px; }
-            .clock-tv { font-size: 12px; }
+            .dash-header { height: auto; flex-direction: column; gap: 15px; text-align: center; border: none;}
+            .dash-header h2 { font-size: 18px; padding-left: 0;}
+            .timeframe-selector { width: 100%; justify-content: center; margin-right: 0; margin-bottom: 5px; }
+            .time-btn { font-size: 11px; padding: 5px 12px; }
+            .clock-tv { font-size: 13px; width: 100%; text-align: center; }
+
             .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .kpi-card { padding: 15px 12px; }
             .kpi-card h3 { font-size: 10px; }
             .kpi-card p { font-size: 22px; }
             
-            .shift-grid { grid-template-columns: 1fr; margin-top: 25px; gap: 15px;}
-            .shift-header { font-size: 14px; padding: 10px; }
-            .shift-stat span { font-size: 10px; }
-            .shift-stat strong { font-size: 18px; }
+            .shift-grid { grid-template-columns: 1fr; gap: 15px; margin-top: 20px;}
+            .shift-header { font-size: 13px; padding: 8px; }
+            .shift-stat span { font-size: 9px; }
+            .shift-stat strong { font-size: 20px; }
             
-            .best-shift { transform: scale(1.02); }
-            .best-shift::after { font-size: 10px; top: -15px; right: 10px; padding: 4px 10px;}
+            .best-shift { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05), 0 0 0 2px var(--primary); }
+            .best-shift::after { font-size: 10px; top: -14px; right: 10px; padding: 3px 8px;}
             
-            .table-container { overflow-x: auto; display: block; height: auto; }
-            .machine-table { min-width: 500px; }
+            .table-container { overflow-x: auto; display: block; height: auto; border-radius: 8px; }
+            .machine-table { min-width: 600px; display: table; }
             .machine-table th { font-size: 11px; padding: 10px; height: auto;}
             .machine-table td { font-size: 14px; padding: 10px; }
-            .col-maq { font-size: 13px !important; padding-left: 10px !important; }
+            .col-maq { font-size: 13px !important; padding-left: 15px !important; }
             
-            .footer-update { font-size: 12px; margin-top: 20px;}
+            .footer-update { font-size: 11px; margin-top: 15px; }
         }
     </style>
 </head>
@@ -146,7 +322,9 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec";
+        const ROSTER_API = "https://script.google.com/macros/s/AKfycbzxBhGp2oElpCW6YzacSbDhqGvbih0X0dBZmnipIkscPp2uJx2CqRQstESXu7M0iZ1gLA/exec";
         const CACHE_KEY = "libus_eficiencia_data";
+        const ROSTER_CACHE_KEY = "libus_roster_data";
     </script>
 
     <!-- HEADER PRINCIPAL -->
@@ -204,26 +382,35 @@
     <div id="dash-view" class="view dashboard-tv">
         <div class="dash-header">
             <img src="libus_positivo_CMYK.jpg" alt="Libus" class="logo" onerror="this.src='https://latam.libus.com/imagenes/logo_libus.png'">
-            <h2>TABLERO DE EFICIENCIA DE PRODUCCIÓN</h2>
-            <div style="display: flex; align-items: center; gap: 15px;">
+            <h2 id="dynamicMainTitle">TABLERO DE EFICIENCIA</h2>
+            
+            <div style="display: flex; align-items: center; gap: 1vw;">
+                <div class="timeframe-selector">
+                    <button class="time-btn active" id="btn-dia" onclick="changeTimeframe('dia')">DÍA ANTERIOR</button>
+                    <button class="time-btn" id="btn-semana" onclick="changeTimeframe('semana')">ÚLT. 7 DÍAS</button>
+                    <button class="time-btn" id="btn-mes" onclick="changeTimeframe('mes')">MES ACTUAL</button>
+                </div>
                 <div class="clock-tv" id="liveClock">00:00:00</div>
                 <button class="btn-exit" onclick="switchView('form-view')" id="btnExitTv" style="display:none;">🔙 Salir</button>
             </div>
         </div>
         
         <div class="kpi-grid">
-            <div class="kpi-card"><h3>Eficiencia Promedio Global</h3><p id="kpi-eff" style="color: var(--primary);">0,0%</p></div>
-            <div class="kpi-card" style="border-top-color: var(--sober-m);"><h3>Disponibilidad Global</h3><p id="kpi-disp" style="color: var(--sober-m);">0,0%</p></div>
-            <div class="kpi-card" style="border-top-color: var(--sober-t);"><h3>Calidad Global</h3><p id="kpi-cal" style="color: var(--sober-t);">0,0%</p></div>
-            <div class="kpi-card" style="border-top-color: var(--sober-n);"><h3>Total Piezas Inyectadas</h3><p id="kpi-pzas" style="color: var(--sober-n);">0</p></div>
+            <div class="kpi-card"><h3 id="kpi-title-eff">Eficiencia Promedio</h3><p id="kpi-eff" style="color: var(--primary);">0,0%</p></div>
+            <div class="kpi-card" style="border-top-color: var(--team-a);"><h3 id="kpi-title-disp">Disponibilidad</h3><p id="kpi-disp" style="color: var(--team-a);">0,0%</p></div>
+            <div class="kpi-card" style="border-top-color: var(--team-b);"><h3 id="kpi-title-cal">Calidad</h3><p id="kpi-cal" style="color: var(--team-b);">0,0%</p></div>
+            <div class="kpi-card" style="border-top-color: var(--team-c);"><h3 id="kpi-title-pzas">Piezas Inyectadas</h3><p id="kpi-pzas" style="color: var(--team-c);">0</p></div>
         </div>
 
         <div class="shift-grid">
             <!-- MAÑANA -->
             <div class="shift-panel" id="panel-manana">
-                <div class="shift-header" style="background-color: var(--sober-m);">☀️ TURNO MAÑANA</div>
+                <div class="shift-header" style="background-color: var(--text-dark);">
+                    <span>☀️ T. MAÑANA</span>
+                    <span class="shift-leader-badge" id="leader-manana">ASIGNANDO...</span>
+                </div>
                 <div class="shift-body">
-                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-m-eff" style="color: var(--sober-m);">0,0%</strong></div>
+                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-m-eff" style="color: var(--text-dark);">0,0%</strong></div>
                     <div class="shift-stat"><span>Piezas Prod.</span><strong id="shift-m-pzas">0</strong></div>
                     <div class="shift-stat"><span>Disponibilidad</span><strong id="shift-m-disp">0,0%</strong></div>
                     <div class="shift-stat"><span>Calidad</span><strong id="shift-m-cal">0,0%</strong></div>
@@ -232,9 +419,12 @@
 
             <!-- TARDE -->
             <div class="shift-panel" id="panel-tarde">
-                <div class="shift-header" style="background-color: var(--sober-t);">🌤 TURNO TARDE</div>
+                <div class="shift-header" style="background-color: var(--primary);">
+                    <span>🌤 T. TARDE</span>
+                    <span class="shift-leader-badge" id="leader-tarde">ASIGNANDO...</span>
+                </div>
                 <div class="shift-body">
-                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-t-eff" style="color: var(--sober-t);">0,0%</strong></div>
+                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-t-eff" style="color: var(--primary);">0,0%</strong></div>
                     <div class="shift-stat"><span>Piezas Prod.</span><strong id="shift-t-pzas">0</strong></div>
                     <div class="shift-stat"><span>Disponibilidad</span><strong id="shift-t-disp">0,0%</strong></div>
                     <div class="shift-stat"><span>Calidad</span><strong id="shift-t-cal">0,0%</strong></div>
@@ -243,9 +433,12 @@
 
             <!-- NOCHE -->
             <div class="shift-panel" id="panel-noche">
-                <div class="shift-header" style="background-color: var(--sober-n);">🌙 TURNO NOCHE</div>
+                <div class="shift-header" style="background-color: #020617;">
+                    <span>🌙 T. NOCHE</span>
+                    <span class="shift-leader-badge" id="leader-noche">ASIGNANDO...</span>
+                </div>
                 <div class="shift-body">
-                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-n-eff" style="color: var(--sober-n);">0,0%</strong></div>
+                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-n-eff" style="color: #020617;">0,0%</strong></div>
                     <div class="shift-stat"><span>Piezas Prod.</span><strong id="shift-n-pzas">0</strong></div>
                     <div class="shift-stat"><span>Disponibilidad</span><strong id="shift-n-disp">0,0%</strong></div>
                     <div class="shift-stat"><span>Calidad</span><strong id="shift-n-cal">0,0%</strong></div>
@@ -258,6 +451,65 @@
     </div>
 
     <script>
+        // Mapeo Inteligente de Líderes y Equipos
+        const PERSONNEL = [
+            { keys: ["dilan"], name: "Dilan Bandes", team: "EQ. DILAN (A)", color: "var(--team-a)" },
+            { keys: ["martha"], name: "Martha Zúñiga", team: "EQ. DILAN (A)", color: "var(--team-a)" },
+            { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQ. DILAN (A)", color: "var(--team-a)" },
+            { keys: ["joel"], name: "Joel Santana", team: "EQ. DILAN (A)", color: "var(--team-a)" },
+            { keys: ["magaly"], name: "Magaly Fuentes", team: "EQ. DILAN (A)", color: "var(--team-a)" },
+            
+            { keys: ["miguel"], name: "Miguel Reyes", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
+            { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
+            { keys: ["efrain"], name: "Efraín Zuleta", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
+            { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
+            { keys: ["marisol"], name: "Marisol Carrillo", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
+            
+            { keys: ["nilson"], name: "Nilson Chiquito", team: "EQ. NILSON (C)", color: "var(--team-c)" },
+            { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQ. NILSON (C)", color: "var(--team-c)" },
+            { keys: ["julio"], name: "Julio Alegría", team: "EQ. NILSON (C)", color: "var(--team-c)" },
+            { keys: ["edgar"], name: "Edgar Balcazar", team: "EQ. NILSON (C)", color: "var(--team-c)" },
+            { keys: ["freddy", "fredi"], name: "Freddy Gómez", team: "EQ. NILSON (C)", color: "var(--team-c)" }
+        ];
+
+        function identifyLeaderByTeam(opName) {
+            if(!opName) return "SIN ASIGNAR";
+            let opLower = opName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            for (let p of PERSONNEL) {
+                for (let k of p.keys) {
+                    if (opLower.includes(k)) return p.team;
+                }
+            }
+            return "SIN ASIGNAR";
+        }
+
+        // --- SISTEMA DE TIEMPO ROTATIVO (DIARIO, SEMANA, MES) ---
+        let currentTimeframe = 'dia'; 
+        let cachedRoster = {};
+        let timelineInterval;
+
+        function changeTimeframe(tf) {
+            currentTimeframe = tf;
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${tf}`).classList.add('active');
+            
+            const titleElement = document.getElementById('dynamicMainTitle');
+            if(tf === 'dia') titleElement.innerText = "TABLERO DE EFICIENCIA - DÍA ANTERIOR";
+            if(tf === 'semana') titleElement.innerText = "TABLERO DE EFICIENCIA - ÚLTIMOS 7 DÍAS";
+            if(tf === 'mes') titleElement.innerText = "TABLERO DE EFICIENCIA - MES ACTUAL";
+            
+            const rawData = localStorage.getItem(CACHE_KEY);
+            if(rawData) {
+                renderizarDatos(JSON.parse(rawData), true);
+            }
+        }
+
+        function rotateTimeline() {
+            const timeframes = ['dia', 'semana', 'mes'];
+            let nextIdx = (timeframes.indexOf(currentTimeframe) + 1) % timeframes.length;
+            changeTimeframe(timeframes[nextIdx]);
+        }
+
         // Reloj en tiempo real
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL');
@@ -316,6 +568,7 @@
                 resetForm(btn);
             });
         }
+        
         function resetForm(btn) {
             document.getElementById('prodForm').reset();
             document.getElementById('fecha').valueAsDate = new Date();
@@ -333,12 +586,35 @@
             return parseFloat(str) || 0;
         }
 
+        function normalizeDateToNum(dateInput) {
+            if (!dateInput) return null;
+            let str = String(dateInput).trim();
+            if (str === "") return null;
+            if (str.includes('T')) str = str.split('T')[0];
+            if (str.includes('-')) {
+                let p = str.split('-');
+                if (p.length >= 3) {
+                    if (p[0].length === 4) return parseInt(p[0] + p[1].padStart(2,'0') + p[2].substring(0,2).padStart(2,'0'), 10);
+                    if (p[2].length === 4) return parseInt(p[2] + p[1].padStart(2,'0') + p[0].substring(0,2).padStart(2,'0'), 10);
+                }
+            }
+            if (str.includes('/')) {
+                let p = str.split(' ')[0].split('/');
+                if (p.length >= 2) {
+                    let d = p[0].padStart(2,'0'), m = p[1].padStart(2,'0'), y = p.length === 3 ? p[2] : String(new Date().getFullYear());
+                    if (y.length === 2) y = "20" + y;
+                    return parseInt(y + m + d, 10);
+                }
+            }
+            return null;
+        }
+
         // Función de Formateo Final para Pantalla
         const formatPctHtml = (val, hasRecord) => {
             if (val === null || isNaN(val)) return '<span style="color:#cbd5e1">-</span>';
             let text = val.toFixed(1).replace('.', ',') + "%";
             if (hasRecord) {
-                text += ` <span class="rocket-badge" title="¡Récord! Ciclo real superó al teórico.">🚀</span>`;
+                text += ` <span class="rocket-badge" title="¡Récord! Ciclo real superó al teórico.">Récord</span>`;
             }
             return text;
         };
@@ -353,6 +629,59 @@
         function renderizarDatos(data, isCached = false) {
             if(!data || data.length === 0) return;
 
+            let hoyDate = new Date();
+            let hoyNum = parseInt(`${hoyDate.getFullYear()}${String(hoyDate.getMonth()+1).padStart(2,'0')}${String(hoyDate.getDate()).padStart(2,'0')}`);
+            let hace7Num = hoyNum - 7; 
+            let currentYM = Math.floor(hoyNum / 100); 
+
+            // Primer barrido para determinar la fecha "Día Anterior" real del set de datos
+            let allValidDates = [];
+            data.forEach(row => {
+                let rClean = {};
+                for(let k in row) {
+                    let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    rClean[cleanKey] = row[k];
+                }
+                let recDateNum = normalizeDateToNum(rClean["fecha"] || rClean["dia"] || rClean["date"]);
+                if (recDateNum) allValidDates.push(recDateNum);
+            });
+            allValidDates.sort((a,b) => b - a);
+            let latestDateNum = allValidDates.length > 0 ? allValidDates[0] : hoyNum;
+            
+            // "Día Anterior" es la fecha más reciente que sea menor que hoy
+            let pastDates = allValidDates.filter(d => d < hoyNum);
+            let diaAnteriorNum = pastDates.length > 0 ? pastDates[0] : null;
+
+            // Filtrado del Timeframe activo
+            let filteredData = data.filter(row => {
+                let rClean = {};
+                for(let k in row) {
+                    let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    rClean[cleanKey] = row[k];
+                }
+                let recDateNum = normalizeDateToNum(rClean["fecha"] || rClean["dia"] || rClean["date"]);
+                if (!recDateNum) return false;
+
+                if (currentTimeframe === 'dia') {
+                    return recDateNum === diaAnteriorNum;
+                } else if (currentTimeframe === 'semana') {
+                    return recDateNum >= hace7Num;
+                } else if (currentTimeframe === 'mes') {
+                    return Math.floor(recDateNum / 100) === currentYM;
+                }
+                return true;
+            });
+
+            // Sincronizar sub-headers de KPI
+            let periodLabel = "Día";
+            if(currentTimeframe === 'semana') periodLabel = "Semana";
+            if(currentTimeframe === 'mes') periodLabel = "Mes";
+
+            document.getElementById('kpi-title-eff').innerText = `Eficiencia Promedio (${periodLabel})`;
+            document.getElementById('kpi-title-disp').innerText = `Disponibilidad (${periodLabel})`;
+            document.getElementById('kpi-title-cal').innerText = `Calidad (${periodLabel})`;
+            document.getElementById('kpi-title-pzas').innerText = `Piezas Inyectadas (${periodLabel})`;
+
             let tEff=0, tDisp=0, tCal=0, tPzas=0, validRows=0, globalRecord = false;
             
             let shiftsData = {
@@ -361,33 +690,31 @@
                 "Noche": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0, rec: false }
             };
             let maquinaTurnoData = {};
+            let leadersOnShift = { "Mañana": new Set(), "Tarde": new Set(), "Noche": new Set() };
 
-            data.forEach(row => {
+            filteredData.forEach(row => {
                 let rClean = {};
                 for(let k in row) {
                     let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
                     rClean[cleanKey] = row[k];
                 }
 
-                // Extracción de datos crudos
                 let dispRaw = parseRobustFloat(rClean["disponibilidad"]);
                 let calRaw = parseRobustFloat(rClean["calidad"]);
                 let pzas = parseRobustFloat(rClean["cantidad inyectada"] || rClean["inyectada"] || rClean["cantidad"]);
                 let tno = String(rClean["turno"] || "").trim();
                 let maq = String(rClean["maquina"] || "").trim();
+                let opName = String(rClean["operador"] || rClean["nombre"] || "").trim();
+                let recDateNum = normalizeDateToNum(rClean["fecha"] || rClean["dia"] || rClean["date"]);
 
                 if(maq && tno) { 
-                    // 1. Normalizamos a escala 0-100%
                     let disp = (dispRaw <= 1.5 && dispRaw !== 0) ? dispRaw * 100 : dispRaw;
                     let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
                     
                     let isRecord = false;
-                    
-                    // 2. Aplicamos la regla estricta de Capping (Tope máximo al 100%)
                     if (disp > 100) { disp = 100; isRecord = true; }
                     if (cal > 100) { cal = 100; }
                     
-                    // 3. Recalculamos la Eficiencia Pura con los valores topados
                     let eff = (disp / 100) * (cal / 100) * 100;
 
                     tPzas += pzas;
@@ -398,6 +725,22 @@
                         shiftsData[tno].eff += eff; shiftsData[tno].disp += disp;
                         shiftsData[tno].cal += cal; shiftsData[tno].pzas += pzas; shiftsData[tno].count++;
                         if(isRecord) shiftsData[tno].rec = true;
+                    }
+                    
+                    // Identificar Líder / Equipo activo para ese día/turno
+                    let activeLeader = "ASIGNANDO...";
+                    if (opName) {
+                        activeLeader = identifyLeaderByTeam(opName);
+                    } else if (cachedRoster[recDateNum] && cachedRoster[recDateNum][maq]) {
+                        // Buscar asignación de turno (M, T, N) para ese día y máquina
+                        let letraTurno = tno.includes("MAÑ") ? "M" : (tno.includes("TAR") ? "T" : "N");
+                        if (cachedRoster[recDateNum][maq][letraTurno]) {
+                            activeLeader = cachedRoster[recDateNum][maq][letraTurno].team;
+                        }
+                    }
+                    
+                    if (activeLeader && activeLeader !== "SIN ASIGNAR") {
+                        leadersOnShift[tno].add(activeLeader);
                     }
                     
                     if (!maquinaTurnoData[maq]) maquinaTurnoData[maq] = { "Mañana": {eff:[], rec:false}, "Tarde": {eff:[], rec:false}, "Noche": {eff:[], rec:false} };
@@ -414,6 +757,7 @@
             document.getElementById('kpi-cal').innerHTML = formatPctHtml(getAvg(tCal, validRows), false);
             document.getElementById('kpi-pzas').innerText = formatThous(tPzas);
 
+            // Determinar el mejor desempeño
             let bestShift = "";
             let maxEff = 0;
             ["Mañana", "Tarde", "Noche"].forEach(t => {
@@ -424,6 +768,12 @@
             ["Mañana", "Tarde", "Noche"].forEach(t => {
                 let d = shiftsData[t];
                 let prefix = t === "Mañana" ? "m" : (t === "Tarde" ? "t" : "n");
+                let leaderBadge = document.getElementById(`leader-${t.toLowerCase().replace('ñ','n')}`);
+                
+                // Mapear el líder de turno a su correspondiente badge
+                let activeLeadersList = Array.from(leadersOnShift[t]);
+                let displayLeaderName = activeLeadersList.length > 0 ? activeLeadersList.join(" / ") : "EQ. ROTATIVO";
+                if(leaderBadge) leaderBadge.innerText = displayLeaderName;
                 
                 document.getElementById(`shift-${prefix}-eff`).innerHTML = formatPctHtml(getAvg(d.eff, d.count), d.rec);
                 document.getElementById(`shift-${prefix}-disp`).innerHTML = formatPctHtml(getAvg(d.disp, d.count), d.rec);
@@ -432,8 +782,15 @@
 
                 let panelEl = document.getElementById(`panel-${t.toLowerCase().replace('ñ','n')}`);
                 if(panelEl) {
-                    if(t === bestShift) panelEl.classList.add('best-shift');
-                    else panelEl.classList.remove('best-shift');
+                    if(t === bestShift) {
+                        panelEl.classList.add('best-shift');
+                        // Modificar header para incluir nombre del líder ganador
+                        let isTeamStr = activeLeadersList.length > 0 ? ` [${activeLeadersList.join("/")}]` : "";
+                        panelEl.style.transform = "translateY(-2px)";
+                    } else {
+                        panelEl.classList.remove('best-shift');
+                        panelEl.style.transform = "none";
+                    }
                 }
             });
 
@@ -444,15 +801,21 @@
             };
 
             const maqLabels = Object.keys(maquinaTurnoData).sort();
+            
+            // Subtítulo de columna de tabla adaptado al tiempo
+            let timeframeColumnLabel = `PROMEDIO DÍA (${formatNumToDateStr(diaAnteriorNum || latestDateNum)})`;
+            if(currentTimeframe === 'semana') timeframeColumnLabel = "PROMEDIO SEMANAL";
+            if(currentTimeframe === 'mes') timeframeColumnLabel = "PROMEDIO MENSUAL";
+
             let tableHTML = `
             <table class="machine-table">
                 <thead>
                     <tr>
                         <th class="col-maq">MÁQUINA</th>
-                        <th style="background-color: var(--sober-m);">☀️ EFICIENCIA MAÑANA</th>
-                        <th style="background-color: var(--sober-t);">🌤 EFICIENCIA TARDE</th>
-                        <th style="background-color: var(--sober-n);">🌙 EFICIENCIA NOCHE</th>
-                        <th style="background-color: #333;">🎯 PROMEDIO DIARIO</th>
+                        <th style="background-color: var(--text-dark);"><span class="medal-3d gold-3d">🥇</span> MAÑANA</th>
+                        <th style="background-color: var(--primary);"><span class="medal-3d silver-3d">🥈</span> TARDE</th>
+                        <th style="background-color: #020617;"><span class="medal-3d bronze-3d">🥉</span> NOCHE</th>
+                        <th style="background-color: #334155;">🎯 ${timeframeColumnLabel}</th>
                     </tr>
                 </thead>
                 <tbody>`;
@@ -480,9 +843,9 @@
                 tableHTML += `
                     <tr>
                         <td class="col-maq">${maqAbreviada}</td>
-                        <td style="color: var(--sober-m);">${txtM}</td>
-                        <td style="color: var(--sober-t);">${txtT}</td>
-                        <td style="color: var(--sober-n);">${txtN}</td>
+                        <td style="color: var(--text-dark);">${txtM}</td>
+                        <td style="color: var(--primary);">${txtT}</td>
+                        <td style="color: #020617;">${txtN}</td>
                         <td style="color: #111;">${txtProm}</td>
                     </tr>`;
             });
@@ -491,7 +854,93 @@
 
             const time = new Date().toLocaleTimeString('es-CL');
             const syncStatus = isCached ? '<span class="sync-indicator" title="Actualizando..."></span>' : '';
-            document.getElementById('lastUpdate').innerHTML = `Última sincronización con Google Sheets: ${time} ${syncStatus}`;
+            document.getElementById('lastUpdate').innerHTML = `Sincronización con Nube Libus: ${time} ${syncStatus}`;
+        }
+
+        // --- CARGAR ASIGNACIONES Y ROSTER ---
+        function parseRosterData(rosterData) {
+            if (!rosterData || rosterData.length === 0) return;
+            let rosterMap = {};
+            let dateCols = {};
+
+            let isObject = !Array.isArray(rosterData[0]);
+            if (isObject) {
+                Object.keys(rosterData[0]).forEach(k => {
+                    let d = normalizeDateToNum(k);
+                    if(d) dateCols[k] = d;
+                });
+            } else {
+                let bestRow = -1, maxDates = 0;
+                for(let r=0; r < Math.min(10, rosterData.length); r++) {
+                    let count = 0;
+                    rosterData[r].forEach(c => { if(normalizeDateToNum(c)) count++; });
+                    if(count > maxDates) { maxDates = count; bestRow = r; }
+                }
+                if(bestRow > -1) {
+                    rosterData[bestRow].forEach((c, idx) => {
+                        let d = normalizeDateToNum(c);
+                        if(d) dateCols[idx] = d;
+                    });
+                }
+            }
+
+            for (let i = isObject ? 0 : 1; i < rosterData.length; i++) {
+                let row = rosterData[i];
+                let vals = isObject ? Object.values(row) : row;
+                
+                let opObj = null;
+                for (let v of vals) {
+                    let opLower = String(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    for (let p of PERSONNEL) {
+                        for (let k of p.keys) {
+                            if (opLower.includes(k)) { opObj = p; break; }
+                        }
+                    }
+                    if (opObj) break;
+                }
+                if (!opObj) continue;
+
+                for (let key in dateCols) {
+                    let dateNum = dateCols[key];
+                    let asignacion = String(row[key] || "").trim().toUpperCase();
+                    if (asignacion.includes("(") && (asignacion.includes("M)") || asignacion.includes("T)") || asignacion.includes("N)"))) {
+                        let parts = asignacion.split("(");
+                        let maqStr = parts[0].replace(/M/g, '').replace(/MAQ/g,'').trim();
+                        let turnoLetra = parts[1].replace(')','').trim();
+                        
+                        if (!rosterMap[dateNum]) rosterMap[dateNum] = {};
+                        maqStr.split('-').forEach(num => {
+                            let n = parseInt(num, 10);
+                            if (!isNaN(n)) {
+                                let maqLabelFull = `Inyectora ${n}`;
+                                if (!rosterMap[dateNum][maqLabelFull]) rosterMap[dateNum][maqLabelFull] = {};
+                                rosterMap[dateNum][maqLabelFull][turnoLetra] = opObj;
+                            }
+                        });
+                    }
+                }
+            }
+            cachedRoster = rosterMap;
+            localStorage.setItem(ROSTER_CACHE_KEY, JSON.stringify(rosterMap));
+        }
+
+        function descargarRosterJSONP() {
+            return new Promise((resolve) => {
+                const callbackName = 'rosterCallback_' + Math.round(100000 * Math.random());
+                window[callbackName] = function(data) {
+                    parseRosterData(data);
+                    delete window[callbackName];
+                    const scriptEl = document.getElementById(callbackName);
+                    if(scriptEl) scriptEl.remove();
+                    resolve();
+                };
+
+                const script = document.createElement('script');
+                script.id = callbackName;
+                script.src = `${ROSTER_API}?callback=${callbackName}&_t=${Date.now()}`;
+                script.onerror = () => resolve(); // no bloquear si falla el roster
+                document.body.appendChild(script);
+            });
         }
 
         function descargarDatosJSONP() {
@@ -511,10 +960,24 @@
         }
 
         function initDashboard() {
+            // Inicializar caché local si existe
             const cachedData = localStorage.getItem(CACHE_KEY);
+            const rCache = localStorage.getItem(ROSTER_CACHE_KEY);
+            if (rCache) cachedRoster = JSON.parse(rCache);
             if (cachedData) renderizarDatos(JSON.parse(cachedData), true);
-            descargarDatosJSONP();
-            setInterval(descargarDatosJSONP, 300000); 
+
+            descargarRosterJSONP().then(() => {
+                descargarDatosJSONP();
+            });
+
+            // Ciclo de consultas en la nube (5 minutos)
+            setInterval(() => {
+                descargarRosterJSONP().then(descargarDatosJSONP);
+            }, 300000); 
+
+            // Iniciar rotación del carousel de tiempo (Cada 12 segundos)
+            clearInterval(timelineInterval);
+            timelineInterval = setInterval(rotateTimeline, 12000);
         }
     </script>
 </body>
