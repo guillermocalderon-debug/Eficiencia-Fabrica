@@ -13,15 +13,14 @@
             --text-muted: #666666;
             --border-color: #e2e8f0;
             
-            --sober-m: #475569; 
-            --sober-t: #64748b; 
-            --sober-n: #0f172a; 
-            
             --gold: #fbbf24;
             --silver: #94a3b8;
             --bronze: #b45309;
             --alert: #ef4444;
-            --leader: #0ea5e9; /* Azul especial para líderes */
+            
+            --team-a: #0284c7; /* Azul Dilan */
+            --team-b: #ea580c; /* Naranja Miguel */
+            --team-c: #16a34a; /* Verde Nilson */
         }
 
         body {
@@ -52,7 +51,7 @@
         .subtitle { color: var(--primary); font-weight: bold; font-size: min(16px, 2vh); margin-top: 5px; text-transform: uppercase;}
         .clock { font-size: min(1.5vw, 3vh); font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
 
-        /* LAYOUT PRINCIPAL (50% / 50%) */
+        /* LAYOUT PRINCIPAL (60% / 40%) */
         .main-container {
             display: flex;
             gap: 2vw;
@@ -60,9 +59,9 @@
             height: calc(100% - 10vh);
         }
 
-        /* PANEL IZQUIERDO: TOP 5 ACUMULADO (CARRUSEL) */
+        /* PANEL IZQUIERDO: TOP ACUMULADO (CARRUSEL) */
         .ranking-panel {
-            flex: 1;
+            flex: 6;
             background: var(--card-bg);
             border-radius: 12px;
             border-top: 5px solid var(--primary);
@@ -80,43 +79,17 @@
             text-align: center;
             border-bottom: 1px solid var(--border-color);
         }
-        .ranking-title {
-            font-size: 3vh;
-            font-weight: 900;
-            color: #111;
-            margin: 0;
-            text-transform: uppercase;
-        }
-        .ranking-subtitle {
-            font-size: 1.5vh;
-            color: var(--text-muted);
-            margin-top: 5px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .ranking-body {
-            flex-grow: 1;
-            position: relative;
-        }
+        .ranking-title { font-size: 3vh; font-weight: 900; color: #111; margin: 0; text-transform: uppercase; }
+        .ranking-subtitle { font-size: 1.5vh; color: var(--text-muted); margin-top: 5px; font-weight: bold; text-transform: uppercase; }
+        .ranking-body { flex-grow: 1; position: relative; }
 
         .carousel-view {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            padding: 2vh 3vw;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 2.5vh;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s ease-in-out;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            padding: 2vh 3vw; display: flex; flex-direction: column; justify-content: center; gap: 2.5vh;
+            opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out;
         }
-        .carousel-view.active {
-            opacity: 1;
-            pointer-events: auto;
-            z-index: 10;
-        }
+        .carousel-view.team-view { gap: 4vh; padding: 4vh 4vw; } /* Más espacio para el Top 3 de Equipos */
+        .carousel-view.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
         .bar-row { display: flex; flex-direction: column; gap: 6px; }
         .bar-info { display: flex; justify-content: space-between; align-items: flex-end; }
@@ -124,128 +97,85 @@
         .bar-medal { font-size: 3vh; width: 4vh; text-align: center; }
         .bar-score { font-size: 2.5vh; font-weight: 900; color: #111;}
         
-        .bar-track {
-            width: 100%;
-            height: 2vh;
-            background: #f1f5f9;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-        }
-        .bar-fill {
-            height: 100%;
-            width: 0%; 
-            border-radius: 10px;
-            transition: width 1.5s cubic-bezier(0.1, 0.7, 0.1, 1);
-            position: relative;
-            overflow: hidden;
-        }
+        .bar-track { width: 100%; height: 2vh; background: #f1f5f9; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .team-view .bar-track { height: 3vh; } /* Barras más gruesas para equipos */
+        
+        .bar-fill { height: 100%; width: 0%; border-radius: 10px; transition: width 1.5s cubic-bezier(0.1, 0.7, 0.1, 1); position: relative; overflow: hidden; }
 
+        /* Colores Base */
         .fill-1 { background: linear-gradient(90deg, #fef08a, #d97706); } 
         .fill-2 { background: linear-gradient(90deg, #f1f5f9, #64748b); } 
         .fill-3 { background: linear-gradient(90deg, #fde68a, #9a3412); } 
         .fill-4 { background: #38bdf8; }
         .fill-5 { background: #818cf8; }
-        .fill-alert { background: linear-gradient(90deg, #fca5a5, #ef4444); } 
         
-        /* Efecto Especial Líderes */
-        .fill-leader-1 { background: linear-gradient(90deg, #38bdf8, #0284c7); }
-        .fill-leader-2 { background: linear-gradient(90deg, #818cf8, #4f46e5); }
-        .fill-leader-3 { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+        /* Colores Equipos */
+        .fill-team-A { background: linear-gradient(90deg, #7dd3fc, var(--team-a)); }
+        .fill-team-B { background: linear-gradient(90deg, #fdba74, var(--team-b)); }
+        .fill-team-C { background: linear-gradient(90deg, #86efac, var(--team-c)); }
 
-        .fill-1::after, .fill-leader-1::after {
+        .fill-1::after, .fill-team-A::after, .fill-team-B::after, .fill-team-C::after {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
             transform: skewX(-20deg); animation: shimmer 2.5s infinite;
         }
         @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
 
-        /* PANEL DERECHO: TOP 5 MÁQUINAS EN LÍNEA */
+        /* PANEL DERECHO: CARRUSEL MÁQUINAS EN VIVO */
         .machines-panel {
-            flex: 1;
+            flex: 4;
             background: var(--card-bg);
             border-radius: 12px;
             border-top: 5px solid #111;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            display: flex; flex-direction: column; position: relative; overflow: hidden;
         }
 
         .m-carousel-header {
-            text-align: center;
-            padding: 2vh;
-            background: #fafbfc;
-            color: #111;
-            font-size: 2.2vh;
-            font-weight: 900;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--border-color);
+            text-align: center; padding: 2vh; background: #fafbfc; color: #111; font-size: 2vh;
+            font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-bottom: 2px solid var(--border-color);
         }
 
-        .m-list-container {
-            flex-grow: 1;
-            padding: 2vh 2vw;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 1.5vh;
-            background: #ffffff;
-            overflow: hidden;
+        .m-carousel-container { flex-grow: 1; position: relative; background: #ffffff; }
+
+        .machine-slide {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            padding: 2.5vh; display: flex; flex-direction: column; gap: 2vh;
+            opacity: 0; transform: translateX(30px); transition: all 0.6s ease-out; justify-content: center;
+        }
+        .machine-slide.active { opacity: 1; transform: translateX(0); }
+
+        .m-card-title {
+            text-align: center; font-size: 3.5vh; font-weight: 900; color: #111;
+            margin-bottom: 2vh; text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 1vh;
         }
 
-        .live-row {
-            display: flex;
-            align-items: center;
-            background: #fafbfc;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 1.5vh 1.5vw;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: transform 0.2s;
+        .m-op-row {
+            background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 1.5vh; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .live-row.alert { border-left: 5px solid var(--alert); background-color: #fef2f2; }
+        /* Rankings por máquina */
+        .m-op-row.rank-1 { border-left: 6px solid var(--gold); background-color: #fffbeb; }
+        .m-op-row.rank-2 { border-left: 6px solid var(--silver); background-color: #f8fafc; }
+        .m-op-row.rank-3 { border-left: 6px solid var(--bronze); background-color: #fff7ed; }
 
-        .live-rank {
-            font-size: 2.5vh;
-            font-weight: 900;
-            width: 4vh;
-            text-align: center;
-            margin-right: 1vw;
-            color: var(--text-muted);
-        }
-        .live-row:nth-child(1) .live-rank { color: var(--gold); font-size: 3.5vh; }
-        .live-row:nth-child(2) .live-rank { color: var(--silver); font-size: 3vh; }
-        .live-row:nth-child(3) .live-rank { color: var(--bronze); font-size: 2.8vh; }
+        .m-rank-icon { font-size: 3vh; width: 4vh; text-align: center; margin-right: 1vw; }
+        .m-details { flex-grow: 1; overflow: hidden;}
+        .m-name { font-size: 2.2vh; font-weight: 900; margin: 0; text-transform: uppercase; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .m-team { font-size: 1.2vh; color: var(--primary); font-weight: bold; text-transform: uppercase; margin-top: 2px;}
+        .m-eff { font-size: 3.5vh; font-weight: 900; color: #111; }
 
-        .live-avatar {
-            width: 4.5vh; height: 4.5vh;
-            border-radius: 50%;
-            background: var(--sober-m);
-            color: #fff;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 1.8vh; margin-right: 1vw; flex-shrink: 0;
-        }
-
-        .live-details { flex-grow: 1; overflow: hidden; }
-        .live-name { font-size: 2.2vh; font-weight: 900; margin: 0; color: #111; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .live-shift { font-size: 1.2vh; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin-top: 2px;}
-        .live-eff { font-size: 3.5vh; font-weight: 900; color: var(--primary); }
-
-        /* Estados Vacíos */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-light); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: var(--primary); font-size: 3vh; font-weight: bold;}
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; opacity: 0.6; text-align: center;}
         .empty-state span { font-size: 5vh; margin-bottom: 10px;}
         .empty-state p { font-size: 2vh; font-weight: bold; color: var(--text-muted); margin: 0;}
-
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <span>Evaluando Desempeño y Liderazgo... ⏳</span>
+        <span>Evaluando Desempeño de Escuadrones... ⏳</span>
     </div>
 
     <div class="header">
@@ -258,22 +188,22 @@
     </div>
 
     <div class="main-container">
-        <!-- PANEL IZQUIERDO: TOP 5 CARRUSEL HISTÓRICO -->
+        <!-- PANEL IZQUIERDO: TOP ACUMULADO -->
         <div class="ranking-panel">
             <div class="ranking-header">
-                <h2 class="ranking-title" id="rkTitle">TOP 5 - CARGANDO...</h2>
-                <div class="ranking-subtitle">Evaluación de Eficiencia Efectiva Neta de Operadores y Líderes</div>
+                <h2 class="ranking-title" id="rkTitle">CARGANDO...</h2>
+                <div class="ranking-subtitle">Evaluación de Eficiencia Efectiva Neta</div>
             </div>
             <div class="ranking-body" id="rankingBody">
                 <!-- Vistas inyectadas por JS -->
             </div>
         </div>
 
-        <!-- PANEL DERECHO: TOP 5 MÁQUINAS EN LÍNEA -->
+        <!-- PANEL DERECHO: CARRUSEL MÁQUINAS -->
         <div class="machines-panel">
-            <div class="m-carousel-header" id="mPanelTitle">🟢 TOP 5 PRODUCCIÓN EN LÍNEA</div>
-            <div class="m-list-container" id="machinesContainer">
-                <!-- Ranking inyectado por JS -->
+            <div class="m-carousel-header" id="mPanelTitle">🟢 PRODUCCIÓN EN LÍNEA</div>
+            <div class="m-carousel-container" id="machinesContainer">
+                <!-- Slides inyectados por JS -->
             </div>
         </div>
     </div>
@@ -283,43 +213,44 @@
         const EFF_API = 'https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec';
 
         // ---------------------------------------------------------
-        // DICCIONARIO DE LÍDERES DE TURNO (MOTOR DE ESCUADRONES)
+        // DICCIONARIO INTELIGENTE DE PERSONAL Y EQUIPOS (INFALIBLE)
         // ---------------------------------------------------------
-        const LEADER_MAPPING = {
-            // EQUIPO MIGUEL REYES
-            "MIGUEL": "MIGUEL REYES (LÍDER)",
-            "EFRAIN": "MIGUEL REYES (LÍDER)",
-            "MARISOL": "MIGUEL REYES (LÍDER)",
-            "YAMILE": "MIGUEL REYES (LÍDER)",
-            "ADOLFO": "MIGUEL REYES (LÍDER)", // Gustavo Adolfo
-
-            // EQUIPO NILSON CHIQUITO
-            "NILSON": "NILSON CHIQUITO (LÍDER)",
-            "EDGAR": "NILSON CHIQUITO (LÍDER)",
-            "JULIO": "NILSON CHIQUITO (LÍDER)",
-            "GENESIS": "NILSON CHIQUITO (LÍDER)",
-            "JENESIS": "NILSON CHIQUITO (LÍDER)",
-            "FREDDY": "NILSON CHIQUITO (LÍDER)",
-
+        const PERSONNEL = [
             // EQUIPO DILAN BANDES
-            "DILAN": "DILAN BANDES (LÍDER)",
-            "JOEL": "DILAN BANDES (LÍDER)",
-            "MAGALY": "DILAN BANDES (LÍDER)",
-            "CORROTEA": "DILAN BANDES (LÍDER)", // Gustavo Corrotea
-            "MARTHA": "DILAN BANDES (LÍDER)"
-        };
+            { keys: ["dilan"], name: "Dilan Bandes", team: "EQUIPO DILAN (TURNO A)", tClass: "fill-team-A" },
+            { keys: ["martha"], name: "Martha Zúñiga", team: "EQUIPO DILAN (TURNO A)", tClass: "fill-team-A" },
+            { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQUIPO DILAN (TURNO A)", tClass: "fill-team-A" },
+            { keys: ["joel"], name: "Joel Santana", team: "EQUIPO DILAN (TURNO A)", tClass: "fill-team-A" },
+            { keys: ["magaly"], name: "Magaly Fuentes", team: "EQUIPO DILAN (TURNO A)", tClass: "fill-team-A" },
+            
+            // EQUIPO MIGUEL REYES
+            { keys: ["miguel"], name: "Miguel Reyes", team: "EQUIPO MIGUEL (TURNO B)", tClass: "fill-team-B" },
+            { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQUIPO MIGUEL (TURNO B)", tClass: "fill-team-B" },
+            { keys: ["efrain"], name: "Efraín Zuleta", team: "EQUIPO MIGUEL (TURNO B)", tClass: "fill-team-B" },
+            { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQUIPO MIGUEL (TURNO B)", tClass: "fill-team-B" },
+            { keys: ["marisol"], name: "Marisol Carrillo", team: "EQUIPO MIGUEL (TURNO B)", tClass: "fill-team-B" },
+            
+            // EQUIPO NILSON CHIQUITO
+            { keys: ["nilson"], name: "Nilson Chiquito", team: "EQUIPO NILSON (TURNO C)", tClass: "fill-team-C" },
+            { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQUIPO NILSON (TURNO C)", tClass: "fill-team-C" },
+            { keys: ["julio"], name: "Julio Alegría", team: "EQUIPO NILSON (TURNO C)", tClass: "fill-team-C" },
+            { keys: ["edgar"], name: "Edgar Balcazar", team: "EQUIPO NILSON (TURNO C)", tClass: "fill-team-C" },
+            { keys: ["freddy", "fredi"], name: "Freddy Gómez", team: "EQUIPO NILSON (TURNO C)", tClass: "fill-team-C" }
+        ];
 
-        function getLeaderByOperator(opName) {
-            if(!opName) return null;
-            let upper = opName.toUpperCase();
-            for (let key in LEADER_MAPPING) {
-                if (upper.includes(key)) return LEADER_MAPPING[key];
+        // Función que lee cualquier texto e identifica a la persona oficial
+        function identifyPerson(text) {
+            if(!text) return null;
+            let t = String(text).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            for(let p of PERSONNEL) {
+                for(let k of p.keys) {
+                    if(t.includes(k)) return p;
+                }
             }
             return null;
         }
 
-        let rkInterval;
-
+        let rkInterval, mqInterval;
         setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL'); }, 1000);
 
         function fetchJSONP(url, prefix) {
@@ -379,13 +310,6 @@
             return `${str.substring(6,8)}/${str.substring(4,6)}/${str.substring(0,4)}`;
         }
 
-        function getAvatarInitials(name) {
-            if(!name || name.includes("OPERADOR")) return "?";
-            let parts = name.trim().split(" ");
-            if(parts.length >= 2) return parts[0][0] + parts[1][0];
-            return parts[0][0];
-        }
-
         function startEngine() {
             Promise.all([fetchJSONP(ROSTER_API, 'roster'), fetchJSONP(EFF_API, 'eff')])
             .then(([rosterData, effData]) => {
@@ -403,23 +327,21 @@
 
             document.getElementById('fechaHoy').innerText = `SISTEMA ACTIVO: ${formatNumToDateStr(hoyNum)}`;
 
-            // 1. ESCÁNER UNIVERSAL DE TURNOS (ROSTER)
-            let generalRoster = {}; 
+            // 1. ESCÁNER INTELIGENTE DE TURNOS (ROSTER)
+            let rosterMap = {}; 
+            let lastKnownRoster = {}; 
 
             if (rosterData && rosterData.length > 0) {
                 for (let i = 0; i < rosterData.length; i++) {
                     let row = rosterData[i];
                     let vals = !Array.isArray(row) ? Object.values(row) : row;
                     
-                    let operario = null;
+                    let operarioObj = null;
                     for (let v of vals) {
-                        let strVal = String(v).trim();
-                        if (strVal.includes(" ") && strVal.length > 5 && !/\d/.test(strVal) && 
-                            !strVal.toLowerCase().includes("turno") && !strVal.toLowerCase().includes("libre")) {
-                            operario = strVal; break;
-                        }
+                        let matched = identifyPerson(v);
+                        if (matched) { operarioObj = matched; break; }
                     }
-                    if (!operario) continue;
+                    if (!operarioObj) continue;
                     
                     for (let v of vals) {
                         let asignacion = String(v).trim().toUpperCase();
@@ -431,8 +353,9 @@
                             maqStr.split('-').forEach(num => {
                                 let n = parseInt(num, 10);
                                 if (!isNaN(n)) {
-                                    if (!generalRoster[n]) generalRoster[n] = {};
-                                    generalRoster[n][turnoLetra] = operario;
+                                    if (!generalRoster) var generalRoster = {}; // Legacy var, safe check
+                                    if (!rosterMap[n]) rosterMap[n] = {};
+                                    rosterMap[n][turnoLetra] = operarioObj;
                                 }
                             });
                         }
@@ -441,9 +364,13 @@
             }
 
             // 2. PROCESAR EFICIENCIAS
-            let effByDate = {}; 
-            let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {};
-            let rankLiderMes = {}; // Acumulado para Líderes
+            let effByDate = {}; // Agrupación para Panel Derecho (Máquinas en vivo)
+            
+            // Stats Operadores
+            let rankAyer = {}, rankSemana = {}, rankMes = {};
+            
+            // Stats Equipos (Líderes)
+            let teamAyer = {}, teamSemana = {}, teamMes = {};
 
             if (effData && effData.length > 0) {
                 let isEffObj = !Array.isArray(effData[0]);
@@ -451,7 +378,6 @@
 
                 for (let i = isEffObj ? 0 : 1; i < effData.length; i++) {
                     let row = effData[i];
-                    
                     let rClean = {};
                     if (isEffObj) {
                         for (let k in row) rClean[String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "")] = row[k];
@@ -461,9 +387,7 @@
 
                     const getCol = (keywords) => {
                         for (let k in rClean) {
-                            for(let w of keywords) {
-                                if (k.includes(w)) return rClean[k];
-                            }
+                            for(let w of keywords) { if (k.includes(w)) return rClean[k]; }
                         }
                         return null;
                     };
@@ -480,16 +404,20 @@
                     if (maqStr && tno && (rendRaw > 0 || calRaw > 0)) {
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
                         if (isNaN(maqNum)) continue;
-
                         let letraTurno = tno.includes("MAÑ") ? "M" : (tno.includes("TAR") ? "T" : "N");
 
-                        // *** ASIGNACIÓN DE OPERADOR ***
-                        let opNombre = generalRoster[maqNum] && generalRoster[maqNum][letraTurno] ? generalRoster[maqNum][letraTurno] : null;
+                        // IDENTIFICACIÓN DEL OPERADOR (INFALIBLE)
+                        let opObj = null;
                         
-                        let isMissing = false;
-                        if (!opNombre) {
-                            opNombre = `OPERADOR M${maqNum}`; // Fallback visual
-                            isMissing = true;
+                        // 1. Escanear toda la fila por si escribieron el nombre manual
+                        for(let key in rClean) {
+                            let match = identifyPerson(rClean[key]);
+                            if (match) { opObj = match; break; }
+                        }
+
+                        // 2. Si no lo escribieron, cruzar con el Roster
+                        if (!opObj && rosterMap[maqNum] && rosterMap[maqNum][letraTurno]) {
+                            opObj = rosterMap[maqNum][letraTurno];
                         }
 
                         // Cálculo
@@ -499,87 +427,98 @@
                         if (cal > 100) cal = 100;
                         let eff = (rend / 100) * (cal / 100) * 100;
 
+                        // Guardar para Panel Derecho
                         if (!effByDate[recDateNum]) effByDate[recDateNum] = {};
-                        if (!effByDate[recDateNum][maqNum]) effByDate[recDateNum][maqNum] = {};
-                        effByDate[recDateNum][maqNum][letraTurno] = { name: opNombre, eff: eff, missing: isMissing };
+                        if (!effByDate[recDateNum][maqNum]) effByDate[recDateNum][maqNum] = [];
+                        
+                        // Agregar el turno a la lista de esa máquina en ese día
+                        effByDate[recDateNum][maqNum].push({
+                            shift: letraTurno,
+                            name: opObj ? opObj.name : `NO ASIGNADO`,
+                            teamInfo: opObj ? opObj.team : '',
+                            eff: eff
+                        });
 
-                        const addStat = (dict, name, val, isMiss) => {
-                            if (!dict[name]) dict[name] = { sum: 0, count: 0, missing: isMiss };
-                            dict[name].sum += val; dict[name].count++;
-                        };
+                        // Acumular para Rankings si identificamos a la persona
+                        if (opObj) {
+                            const addStat = (dict, keyName, val) => {
+                                if (!dict[keyName]) dict[keyName] = { sum: 0, count: 0, obj: opObj };
+                                dict[keyName].sum += val; dict[keyName].count++;
+                            };
 
-                        let recYM = Math.floor(recDateNum / 100);
+                            let recYM = Math.floor(recDateNum / 100);
 
-                        // Acumulados para Operadores
-                        addStat(rankGlobal, opNombre, eff, isMissing);
-                        if (recYM === currentYM) addStat(rankMes, opNombre, eff, isMissing);
-                        if (recDateNum >= hace7Num) addStat(rankSemana, opNombre, eff, isMissing);
-                        if (recDateNum < hoyNum) {
-                            if (!rankAyer[recDateNum]) rankAyer[recDateNum] = {};
-                            addStat(rankAyer[recDateNum], opNombre, eff, isMissing);
-                        }
+                            // Acumulados Operador
+                            if (recYM === currentYM) addStat(rankMes, opObj.name, eff);
+                            if (recDateNum >= hace7Num) addStat(rankSemana, opObj.name, eff);
+                            if (recDateNum < hoyNum) {
+                                if (!rankAyer[recDateNum]) rankAyer[recDateNum] = {};
+                                addStat(rankAyer[recDateNum], opObj.name, eff);
+                            }
 
-                        // Acumulados para el Líder de Turno (Solo Mes Actual)
-                        if (!isMissing) {
-                            let liderAsignado = getLeaderByOperator(opNombre);
-                            if (liderAsignado && recYM === currentYM) {
-                                addStat(rankLiderMes, liderAsignado, eff, false);
+                            // Acumulados de su Equipo (Líder)
+                            if (recYM === currentYM) addStat(teamMes, opObj.team, eff);
+                            if (recDateNum >= hace7Num) addStat(teamSemana, opObj.team, eff);
+                            if (recDateNum < hoyNum) {
+                                if (!teamAyer[recDateNum]) teamAyer[recDateNum] = {};
+                                addStat(teamAyer[recDateNum], opObj.team, eff);
                             }
                         }
                     }
                 }
             }
 
-            // Seleccionar Fecha para el Panel Derecho
+            // Seleccionar Fecha del Panel Derecho (Máquinas)
             let allRecDates = Object.keys(effByDate).map(Number).sort((a,b) => b - a);
             let latestDateNum = allRecDates.length > 0 ? allRecDates[0] : hoyNum;
 
             document.getElementById('mPanelTitle').innerText = (latestDateNum === hoyNum) ? 
-                `🟢 TOP 5 - MÁQUINAS EN LÍNEA (HOY)` : 
-                `🟢 TOP 5 - MÁQUINAS (${formatNumToDateStr(latestDateNum)})`;
+                `🟢 TOP OPERADORES EN MÁQUINA (HOY)` : 
+                `🟢 TOP OPERADORES EN MÁQUINA (${formatNumToDateStr(latestDateNum)})`;
 
-            let bestAyerData = {};
+            // Buscar fecha consolidada para "Ayer"
+            let bestRankAyer = {}, bestTeamAyer = {};
             let ultimaFechaCerradaNum = null;
             let sortedFechasAyer = Object.keys(rankAyer).map(Number).sort((a,b) => b - a);
             if(sortedFechasAyer.length > 0) {
                 ultimaFechaCerradaNum = sortedFechasAyer[0];
-                bestAyerData = rankAyer[ultimaFechaCerradaNum];
+                bestRankAyer = rankAyer[ultimaFechaCerradaNum] || {};
+                bestTeamAyer = teamAyer[ultimaFechaCerradaNum] || {};
             }
 
-            // 3. GENERAR LISTAS TOP 5
-            const getTop5 = (dict) => {
+            // 3. ORDENAR Y PREPARAR LISTAS TOP
+            const getTopList = (dict, limit) => {
                 let arr = [];
-                for(let name in dict) {
-                    arr.push({ name: name, eff: dict[name].sum / dict[name].count, missing: dict[name].missing });
+                for(let key in dict) {
+                    arr.push({ name: key, eff: dict[key].sum / dict[key].count, obj: dict[key].obj });
                 }
-                return arr.sort((a,b) => b.eff - a.eff).slice(0, 5);
+                return arr.sort((a,b) => b.eff - a.eff).slice(0, limit);
             };
 
-            let listGlobal = getTop5(rankGlobal);
-            let listAyer = getTop5(bestAyerData);
-            let listSemana = getTop5(rankSemana);
-            let listMes = getTop5(rankMes);
-            let listLideres = getTop5(rankLiderMes); // TOP DE LÍDERES
+            let viewsData = {
+                fechaAyerStr: ultimaFechaCerradaNum ? formatNumToDateStr(ultimaFechaCerradaNum) : "---",
+                opAyer: getTopList(bestRankAyer, 5),
+                opSemana: getTopList(rankSemana, 5),
+                opMes: getTopList(rankMes, 5),
+                
+                teamAyer: getTopList(bestTeamAyer, 3),
+                teamSemana: getTopList(teamSemana, 3),
+                teamMes: getTopList(teamMes, 3)
+            };
 
-            // Resguardo si no hay datos suficientes
-            if (listAyer.length === 0) listAyer = listMes.length > 0 ? listMes : listGlobal;
-            if (listSemana.length === 0) listSemana = listMes.length > 0 ? listMes : listGlobal;
-            if (listMes.length === 0) listMes = listGlobal;
-
-            // RENDERIZAR
-            renderLeaderboards(listAyer, listSemana, listMes, listGlobal, listLideres, ultimaFechaCerradaNum ? formatNumToDateStr(ultimaFechaCerradaNum) : null);
+            renderLeaderboards(viewsData);
             renderMachines(effByDate[latestDateNum] || {});
 
             document.getElementById('loader').style.display = 'none';
         }
 
-        // PANEL IZQUIERDO: CARRUSEL (AHORA CON 5 VISTAS INCLUYENDO LÍDERES)
-        function renderLeaderboards(lAyer, lSemana, lMes, lGlobal, lLideres, fechaAyerStr) {
+        // PANEL IZQUIERDO: CARRUSEL CON 6 VISTAS (OPERADORES Y EQUIPOS)
+        function renderLeaderboards(data) {
             let container = document.getElementById('rankingBody');
             let fullHtml = '';
 
-            const createView = (id, list, title, isLeaderMode = false) => {
-                let html = `<div class="carousel-view" id="rk-${id}" data-title="${title}">`;
+            const createView = (id, list, title, isTeamMode) => {
+                let html = `<div class="carousel-view ${isTeamMode ? 'team-view' : ''}" id="rk-${id}" data-title="${title}">`;
                 
                 if (list.length === 0) {
                     html += `
@@ -591,15 +530,15 @@
                     list.forEach((item, index) => {
                         let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
                         
-                        let colorClass, colorNombre;
-                        
-                        if (isLeaderMode) {
-                            colorClass = `fill-leader-${index+1}`; // Color especial para líderes
-                            colorNombre = 'var(--leader)';
+                        let colorClass;
+                        if (isTeamMode) {
+                            colorClass = item.obj ? item.obj.tClass : 'fill-1';
                         } else {
-                            colorClass = item.missing ? `fill-alert` : `fill-${index+1}`;
-                            colorNombre = item.missing ? 'var(--alert)' : (index === 0 ? 'var(--gold)' : (index === 1 ? '#64748b' : (index===2 ? 'var(--bronze)' : '#222')));
+                            colorClass = `fill-${index+1}`;
                         }
+                        
+                        let colorNombre = (index === 0) ? 'var(--gold)' : (index === 1 ? '#64748b' : (index===2 ? 'var(--bronze)' : '#222'));
+                        if(isTeamMode && index > 0) colorNombre = '#222'; // Menos énfasis en el texto para el 2do y 3ro equipo
                         
                         html += `
                         <div class="bar-row">
@@ -620,13 +559,15 @@
                 return html;
             };
 
-            let strAyer = fechaAyerStr ? `DÍA ANTERIOR (${fechaAyerStr})` : "DÍA ANTERIOR";
+            let strAyer = data.fechaAyerStr;
             
-            fullHtml += createView(0, lAyer, `TOP 5 OPERADORES - ${strAyer}`);
-            fullHtml += createView(1, lSemana, "TOP 5 OPERADORES - ÚLTIMOS 7 DÍAS");
-            fullHtml += createView(2, lMes, "TOP 5 OPERADORES - MES ACTUAL");
-            fullHtml += createView(3, lGlobal, "TOP 5 OPERADORES - HISTÓRICO GLOBAL");
-            fullHtml += createView(4, lLideres, "🏆 RANKING LÍDERES DE TURNO - MES ACTUAL", true); // NUEVA VISTA LÍDERES
+            fullHtml += createView(0, data.opAyer, `TOP 5 OPERADORES - DÍA ANTERIOR (${strAyer})`, false);
+            fullHtml += createView(1, data.opSemana, "TOP 5 OPERADORES - ÚLTIMOS 7 DÍAS", false);
+            fullHtml += createView(2, data.opMes, "TOP 5 OPERADORES - MES ACTUAL", false);
+            
+            fullHtml += createView(3, data.teamAyer, `🏆 TOP 3 EQUIPOS (LÍDERES) - DÍA ANTERIOR (${strAyer})`, true);
+            fullHtml += createView(4, data.teamSemana, "🏆 TOP 3 EQUIPOS (LÍDERES) - ÚLTIMOS 7 DÍAS", true);
+            fullHtml += createView(5, data.teamMes, "🏆 TOP 3 EQUIPOS (LÍDERES) - MES ACTUAL", true);
 
             container.innerHTML = fullHtml;
 
@@ -654,55 +595,81 @@
             currentRkIndex = 0;
             showRk(0);
             rkInterval = setInterval(() => {
-                currentRkIndex = (currentRkIndex + 1) % 5; // Ahora cicla entre 5 vistas
+                currentRkIndex = (currentRkIndex + 1) % 6; // Rota entre las 6 vistas
                 showRk(currentRkIndex);
-            }, 10000); 
+            }, 8000); // 8 segundos por pantalla
         }
 
-        // PANEL DERECHO: TOP 5 MÁQUINAS EN LÍNEA (LISTA ESTÁTICA)
+        // PANEL DERECHO: CARRUSEL DE MÁQUINAS EN VIVO (RANKING INTERNO)
         function renderMachines(statsFecha) {
             let container = document.getElementById('machinesContainer');
+            let fullHtml = '';
             
-            let records = [];
-            for (let m in statsFecha) {
-                if (statsFecha[m].M) records.push({ maq: m, shift: 'M', label: '☀ MAÑANA', ...statsFecha[m].M });
-                if (statsFecha[m].T) records.push({ maq: m, shift: 'T', label: '🌤 TARDE', ...statsFecha[m].T });
-                if (statsFecha[m].N) records.push({ maq: m, shift: 'N', label: '🌙 NOCHE', ...statsFecha[m].N });
-            }
+            let maqKeys = Object.keys(statsFecha).map(Number).sort((a,b)=>a-b);
 
-            if (records.length === 0) {
+            if(maqKeys.length === 0) {
                 container.innerHTML = `
-                <div class="empty-state">
-                    <span>⏳</span><p>ESPERANDO REGISTROS DE PRODUCCIÓN</p>
+                <div class="machine-slide active" style="justify-content:center; position:relative; transform:none;">
+                    <div class="empty-state" style="margin:auto;">
+                        <span style="font-size: 5vh; color:#666;">⏳</span>
+                        <p style="color:#666;">ESPERANDO REGISTROS<br>DE PRODUCCIÓN</p>
+                    </div>
                 </div>`;
                 return;
             }
 
-            records.sort((a, b) => b.eff - a.eff);
-            let top5 = records.slice(0, 5);
-
-            let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
-            let fullHtml = '';
-
-            top5.forEach((item, index) => {
-                let init = getAvatarInitials(item.name);
-                let rowCls = item.missing ? 'live-row alert' : 'live-row';
-                let nameCol = item.missing ? 'var(--alert)' : '#475569';
-                let shiftColor = item.shift === 'M' ? 'var(--sober-m)' : (item.shift === 'T' ? 'var(--sober-t)' : 'var(--sober-n)');
+            maqKeys.forEach((m, idx) => {
+                let shiftsArray = statsFecha[m];
                 
-                fullHtml += `
-                <div class="${rowCls}">
-                    <div class="live-rank">${medals[index]}</div>
-                    <div class="live-avatar" style="background: ${shiftColor};">${init}</div>
-                    <div class="live-details">
-                        <p class="live-name">MÁQUINA ${item.maq} <span style="font-size:1.6vh; color:${nameCol}; font-weight:bold;">- ${item.name}</span></p>
-                        <p class="live-shift">${item.label}</p>
-                    </div>
-                    <div class="live-eff">${item.eff.toFixed(1).replace('.',',')}%</div>
-                </div>`;
-            });
+                // Ordenar los turnos de la máquina de Mayor a Menor Eficiencia (Genera un Ranking interno)
+                shiftsArray.sort((a,b) => b.eff - a.eff);
 
+                let slideHtml = `
+                <div class="machine-slide" id="mq-${idx}">
+                    <div class="m-card-title">MÁQUINA ${m}</div>`;
+                
+                let medals = ['🥇', '🥈', '🥉'];
+                shiftsArray.forEach((op, rankIdx) => {
+                    let rankClass = `rank-${rankIdx + 1}`;
+                    let shiftLabel = op.shift === 'M' ? '☀ TURNO MAÑANA' : (op.shift === 'T' ? '🌤 TURNO TARDE' : '🌙 TURNO NOCHE');
+                    
+                    slideHtml += `
+                    <div class="m-op-row ${rankClass}">
+                        <div class="m-rank-icon">${medals[rankIdx] || ''}</div>
+                        <div class="m-details">
+                            <p class="m-name">${op.name}</p>
+                            <p class="m-team">${op.teamInfo || ''} • ${shiftLabel}</p>
+                        </div>
+                        <div class="m-eff">${op.eff.toFixed(1).replace('.',',')}%</div>
+                    </div>`;
+                });
+
+                slideHtml += `</div>`;
+                fullHtml += slideHtml;
+            });
+            
             container.innerHTML = fullHtml;
+
+            clearInterval(mqInterval);
+            let slides = document.querySelectorAll('.machine-slide');
+            if(slides.length === 0) return;
+            
+            if(slides.length === 1) {
+                slides[0].classList.add('active'); 
+                return;
+            }
+
+            const showMq = (index) => {
+                slides.forEach(s => s.classList.remove('active'));
+                slides[index].classList.add('active');
+            };
+
+            currentMqIndex = 0;
+            showMq(0);
+            mqInterval = setInterval(() => {
+                currentMqIndex = (currentMqIndex + 1) % slides.length;
+                showMq(currentMqIndex);
+            }, 6000); // Rota de máquina cada 6 segundos
         }
 
         window.onload = startEngine;
