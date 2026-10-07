@@ -184,6 +184,9 @@
             background: linear-gradient(to right, #4338ca 0%, #818cf8 25%, #e0e7ff 50%, #4f46e5 80%, #312e81 100%);
             box-shadow: 2px 5px 10px rgba(67, 56, 202, 0.2);
         }
+        .col-bar-3d.rank-rest {
+            background: linear-gradient(to right, #64748b 0%, #94a3b8 50%, #475569 100%);
+        }
 
         /* Equipos / Líderes en 3D */
         .col-bar-3d.team-A {
@@ -215,6 +218,7 @@
         .rank-3 .col-bar-cap { background: radial-gradient(circle, #ffedd5 10%, #ea580c 80%, #9a3412 100%); }
         .rank-4 .col-bar-cap { background: radial-gradient(circle, #e0f2fe 10%, #0284c7 80%, #0369a1 100%); }
         .rank-5 .col-bar-cap { background: radial-gradient(circle, #e0e7ff 10%, #4f46e5 80%, #4338ca 100%); }
+        .rank-rest .col-bar-cap { background: #94a3b8; }
         
         .team-A .col-bar-cap { background: radial-gradient(circle, #f0f9ff 10%, #0284c7 80%, #0369a1 100%); }
         .team-B .col-bar-cap { background: radial-gradient(circle, #fff7ed 10%, #ea580c 80%, #9a3412 100%); }
@@ -451,7 +455,7 @@
             return null;
         }
 
-        let rkInterval, mqInterval;
+        let maqInterval;
         let globalDataCache = null; 
 
         setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL'); }, 1000);
@@ -468,7 +472,7 @@
                 const script = document.createElement('script');
                 script.id = callbackName;
                 script.src = `${url}?callback=${callbackName}&_t=${Date.now()}`;
-                script.onerror = () => reject(`Error conectando a Google Sheets`);
+                script.onerror = () => reject(new Error(`Error conectando a Google Sheets`));
                 document.body.appendChild(script);
             });
         }
@@ -510,19 +514,25 @@
             return `${str.substring(6,8)}/${str.substring(4,6)}/${str.substring(0,4)}`;
         }
 
+        // --- MOTOR DE FECHAS REAL ---
+        function getSafeDateAgo(baseDate, days) {
+            let d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate() - days);
+            return parseInt(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
+        }
+
         function startEngine() {
             Promise.all([fetchJSONP(ROSTER_API, 'roster'), fetchJSONP(EFF_API, 'eff')])
             .then(([rosterData, effData]) => {
                 processData(rosterData, effData);
             }).catch(err => {
-                document.getElementById('loader').innerHTML = "❌ Error de conexión con Planillas. Recargue.";
+                document.getElementById('loader').innerHTML = `❌ Error de conexión con Planillas. Recargue.<br><span style="font-size:14px">${err.message || err}</span>`;
             });
         }
 
         function processData(rosterData, effData) {
             let hoyDate = new Date();
             let hoyNum = parseInt(`${hoyDate.getFullYear()}${String(hoyDate.getMonth()+1).padStart(2,'0')}${String(hoyDate.getDate()).padStart(2,'0')}`);
-            let hace7Num = hoyNum - 7; 
+            let hace7Num = getSafeDateAgo(hoyDate, 7); 
             let currentYM = Math.floor(hoyNum / 100); 
 
             // 1. CARGAR ASIGNACIONES
@@ -566,8 +576,9 @@
                             maqStr.split('-').forEach(num => {
                                 let n = parseInt(num, 10);
                                 if (!isNaN(n)) {
-                                    if (!rosterMap[dateNum][n]) rosterMap[dateNum][n] = {};
-                                    rosterMap[dateNum][n][turnoLetra] = opObj;
+                                    let maqKey = `Inyectora ${n}`;
+                                    if (!rosterMap[dateNum][maqKey]) rosterMap[dateNum][maqKey] = {};
+                                    rosterMap[dateNum][maqKey][turnoLetra] = opObj;
                                 }
                             });
                         }
@@ -610,18 +621,29 @@
 
                     let rendRaw = parseRobustFloat(getCol(["disponibilidad", "rendimiento", "eficiencia"]) || (isEffObj ? 0 : row[3]));
                     let calRaw = parseRobustFloat(getCol(["calidad"]) || (isEffObj ? 0 : row[4]));
-                    let tno = String(getCol(["turno"]) || (isEffObj ? '' : row[1]) || "").trim().toUpperCase();
-                    let maqStr = String(getCol(["maquina", "inyectora"]) || (isEffObj ? '' : row[2]) || "").trim();
+                    
+                    let tnoRaw = String(getCol(["turno"]) || (isEffObj ? '' : row[1]) || "").trim().toUpperCase();
+                    let tno = "";
+                    if (tnoRaw.includes("MAÑ") || tnoRaw.includes("MAN") || tnoRaw.includes("M")) tno = "Mañana";
+                    else if (tnoRaw.includes("TAR") || tnoRaw.includes("T")) tno = "Tarde";
+                    else if (tnoRaw.includes("NOC") || tnoRaw.includes("N")) tno = "Noche";
+
+                    // NORMALIZADOR FLEXIBLE DE MÁQUINAS
+                    let maqRaw = String(getCol(["maquina", "inyectora"]) || (isEffObj ? '' : row[2]) || "").trim().toUpperCase();
+                    let maq = maqRaw;
+                    if (/^\d+$/.test(maqRaw)) {
+                        maq = `Inyectora ${maqRaw}`;
+                    } else if (maqRaw.includes("IN") || maqRaw.includes("MQ") || maqRaw.includes("MA")) {
+                        let numOnly = maqRaw.replace(/\D/g, "");
+                        if(numOnly) maq = `Inyectora ${numOnly}`;
+                    }
+
                     let fechaRaw = getCol(["fecha", "dia", "date"]) || (isEffObj ? '' : row[0]);
-
                     let recDateNum = normalizeDateToNum(fechaRaw);
-                    if (!recDateNum) continue;
+                    
+                    if (!recDateNum || !maq || !tno) continue;
 
-                    if (maqStr && tno && (rendRaw > 0 || calRaw > 0)) {
-                        let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
-                        if (isNaN(maqNum)) continue;
-                        let letraTurno = tno.includes("MAÑ") ? "M" : (tno.includes("TAR") ? "T" : "N");
-
+                    if (rendRaw > 0 || calRaw > 0) {
                         let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
                         let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
                         let eff = (rend / 100) * (cal / 100) * 100;
@@ -631,8 +653,8 @@
 
                         rawEffData.push({
                             dateNum: recDateNum,
-                            maqNum: maqNum,
-                            letraTurno: letraTurno,
+                            maqName: maq,
+                            tno: tno,
                             eff: eff,
                             rawCols: rClean
                         });
@@ -648,7 +670,7 @@
             let diaAnteriorStr = diaAnteriorNum ? formatNumToDateStr(diaAnteriorNum) : "SIN DATOS";
 
             if(currentView === 'operadores') document.getElementById('dynamicMainTitle').innerText = 'TOP OPERADORES - PLANTA';
-            else if(currentView === 'lideres') document.getElementById('dynamicMainTitle').innerText = 'RENDIMIENTO LÍDERES DE TURNO';
+            else if(currentView === 'lideres') document.getElementById('dynamicMainTitle').innerText = 'RENDIMIENTO LÍDERES DE EQUIPO';
             else if(currentView === 'maquinas') document.getElementById('dynamicMainTitle').innerText = 'RANKING POR MÁQUINA';
 
             document.getElementById('fechaHoy').innerText = `SISTEMA ACTIVO: ${formatNumToDateStr(latestDateNum)}`;
@@ -675,35 +697,52 @@
                     let match = identifyPerson(item.rawCols[key]);
                     if (match) { opObj = match; break; }
                 }
-                if (!opObj && rosterMap[item.dateNum] && rosterMap[item.dateNum][item.maqNum] && rosterMap[item.dateNum][item.maqNum][item.letraTurno]) {
-                    opObj = rosterMap[item.dateNum][item.maqNum][item.letraTurno];
+                
+                let letraTurno = item.tno === "Mañana" ? "M" : (item.tno === "Tarde" ? "T" : "N");
+                if (!opObj && rosterMap[item.dateNum] && rosterMap[item.dateNum][item.maqName] && rosterMap[item.dateNum][item.maqName][letraTurno]) {
+                    opObj = rosterMap[item.dateNum][item.maqName][letraTurno];
                 }
 
-                if(opObj) {
-                    let recYM = Math.floor(item.dateNum / 100);
+                // Fallback robusto
+                if (!opObj) {
+                    let fallbackTeam = "EQUIPO ROTATIVO";
+                    if (item.tno === "Mañana") fallbackTeam = "EQUIPO DILAN (TURNO A)";
+                    else if (item.tno === "Tarde") fallbackTeam = "EQUIPO MIGUEL (TURNO B)";
+                    else if (item.tno === "Noche") fallbackTeam = "EQUIPO NILSON (TURNO C)";
                     
-                    addObjStat(opStats.global, opObj.name, item.eff, opObj);
-                    addObjStat(teamStats.global, opObj.team, item.eff, opObj);
-                    addMaqStat('global', item.maqNum, opObj.name, item.eff, opObj);
-
-                    if (recYM === currentYM) {
-                        addObjStat(opStats.mes, opObj.name, item.eff, opObj);
-                        addObjStat(teamStats.mes, opObj.team, item.eff, opObj);
-                        addMaqStat('mes', item.maqNum, opObj.name, item.eff, opObj);
-                    }
-
-                    if (item.dateNum >= hace7Num) {
-                        addObjStat(opStats.semana, opObj.name, item.eff, opObj);
-                        addObjStat(teamStats.semana, opObj.team, item.eff, opObj);
-                        addMaqStat('semana', item.maqNum, opObj.name, item.eff, opObj);
-                    }
-
-                    if (item.dateNum === diaAnteriorNum) {
-                        addObjStat(opStats.ayer, opObj.name, item.eff, opObj);
-                        addObjStat(teamStats.ayer, opObj.team, item.eff, opObj);
-                        addMaqStat('ayer', item.maqNum, opObj.name, item.eff, opObj);
-                    }
+                    opObj = { name: "NO ASIGNADO", team: fallbackTeam, tColor: "var(--text-muted)", tClass: "rank-rest" };
                 }
+
+                let recYM = Math.floor(item.dateNum / 100);
+                
+                addObjStat(opStats.global, opObj.name, item.eff, opObj);
+                addObjStat(teamStats.global, opObj.team, item.eff, opObj);
+                addMaqStat('global', item.maqName, opObj.name, item.eff, opObj);
+
+                if (recYM === currentYM) {
+                    addObjStat(opStats.mes, opObj.name, item.eff, opObj);
+                    addObjStat(teamStats.mes, opObj.team, item.eff, opObj);
+                    addMaqStat('mes', item.maqName, opObj.name, item.eff, opObj);
+                }
+
+                if (item.dateNum >= hace7Num) {
+                    addObjStat(opStats.semana, opObj.name, item.eff, opObj);
+                    addObjStat(teamStats.semana, opObj.team, item.eff, opObj);
+                    addMaqStat('semana', item.maqName, opObj.name, item.eff, opObj);
+                }
+
+                if (item.dateNum === diaAnteriorNum) {
+                    addObjStat(opStats.ayer, opObj.name, item.eff, opObj);
+                    addObjStat(teamStats.ayer, opObj.team, item.eff, opObj);
+                    addMaqStat('ayer', item.maqName, opObj.name, item.eff, opObj);
+                }
+            });
+
+            // Ordenamiento inteligente de máquinas (MQ 1, MQ 2...)
+            let maqKeysSorted = Object.keys(maqStats.global).sort((a, b) => {
+                let aNum = parseInt(a.replace(/\D/g, ''), 10) || 0;
+                let bNum = parseInt(b.replace(/\D/g, ''), 10) || 0;
+                return aNum - bNum;
             });
 
             globalDataCache = {
@@ -711,7 +750,7 @@
                 opStats: opStats,
                 teamStats: teamStats,
                 maqStats: maqStats,
-                machineKeys: Object.keys(maqStats.global).map(Number).sort((a,b)=>a-b)
+                machineKeys: maqKeysSorted
             };
 
             renderCurrentView();
@@ -720,13 +759,14 @@
 
         const getTopList = (dict, limit) => {
             let arr = [];
-            for(let key in dict) arr.push({ name: key, eff: dict[key].sum / dict[key].count, obj: dict[key].obj });
+            for(let key in dict) {
+                if(dict[key].count > 0 && dict[key].obj.name !== "NO ASIGNADO") {
+                    arr.push({ name: key, eff: dict[key].sum / dict[key].count, obj: dict[key].obj });
+                }
+            }
             return arr.sort((a,b) => b.eff - a.eff).slice(0, limit);
         };
 
-        // =========================================================
-        // RESTRICCIÓN RENDER: 3D VERTICAL COLUMNS
-        // =========================================================
         function renderQuadrant(title, subtitle, list, isTeamMode) {
             let html = `
             <div class="quadrant">
@@ -737,22 +777,24 @@
                 <div class="q-body">`;
             
             if (list.length === 0) {
-                html += `<div class="empty-state"><span>📊</span><p>SIN DATOS REGISTRADOS</p></div>`;
+                html += `<div class="empty-state"><span style="font-size:3vh;">📊</span><p style="font-size:1.5vh;">SIN DATOS REGISTRADOS</p></div>`;
             } else {
                 let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
                 list.forEach((item, index) => {
                     let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
                     
                     let isMedal = index < 3;
-                    let displayLabelOrMedal = isMedal ? `<span class="col-medal">${medals[index]}</span>` : `<div class="col-medal" style="font-size:1.1vh; font-weight:800; color:var(--text-muted); padding:3px 0;">${index+1}°</div>`;
+                    let displayLabelOrMedal = isMedal ? `<span class="col-medal">${medals[index]}</span>` : `<div style="font-size:1.1vh; font-weight:800; color:var(--text-muted); padding:3px 0;">${index+1}°</div>`;
                     
                     let col3DClass = isTeamMode ? item.obj.tClass : `rank-${index+1}`;
+
                     let colorNombre = (index === 0 && !isTeamMode) ? 'var(--gold-dark)' : (isTeamMode ? item.obj.tColor : '#1e293b');
+                    if (isTeamMode && index > 0) colorNombre = '#f1f5f9';
                     
                     let badgeLabel = isTeamMode ? item.name.split(" ")[1] || "TEAM" : '';
                     let badgeColor = isTeamMode ? item.obj.tColor : '';
                     
-                    let subInfo = isTeamMode ? 'LÍDER' : (item.obj ? item.obj.team.split(" (")[0] : '');
+                    let subInfo = isTeamMode ? 'LÍDER' : (item.obj && item.obj.team ? item.obj.team.split(" (")[0] : 'OPERADOR');
                     
                     html += `
                     <div class="col-item">
@@ -766,7 +808,7 @@
                         ${displayLabelOrMedal}
                         <div class="col-name" title="${item.name}">${item.name}</div>
                         <div class="col-sub">${subInfo}</div>
-                        ${isTeamMode ? `<span class="col-badge" style="background-color:${badgeColor};">${badgeLabel}</span>` : ''}
+                        ${isTeamMode && badgeLabel ? `<span class="col-badge" style="background-color:${badgeColor};">${badgeLabel}</span>` : ''}
                     </div>`;
                 });
             }
@@ -794,7 +836,7 @@
                 grid.innerHTML = html;
             }
             else if (currentView === 'maquinas') {
-                if (cache.machineKeys.length === 0) {
+                if (!cache.machineKeys || cache.machineKeys.length === 0) {
                     grid.innerHTML = `<div class="empty-state" style="grid-column: span 2;"><span>⏳</span><p>SIN MÁQUINAS REGISTRADAS</p></div>`;
                     return;
                 }
@@ -803,20 +845,20 @@
                 
                 const updateMachineGrid = () => {
                     let m = cache.machineKeys[currentMaqIndex];
-                    document.getElementById('dynamicMainTitle').innerText = `MÁQUINA ${m} - RANKING OPERADORES`;
+                    let maqLabelClean = m.toUpperCase().replace('INYECTORA', 'MQ');
+                    document.getElementById('dynamicMainTitle').innerText = `${maqLabelClean} - RENDIMIENTO`;
                     
                     let mqHtml = '';
-                    mqHtml += renderQuadrant("MÁQUINA " + m + " - DÍA ANTERIOR", cache.diaAnteriorStr, getTopList(cache.maqStats.ayer[m] || {}, 5), false);
-                    mqHtml += renderQuadrant("MÁQUINA " + m + " - 7 DÍAS", "EVALUACIÓN SEMANAL", getTopList(cache.maqStats.semana[m] || {}, 5), false);
-                    mqHtml += renderQuadrant("MÁQUINA " + m + " - MES", "EVALUACIÓN MENSUAL", getTopList(cache.maqStats.mes[m] || {}, 5), false);
-                    mqHtml += renderQuadrant("MÁQUINA " + m + " - GLOBAL", "EVALUACIÓN GENERAL", getTopList(cache.maqStats.global[m] || {}, 5), false);
+                    mqHtml += renderQuadrant(`${maqLabelClean} - DÍA ANTERIOR`, cache.diaAnteriorStr, getTopList(cache.maqStats.ayer[m] || {}, 5), false);
+                    mqHtml += renderQuadrant(`${maqLabelClean} - 7 DÍAS`, "EVALUACIÓN SEMANAL", getTopList(cache.maqStats.semana[m] || {}, 5), false);
+                    mqHtml += renderQuadrant(`${maqLabelClean} - MES`, "EVALUACIÓN MENSUAL", getTopList(cache.maqStats.mes[m] || {}, 5), false);
+                    mqHtml += renderQuadrant(`${maqLabelClean} - GLOBAL`, "EVALUACIÓN GENERAL", getTopList(cache.maqStats.global[m] || {}, 5), false);
                     grid.innerHTML = mqHtml;
 
-                    // Forzar animación de las barras 3D
                     setTimeout(() => {
                         grid.querySelectorAll('.col-bar-3d').forEach(b => {
                             let targetVal = b.getAttribute('data-height');
-                            b.style.height = targetVal + '%';
+                            if(targetVal) b.style.height = targetVal + '%';
                         });
                     }, 80);
 
@@ -828,12 +870,11 @@
                 maqInterval = setInterval(updateMachineGrid, 8000); 
             }
             
-            // Forzar animación inicial (Para no-rotativas)
             if(currentView !== 'maquinas') {
                 setTimeout(() => {
                     grid.querySelectorAll('.col-bar-3d').forEach(b => {
                         let targetVal = b.getAttribute('data-height');
-                        b.style.height = targetVal + '%';
+                        if(targetVal) b.style.height = targetVal + '%';
                     });
                 }, 80);
             }
