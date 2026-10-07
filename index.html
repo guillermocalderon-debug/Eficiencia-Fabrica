@@ -123,28 +123,52 @@
             color: #111; 
             text-transform: uppercase; 
             flex-grow: 1;
-            padding-left: 2vw;
+            padding-left: 1vw;
         }
         
-        /* SELECTOR / CAROUSEL DE TIEMPO */
-        .timeframe-selector {
+        /* CAROUSEL INFORMATIVO (Indicador dinámico para Yodeck) */
+        .timeframe-carousel-indicator {
             display: flex;
-            background: #e2e8f0;
-            padding: 4px;
+            align-items: center;
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            padding: 0.5vh 1.2vw;
             border-radius: 30px;
-            gap: 5px;
+            gap: 15px;
             margin-right: 1.5vw;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
         }
-        .time-btn {
-            background: transparent; border: none; padding: 6px 18px; border-radius: 20px;
-            font-weight: 900; font-size: min(0.8vw, 1.8vh); text-transform: uppercase; color: var(--text-muted);
-            cursor: pointer; transition: 0.3s;
+        .carousel-pulse {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+            animation: pulse-yodeck 1.5s infinite;
         }
-        .time-btn.active {
-            background: var(--primary); color: white; box-shadow: 0 4px 8px rgba(230,0,90,0.2);
+        @keyframes pulse-yodeck { 0% { transform: scale(0.9); opacity: 1;} 100% { transform: scale(1.4); opacity: 0; } }
+
+        .carousel-text {
+            font-weight: 900;
+            font-size: min(0.9vw, 2vh);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        /* Barra de progreso de rotación (Yodeck timer) */
+        .carousel-progress-bar {
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 4px; width: 0%;
+            background: var(--primary);
+            transition: width 0.1s linear;
         }
 
-        .clock-tv { font-size: min(1.3vw, 2.5vh); font-weight: bold; color: var(--text-muted); background: #ffffff; padding: 0.6vh 1.2vw; border-radius: 20px; border: 1px solid var(--border-color); letter-spacing: 1px;}
+        .clock-tv { font-size: min(1.3vw, 2.5vh); font-weight: bold; color: var(--text-dark); background: #ffffff; padding: 0.6vh 1.2vw; border-radius: 20px; border: 1px solid var(--border-color); letter-spacing: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .btn-exit { background-color: #334155; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 10px; font-size: min(0.9vw, 1.8vh);}
         
         /* Tarjetas Globales */
@@ -197,7 +221,7 @@
         .shift-stat span { display: block; font-size: min(0.6vw, 1.4vh); color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.1vh; font-weight: bold;}
         .shift-stat strong { display: flex; justify-content: center; align-items: center; gap: 4px; font-size: min(1.5vw, 3.2vh); color: #222; font-weight: 900;}
 
-        /* RECURSOS 3D INDUSTRIAL NATURAL (MEDALLAS / TROFEOS) */
+        /* RECURSOS 3D INDUSTRIAL NATURAL */
         .best-shift { 
             transform: translateY(-2px); 
             box-shadow: 0 12px 25px rgba(230, 0, 90, 0.12), 0 0 0 3px var(--primary); 
@@ -213,7 +237,6 @@
         }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.5vh); } }
 
-        /* Medalla Metálica Natural 3D (Cilindro pulido en relieve) */
         .medal-3d {
             display: inline-flex; align-items: center; justify-content: center;
             width: 2.5vh; height: 2.5vh;
@@ -237,12 +260,11 @@
             color: #fff; border-color: #ffedd5; box-shadow: 0 0 6px var(--bronze-shadow);
         }
 
-        /* 🚀 Badge de Desempeño Récord (Metálico sutil) */
         .rocket-badge {
             background: linear-gradient(135deg, #e0f2fe, #38bdf8);
             border: 1px solid #7dd3fc;
             color: #0369a1;
-            padding: 1px 4px;
+            padding: 1px 5px;
             border-radius: 4px;
             font-size: 0.55em;
             margin-left: 4px;
@@ -291,8 +313,8 @@
             
             .dash-header { height: auto; flex-direction: column; gap: 15px; text-align: center; border: none;}
             .dash-header h2 { font-size: 18px; padding-left: 0;}
-            .timeframe-selector { width: 100%; justify-content: center; margin-right: 0; margin-bottom: 5px; }
-            .time-btn { font-size: 11px; padding: 5px 12px; }
+            .timeframe-carousel-indicator { width: 100%; justify-content: center; margin-right: 0; margin-bottom: 5px; }
+            .carousel-text { font-size: 13px; }
             .clock-tv { font-size: 13px; width: 100%; text-align: center; }
 
             .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -385,10 +407,11 @@
             <h2 id="dynamicMainTitle">TABLERO DE EFICIENCIA</h2>
             
             <div style="display: flex; align-items: center; gap: 1vw;">
-                <div class="timeframe-selector">
-                    <button class="time-btn active" id="btn-dia" onclick="changeTimeframe('dia')">DÍA ANTERIOR</button>
-                    <button class="time-btn" id="btn-semana" onclick="changeTimeframe('semana')">ÚLT. 7 DÍAS</button>
-                    <button class="time-btn" id="btn-mes" onclick="changeTimeframe('mes')">MES ACTUAL</button>
+                <!-- Carrusel Automático Yodeck (No manipulable, sin botones tradicionales) -->
+                <div class="timeframe-carousel-indicator">
+                    <div class="carousel-pulse"></div>
+                    <span class="carousel-text" id="carousel-info-text">MOSTRANDO: DÍA ANTERIOR</span>
+                    <div class="carousel-progress-bar" id="progressBar"></div>
                 </div>
                 <div class="clock-tv" id="liveClock">00:00:00</div>
                 <button class="btn-exit" onclick="switchView('form-view')" id="btnExitTv" style="display:none;">🔙 Salir</button>
@@ -407,7 +430,7 @@
             <div class="shift-panel" id="panel-manana">
                 <div class="shift-header" style="background-color: var(--text-dark);">
                     <span>☀️ T. MAÑANA</span>
-                    <span class="shift-leader-badge" id="leader-manana">ASIGNANDO...</span>
+                    <span class="shift-leader-badge" id="leader-manana">Cargando...</span>
                 </div>
                 <div class="shift-body">
                     <div class="shift-stat"><span>Eficiencia</span><strong id="shift-m-eff" style="color: var(--text-dark);">0,0%</strong></div>
@@ -421,7 +444,7 @@
             <div class="shift-panel" id="panel-tarde">
                 <div class="shift-header" style="background-color: var(--primary);">
                     <span>🌤 T. TARDE</span>
-                    <span class="shift-leader-badge" id="leader-tarde">ASIGNANDO...</span>
+                    <span class="shift-leader-badge" id="leader-tarde">Cargando...</span>
                 </div>
                 <div class="shift-body">
                     <div class="shift-stat"><span>Eficiencia</span><strong id="shift-t-eff" style="color: var(--primary);">0,0%</strong></div>
@@ -435,7 +458,7 @@
             <div class="shift-panel" id="panel-noche">
                 <div class="shift-header" style="background-color: #020617;">
                     <span>🌙 T. NOCHE</span>
-                    <span class="shift-leader-badge" id="leader-noche">ASIGNANDO...</span>
+                    <span class="shift-leader-badge" id="leader-noche">Cargando...</span>
                 </div>
                 <div class="shift-body">
                     <div class="shift-stat"><span>Eficiencia</span><strong id="shift-n-eff" style="color: #020617;">0,0%</strong></div>
@@ -473,30 +496,40 @@
         ];
 
         function identifyLeaderByTeam(opName) {
-            if(!opName) return "SIN ASIGNAR";
+            if(!opName) return "EQ. ROTATIVO";
             let opLower = opName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             for (let p of PERSONNEL) {
                 for (let k of p.keys) {
                     if (opLower.includes(k)) return p.team;
                 }
             }
-            return "SIN ASIGNAR";
+            return "EQ. ROTATIVO";
         }
 
         // --- SISTEMA DE TIEMPO ROTATIVO (DIARIO, SEMANA, MES) ---
         let currentTimeframe = 'dia'; 
         let cachedRoster = {};
         let timelineInterval;
+        let rotationTimer = 0;
+        const ROTATION_DURATION = 12; // 12 segundos por pantalla
 
         function changeTimeframe(tf) {
             currentTimeframe = tf;
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${tf}`).classList.add('active');
+            rotationTimer = 0; // Reinicia la barra
             
             const titleElement = document.getElementById('dynamicMainTitle');
-            if(tf === 'dia') titleElement.innerText = "TABLERO DE EFICIENCIA - DÍA ANTERIOR";
-            if(tf === 'semana') titleElement.innerText = "TABLERO DE EFICIENCIA - ÚLTIMOS 7 DÍAS";
-            if(tf === 'mes') titleElement.innerText = "TABLERO DE EFICIENCIA - MES ACTUAL";
+            const infoTextElement = document.getElementById('carousel-info-text');
+
+            if(tf === 'dia') {
+                titleElement.innerText = "TABLERO DE EFICIENCIA - DÍA ANTERIOR";
+                infoTextElement.innerText = "PERIODO: DÍA ANTERIOR";
+            } else if(tf === 'semana') {
+                titleElement.innerText = "TABLERO DE EFICIENCIA - ÚLTIMOS 7 DÍAS";
+                infoTextElement.innerText = "PERIODO: ÚLT. 7 DÍAS";
+            } else if(tf === 'mes') {
+                titleElement.innerText = "TABLERO DE EFICIENCIA - MES ACTUAL";
+                infoTextElement.innerText = "PERIODO: MES ACTUAL";
+            }
             
             const rawData = localStorage.getItem(CACHE_KEY);
             if(rawData) {
@@ -509,6 +542,18 @@
             let nextIdx = (timeframes.indexOf(currentTimeframe) + 1) % timeframes.length;
             changeTimeframe(timeframes[nextIdx]);
         }
+
+        // Motor animador de barra para Yodeck
+        setInterval(() => {
+            if (document.getElementById('dash-view').classList.contains('active')) {
+                rotationTimer += 0.1;
+                let pct = (rotationTimer / ROTATION_DURATION) * 100;
+                document.getElementById('progressBar').style.width = Math.min(pct, 100) + '%';
+                if (rotationTimer >= ROTATION_DURATION) {
+                    rotateTimeline();
+                }
+            }
+        }, 100);
 
         // Reloj en tiempo real
         setInterval(() => {
@@ -673,9 +718,9 @@
             });
 
             // Sincronizar sub-headers de KPI
-            let periodLabel = "Día";
-            if(currentTimeframe === 'semana') periodLabel = "Semana";
-            if(currentTimeframe === 'mes') periodLabel = "Mes";
+            let periodLabel = "DÍA";
+            if(currentTimeframe === 'semana') periodLabel = "7 DÍAS";
+            if(currentTimeframe === 'mes') periodLabel = "MES";
 
             document.getElementById('kpi-title-eff').innerText = `Eficiencia Promedio (${periodLabel})`;
             document.getElementById('kpi-title-disp').innerText = `Disponibilidad (${periodLabel})`;
@@ -702,8 +747,24 @@
                 let dispRaw = parseRobustFloat(rClean["disponibilidad"]);
                 let calRaw = parseRobustFloat(rClean["calidad"]);
                 let pzas = parseRobustFloat(rClean["cantidad inyectada"] || rClean["inyectada"] || rClean["cantidad"]);
-                let tno = String(rClean["turno"] || "").trim();
-                let maq = String(rClean["maquina"] || "").trim();
+                
+                // NORMALIZAR EL TURNO DE FORMA ABSOLUTA (Ignorando errores de tipeo del operador)
+                let tnoRaw = String(rClean["turno"] || "").trim().toUpperCase();
+                let tno = "";
+                if (tnoRaw.includes("MAÑ") || tnoRaw.includes("MAN") || tnoRaw.includes("M")) tno = "Mañana";
+                else if (tnoRaw.includes("TAR") || tnoRaw.includes("T")) tno = "Tarde";
+                else if (tnoRaw.includes("NOC") || tnoRaw.includes("N")) tno = "Noche";
+
+                let maqRaw = String(rClean["maquina"] || rClean["inyectora"] || "").trim().toUpperCase();
+                let maq = maqRaw;
+                // Si viene solo un número "3", lo convertimos a "Inyectora 3" para uniformar
+                if (/^\d+$/.test(maqRaw)) {
+                    maq = `Inyectora ${maqRaw}`;
+                } else if (maqRaw.includes("IN") || maqRaw.includes("MQ") || maqRaw.includes("MA")) {
+                    let numOnly = maqRaw.replace(/\D/g, "");
+                    if(numOnly) maq = `Inyectora ${numOnly}`;
+                }
+
                 let opName = String(rClean["operador"] || rClean["nombre"] || "").trim();
                 let recDateNum = normalizeDateToNum(rClean["fecha"] || rClean["dia"] || rClean["date"]);
 
@@ -728,18 +789,18 @@
                     }
                     
                     // Identificar Líder / Equipo activo para ese día/turno
-                    let activeLeader = "ASIGNANDO...";
+                    let activeLeader = "";
                     if (opName) {
                         activeLeader = identifyLeaderByTeam(opName);
                     } else if (cachedRoster[recDateNum] && cachedRoster[recDateNum][maq]) {
                         // Buscar asignación de turno (M, T, N) para ese día y máquina
-                        let letraTurno = tno.includes("MAÑ") ? "M" : (tno.includes("TAR") ? "T" : "N");
+                        let letraTurno = tno.includes("Mañ") ? "M" : (tno.includes("Tar") ? "T" : "N");
                         if (cachedRoster[recDateNum][maq][letraTurno]) {
                             activeLeader = cachedRoster[recDateNum][maq][letraTurno].team;
                         }
                     }
                     
-                    if (activeLeader && activeLeader !== "SIN ASIGNAR") {
+                    if (activeLeader && activeLeader !== "EQ. ROTATIVO") {
                         leadersOnShift[tno].add(activeLeader);
                     }
                     
@@ -772,7 +833,14 @@
                 
                 // Mapear el líder de turno a su correspondiente badge
                 let activeLeadersList = Array.from(leadersOnShift[t]);
-                let displayLeaderName = activeLeadersList.length > 0 ? activeLeadersList.join(" / ") : "EQ. ROTATIVO";
+                
+                // Fallbacks históricos en caso de que no haya cruce inmediato
+                let defaultSupervisor = "EQ. ROTATIVO";
+                if (t === "Mañana") defaultSupervisor = "EQ. DILAN (A)";
+                else if (t === "Tarde") defaultSupervisor = "EQ. MIGUEL (B)";
+                else if (t === "Noche") defaultSupervisor = "EQ. NILSON (C)";
+
+                let displayLeaderName = activeLeadersList.length > 0 ? activeLeadersList.join(" / ") : defaultSupervisor;
                 if(leaderBadge) leaderBadge.innerText = displayLeaderName;
                 
                 document.getElementById(`shift-${prefix}-eff`).innerHTML = formatPctHtml(getAvg(d.eff, d.count), d.rec);
@@ -784,8 +852,6 @@
                 if(panelEl) {
                     if(t === bestShift) {
                         panelEl.classList.add('best-shift');
-                        // Modificar header para incluir nombre del líder ganador
-                        let isTeamStr = activeLeadersList.length > 0 ? ` [${activeLeadersList.join("/")}]` : "";
                         panelEl.style.transform = "translateY(-2px)";
                     } else {
                         panelEl.classList.remove('best-shift');
@@ -800,7 +866,12 @@
                 return arrObj.eff.reduce((a,b)=>a+b,0) / arrObj.eff.length;
             };
 
-            const maqLabels = Object.keys(maquinaTurnoData).sort();
+            const maqLabels = Object.keys(maquinaTurnoData).sort((a, b) => {
+                // Ordenador inteligente por número (MQ 1, MQ 2...) en lugar de alfabético crudo
+                let aNum = parseInt(a.replace(/\D/g, ''), 10) || 0;
+                let bNum = parseInt(b.replace(/\D/g, ''), 10) || 0;
+                return aNum - bNum;
+            });
             
             // Subtítulo de columna de tabla adaptado al tiempo
             let timeframeColumnLabel = `PROMEDIO DÍA (${formatNumToDateStr(diaAnteriorNum || latestDateNum)})`;
@@ -853,7 +924,7 @@
             document.getElementById('machine-table-wrapper').innerHTML = tableHTML;
 
             const time = new Date().toLocaleTimeString('es-CL');
-            const syncStatus = isCached ? '<span class="sync-indicator" title="Actualizando..."></span>' : '';
+            const syncStatus = isCached ? '<span class="sync-indicator" title="Sincronizado"></span>' : '';
             document.getElementById('lastUpdate').innerHTML = `Sincronización con Nube Libus: ${time} ${syncStatus}`;
         }
 
@@ -975,9 +1046,8 @@
                 descargarRosterJSONP().then(descargarDatosJSONP);
             }, 300000); 
 
-            // Iniciar rotación del carousel de tiempo (Cada 12 segundos)
-            clearInterval(timelineInterval);
-            timelineInterval = setInterval(rotateTimeline, 12000);
+            // Control inicial de carrusel activo
+            changeTimeframe('dia');
         }
     </script>
 </body>
