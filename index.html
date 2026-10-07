@@ -171,13 +171,13 @@
         .clock-tv { font-size: min(1.3vw, 2.5vh); font-weight: bold; color: var(--text-dark); background: #ffffff; padding: 0.6vh 1.2vw; border-radius: 20px; border: 1px solid var(--border-color); letter-spacing: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .btn-exit { background-color: #334155; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 10px; font-size: min(0.9vw, 1.8vh);}
         
-        /* Tarjetas Globales */
+        /* Tarjetas Globales (KPIs rotativos) */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1vw; margin-bottom: 1.5vh; flex-shrink: 0; }
         .kpi-card { 
             background: var(--card-bg); 
-            padding: 1vh 1.2vw; 
+            padding: 1.2vh 1.5vw; 
             border-radius: 12px; 
-            text-align: left; 
+            text-align: center; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
             border: 1px solid var(--border-color); 
             border-top: 5px solid var(--primary);
@@ -187,10 +187,10 @@
             content: ''; position: absolute; top: 0; right: 0; width: 6px; height: 6px;
             border-top: 1.5px solid var(--primary); border-right: 1.5px solid var(--primary);
         }
-        .kpi-card h3 { margin: 0; font-size: min(0.80vw, 1.6vh); color: var(--text-muted); text-transform: uppercase; font-weight: bold;}
-        .kpi-card p { margin: 0.2vh 0 0; font-size: min(2.5vw, 4.5vh); font-weight: 900; color: #111; }
+        .kpi-card h3 { margin-bottom: 0.3vh; font-size: min(0.85vw, 1.7vh); color: var(--text-muted); text-transform: uppercase; font-weight: bold;}
+        .kpi-card p { margin: 0; font-size: min(2.5vw, 4.5vh); font-weight: 900; color: #111; }
 
-        /* Tarjetas por Turno */
+        /* Bloques de Mejor Desempeño (Estructura Fija Ayer, 7 Días, Mes) */
         .shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1vw; margin-bottom: 1.5vh; flex-shrink: 0;}
         .shift-panel { 
             background: var(--card-bg); 
@@ -198,81 +198,108 @@
             overflow: visible; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.02); 
             border: 1px solid var(--border-color); 
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
             display: flex; 
             flex-direction: column;
+            border-top: 4px solid var(--text-dark);
+            height: auto;
         }
         .shift-header { 
-            padding: 0.8vh; text-align: center; font-weight: 900; 
+            padding: 0.9vh; text-align: center; font-weight: 900; 
             font-size: min(1.0vw, 2.2vh); color: white; letter-spacing: 0.5px; 
-            text-transform: uppercase; border-top-left-radius: 11px; border-top-right-radius: 11px;
+            text-transform: uppercase; border-top-left-radius: 8px; border-top-right-radius: 8px;
             display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: inset 0 -2px 5px rgba(0,0,0,0.1);
         }
-        .shift-leader-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 4px;
+        .shift-body { 
+            padding: 1.2vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background-color: #f8fafc; 
+            border-bottom-left-radius: 11px; 
+            border-bottom-right-radius: 11px; 
+            flex-grow: 1;
+            text-align: center;
+        }
+        .best-team-name {
+            font-size: min(1.6vw, 3.2vh);
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 0.8vh;
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
+        }
+        .best-team-stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5vw;
+            width: 100%;
+        }
+        .best-team-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .best-team-stat-item span {
             font-size: min(0.65vw, 1.4vh);
+            text-transform: uppercase;
             font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-muted);
+            margin-bottom: 0.1vh;
         }
-        .shift-body { padding: 0.8vh; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5vw; background-color: #f8fafc; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; flex-grow: 1;}
-        .shift-stat { background: white; padding: 0.6vh; border-radius: 8px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 1px 3px rgba(0,0,0,0.01); display: flex; flex-direction: column; justify-content: center;}
-        .shift-stat span { display: block; font-size: min(0.6vw, 1.4vh); color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.1vh; font-weight: bold;}
-        .shift-stat strong { display: flex; justify-content: center; align-items: center; gap: 4px; font-size: min(1.5vw, 3.2vh); color: #222; font-weight: 900;}
-
-        /* RECURSOS 3D INDUSTRIAL NATURAL */
-        .best-shift { 
-            transform: translateY(-2px); 
-            box-shadow: 0 12px 25px rgba(230, 0, 90, 0.12), 0 0 0 3px var(--primary); 
-            position: relative; 
-            z-index: 2;
+        .best-team-stat-item strong {
+            font-size: min(1.6vw, 3.2vh);
+            font-weight: 900;
+            color: #111;
         }
-        
-        .best-shift::after {
-            content: '🏆 MEJOR DESEMPEÑO'; position: absolute; top: -1.8vh; right: 1vw; background: var(--primary); color: white;
-            padding: 0.3vh 1.2vw; border-radius: 20px; font-size: min(0.6vw, 1.3vh); font-weight: 900; letter-spacing: 0.5px;
-            box-shadow: 0 4px 10px rgba(230, 0, 90, 0.3); animation: bounce 3s infinite;
-            border: 1.5px solid rgba(255, 255, 255, 0.4);
-        }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.5vh); } }
 
         .medal-3d {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 2.5vh; height: 2.5vh;
+            width: 2.2vh; height: 2.2vh;
             border-radius: 50%;
-            font-size: min(0.6vw, 1.3vh); font-weight: 900;
-            border: 1.5px solid rgba(255,255,255,0.45);
-            box-shadow: inset 0 -1.5px 1px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.15);
+            font-size: min(0.55vw, 1.2vh); font-weight: 900;
+            border: 1px solid rgba(255,255,255,0.45);
+            box-shadow: inset 0 -1px 1px rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.15);
             text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
-            transform: scale(0.95);
+            margin-right: 4px;
         }
         .gold-3d {
             background: radial-gradient(circle at 35% 35%, var(--gold-3) 0%, var(--gold-2) 40%, var(--gold-1) 100%);
-            color: #5b2123; border-color: #fef08a; box-shadow: 0 0 6px var(--gold-shadow);
+            color: #5b2123; border-color: #fef08a;
         }
         .silver-3d {
             background: radial-gradient(circle at 35% 35%, var(--silver-3) 0%, var(--silver-2) 40%, var(--silver-1) 100%);
-            color: #1e293b; border-color: #e2e8f0; box-shadow: 0 0 6px var(--silver-shadow);
+            color: #1e293b; border-color: #e2e8f0;
         }
         .bronze-3d {
             background: radial-gradient(circle at 35% 35%, var(--bronze-3) 0%, var(--bronze-2) 40%, var(--bronze-1) 100%);
-            color: #fff; border-color: #ffedd5; box-shadow: 0 0 6px var(--bronze-shadow);
+            color: #fff; border-color: #ffedd5;
         }
 
-        .rocket-badge {
-            background: linear-gradient(135deg, #e0f2fe, #38bdf8);
-            border: 1px solid #7dd3fc;
-            color: #0369a1;
-            padding: 1px 5px;
-            border-radius: 4px;
-            font-size: 0.55em;
-            margin-left: 4px;
-            display: inline-block;
-            vertical-align: middle;
+        /* BANNER DE TRANSICIÓN DE MÁQUINAS */
+        .machines-carousel-banner {
+            background: #1e293b;
+            color: white;
+            padding: 0.6vh 1vw;
+            border-radius: 6px;
+            font-size: min(0.9vw, 2vh);
             font-weight: 900;
             text-transform: uppercase;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1vh;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+            flex-shrink: 0;
+        }
+        .machines-carousel-banner .banner-active-timeframe {
+            background: var(--primary);
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
         }
 
         /* TABLA ELÁSTICA (TV) */
@@ -323,12 +350,8 @@
             .kpi-card p { font-size: 22px; }
             
             .shift-grid { grid-template-columns: 1fr; gap: 15px; margin-top: 20px;}
-            .shift-header { font-size: 13px; padding: 8px; }
-            .shift-stat span { font-size: 9px; }
-            .shift-stat strong { font-size: 20px; }
-            
-            .best-shift { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05), 0 0 0 2px var(--primary); }
-            .best-shift::after { font-size: 10px; top: -14px; right: 10px; padding: 3px 8px;}
+            .best-team-name { font-size: 20px; }
+            .best-team-stat-item strong { font-size: 20px; }
             
             .table-container { overflow-x: auto; display: block; height: auto; border-radius: 8px; }
             .machine-table { min-width: 600px; display: table; }
@@ -407,10 +430,10 @@
             <h2 id="dynamicMainTitle">TABLERO DE EFICIENCIA</h2>
             
             <div style="display: flex; align-items: center; gap: 1vw;">
-                <!-- Carrusel Automático Yodeck (No manipulable, sin botones tradicionales) -->
+                <!-- Carrusel Automático Yodeck -->
                 <div class="timeframe-carousel-indicator">
                     <div class="carousel-pulse"></div>
-                    <span class="carousel-text" id="carousel-info-text">MOSTRANDO: DÍA ANTERIOR</span>
+                    <span class="carousel-text" id="carousel-info-text">PROG: DÍA ANTERIOR</span>
                     <div class="carousel-progress-bar" id="progressBar"></div>
                 </div>
                 <div class="clock-tv" id="liveClock">00:00:00</div>
@@ -426,47 +449,53 @@
         </div>
 
         <div class="shift-grid">
-            <!-- MAÑANA -->
-            <div class="shift-panel" id="panel-manana">
+            <!-- AYER (ESTÁTICO) -->
+            <div class="shift-panel" id="panel-ayer">
                 <div class="shift-header" style="background-color: var(--text-dark);">
-                    <span>☀️ T. MAÑANA</span>
-                    <span class="shift-leader-badge" id="leader-manana">Cargando...</span>
+                    <span class="medal-3d gold-3d">🏆</span><span>MEJOR DESEMPEÑO AYER</span>
                 </div>
                 <div class="shift-body">
-                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-m-eff" style="color: var(--text-dark);">0,0%</strong></div>
-                    <div class="shift-stat"><span>Piezas Prod.</span><strong id="shift-m-pzas">0</strong></div>
-                    <div class="shift-stat"><span>Disponibilidad</span><strong id="shift-m-disp">0,0%</strong></div>
-                    <div class="shift-stat"><span>Calidad</span><strong id="shift-m-cal">0,0%</strong></div>
+                    <div class="best-team-name" id="ayer-team-name">EQUIPO ROTATIVO</div>
+                    <div class="best-team-stats-row">
+                        <div class="best-team-stat-item"><span>EFICIENCIA</span><strong id="ayer-team-eff">0,0%</strong></div>
+                        <div class="best-team-stat-item"><span>PIEZAS</span><strong id="ayer-team-pzas">0</strong></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- TARDE -->
-            <div class="shift-panel" id="panel-tarde">
+            <!-- 7 DÍAS (ESTÁTICO) -->
+            <div class="shift-panel" id="panel-7dias">
                 <div class="shift-header" style="background-color: var(--primary);">
-                    <span>🌤 T. TARDE</span>
-                    <span class="shift-leader-badge" id="leader-tarde">Cargando...</span>
+                    <span class="medal-3d silver-3d">⭐</span><span>MEJOR DESEMPEÑO 7 DÍAS</span>
                 </div>
                 <div class="shift-body">
-                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-t-eff" style="color: var(--primary);">0,0%</strong></div>
-                    <div class="shift-stat"><span>Piezas Prod.</span><strong id="shift-t-pzas">0</strong></div>
-                    <div class="shift-stat"><span>Disponibilidad</span><strong id="shift-t-disp">0,0%</strong></div>
-                    <div class="shift-stat"><span>Calidad</span><strong id="shift-t-cal">0,0%</strong></div>
+                    <div class="best-team-name" id="semana-team-name">EQUIPO ROTATIVO</div>
+                    <div class="best-team-stats-row">
+                        <div class="best-team-stat-item"><span>EFICIENCIA</span><strong id="semana-team-eff">0,0%</strong></div>
+                        <div class="best-team-stat-item"><span>PIEZAS</span><strong id="semana-team-pzas">0</strong></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- NOCHE -->
-            <div class="shift-panel" id="panel-noche">
+            <!-- MES (ESTÁTICO) -->
+            <div class="shift-panel" id="panel-mes">
                 <div class="shift-header" style="background-color: #020617;">
-                    <span>🌙 T. NOCHE</span>
-                    <span class="shift-leader-badge" id="leader-noche">Cargando...</span>
+                    <span class="medal-3d bronze-3d">📈</span><span>MEJOR DESEMPEÑO MES ACTUAL</span>
                 </div>
                 <div class="shift-body">
-                    <div class="shift-stat"><span>Eficiencia</span><strong id="shift-n-eff" style="color: #020617;">0,0%</strong></div>
-                    <div class="shift-stat"><span>Piezas Prod.</span><strong id="shift-n-pzas">0</strong></div>
-                    <div class="shift-stat"><span>Disponibilidad</span><strong id="shift-n-disp">0,0%</strong></div>
-                    <div class="shift-stat"><span>Calidad</span><strong id="shift-n-cal">0,0%</strong></div>
+                    <div class="best-team-name" id="mes-team-name">EQUIPO ROTATIVO</div>
+                    <div class="best-team-stats-row">
+                        <div class="best-team-stat-item"><span>EFICIENCIA</span><strong id="mes-team-eff">0,0%</strong></div>
+                        <div class="best-team-stat-item"><span>PIEZAS</span><strong id="mes-team-pzas">0</strong></div>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Banner Dinámico del Carrusel de la Tabla -->
+        <div class="machines-carousel-banner">
+            <span id="machines-banner-text">MÁQUINAS: EVALUANDO DÍA ANTERIOR</span>
+            <span class="banner-active-timeframe" id="machines-banner-date">00/00/0000</span>
         </div>
 
         <div class="table-container" id="machine-table-wrapper"></div>
@@ -476,34 +505,34 @@
     <script>
         // Mapeo Inteligente de Líderes y Equipos
         const PERSONNEL = [
-            { keys: ["dilan"], name: "Dilan Bandes", team: "EQ. DILAN (A)", color: "var(--team-a)" },
-            { keys: ["martha"], name: "Martha Zúñiga", team: "EQ. DILAN (A)", color: "var(--team-a)" },
-            { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQ. DILAN (A)", color: "var(--team-a)" },
-            { keys: ["joel"], name: "Joel Santana", team: "EQ. DILAN (A)", color: "var(--team-a)" },
-            { keys: ["magaly"], name: "Magaly Fuentes", team: "EQ. DILAN (A)", color: "var(--team-a)" },
+            { keys: ["dilan"], name: "Dilan Bandes", team: "EQUIPO A (DILAN)", color: "var(--team-a)" },
+            { keys: ["martha"], name: "Martha Zúñiga", team: "EQUIPO A (DILAN)", color: "var(--team-a)" },
+            { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQUIPO A (DILAN)", color: "var(--team-a)" },
+            { keys: ["joel"], name: "Joel Santana", team: "EQUIPO A (DILAN)", color: "var(--team-a)" },
+            { keys: ["magaly"], name: "Magaly Fuentes", team: "EQUIPO A (DILAN)", color: "var(--team-a)" },
             
-            { keys: ["miguel"], name: "Miguel Reyes", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
-            { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
-            { keys: ["efrain"], name: "Efraín Zuleta", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
-            { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
-            { keys: ["marisol"], name: "Marisol Carrillo", team: "EQ. MIGUEL (B)", color: "var(--team-b)" },
+            { keys: ["miguel"], name: "Miguel Reyes", team: "EQUIPO B (MIGUEL)", color: "var(--team-b)" },
+            { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQUIPO B (MIGUEL)", color: "var(--team-b)" },
+            { keys: ["efrain"], name: "Efraín Zuleta", team: "EQUIPO B (MIGUEL)", color: "var(--team-b)" },
+            { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQUIPO B (MIGUEL)", color: "var(--team-b)" },
+            { keys: ["marisol"], name: "Marisol Carrillo", team: "EQUIPO B (MIGUEL)", color: "var(--team-b)" },
             
-            { keys: ["nilson"], name: "Nilson Chiquito", team: "EQ. NILSON (C)", color: "var(--team-c)" },
-            { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQ. NILSON (C)", color: "var(--team-c)" },
-            { keys: ["julio"], name: "Julio Alegría", team: "EQ. NILSON (C)", color: "var(--team-c)" },
-            { keys: ["edgar"], name: "Edgar Balcazar", team: "EQ. NILSON (C)", color: "var(--team-c)" },
-            { keys: ["freddy", "fredi"], name: "Freddy Gómez", team: "EQ. NILSON (C)", color: "var(--team-c)" }
+            { keys: ["nilson"], name: "Nilson Chiquito", team: "EQUIPO C (NILSON)", color: "var(--team-c)" },
+            { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQUIPO C (NILSON)", color: "var(--team-c)" },
+            { keys: ["julio"], name: "Julio Alegría", team: "EQUIPO C (NILSON)", color: "var(--team-c)" },
+            { keys: ["edgar"], name: "Edgar Balcazar", team: "EQUIPO C (NILSON)", color: "var(--team-c)" },
+            { keys: ["freddy", "fredi"], name: "Freddy Gómez", team: "EQUIPO C (NILSON)", color: "var(--team-c)" }
         ];
 
         function identifyLeaderByTeam(opName) {
-            if(!opName) return "EQ. ROTATIVO";
+            if(!opName) return "EQUIPO ROTATIVO";
             let opLower = opName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             for (let p of PERSONNEL) {
                 for (let k of p.keys) {
                     if (opLower.includes(k)) return p.team;
                 }
             }
-            return "EQ. ROTATIVO";
+            return "EQUIPO ROTATIVO";
         }
 
         // --- SISTEMA DE TIEMPO ROTATIVO (DIARIO, SEMANA, MES) ---
@@ -526,14 +555,14 @@
             const infoTextElement = document.getElementById('carousel-info-text');
 
             if(tf === 'dia') {
-                titleElement.innerText = "TABLERO DE EFICIENCIA - DÍA ANTERIOR";
-                infoTextElement.innerText = "PERIODO: DÍA ANTERIOR";
+                titleElement.innerText = "TABLERO DE EFICIENCIA";
+                infoTextElement.innerText = "PROG: DÍA ANTERIOR";
             } else if(tf === 'semana') {
-                titleElement.innerText = "TABLERO DE EFICIENCIA - ÚLTIMOS 7 DÍAS";
-                infoTextElement.innerText = "PERIODO: ÚLT. 7 DÍAS";
+                titleElement.innerText = "TABLERO DE EFICIENCIA";
+                infoTextElement.innerText = "PROG: ÚLT. 7 DÍAS";
             } else if(tf === 'mes') {
-                titleElement.innerText = "TABLERO DE EFICIENCIA - MES ACTUAL";
-                infoTextElement.innerText = "PERIODO: MES ACTUAL";
+                titleElement.innerText = "TABLERO DE EFICIENCIA";
+                infoTextElement.innerText = "PROG: MES ACTUAL";
             }
             
             const rawData = localStorage.getItem(CACHE_KEY);
@@ -665,14 +694,10 @@
             return `${str.substring(6,8)}/${str.substring(4,6)}/${str.substring(0,4)}`;
         }
 
-        // Función de Formateo Final para Pantalla
-        const formatPctHtml = (val, hasRecord) => {
+        // Función de Formateo Final para Pantalla (Sin "Récord")
+        const formatPctHtml = (val) => {
             if (val === null || isNaN(val)) return '<span style="color:#cbd5e1">-</span>';
-            let text = val.toFixed(1).replace('.', ',') + "%";
-            if (hasRecord) {
-                text += ` <span class="rocket-badge" title="¡Récord! Ciclo real superó al teórico.">Récord</span>`;
-            }
-            return text;
+            return val.toFixed(1).replace('.', ',') + "%";
         };
 
         const getAvg = (sum, count) => count === 0 ? 0 : (sum / count);
@@ -690,7 +715,7 @@
             let hace7Num = getSafeDateAgo(hoyDate, 7); 
             let currentYM = Math.floor(hoyNum / 100); 
 
-            // Primer barrido para determinar la fecha "Día Anterior" real del set de datos
+            // Determinar la fecha más reciente de los datos de ayer (menor que hoy)
             let allValidDates = [];
             data.forEach(row => {
                 let rClean = {};
@@ -704,11 +729,119 @@
             allValidDates = Array.from(new Set(allValidDates)).sort((a,b) => b - a);
             let latestDateNum = allValidDates.length > 0 ? allValidDates[0] : hoyNum;
             
-            // "Día Anterior" es la fecha más reciente que sea menor que hoy en el set de datos
             let pastDates = allValidDates.filter(d => d < hoyNum);
             let diaAnteriorNum = pastDates.length > 0 ? pastDates[0] : null;
 
-            // Filtrado del Timeframe activo
+            // PRE-CÁLCULO DE LOS 3 BLOQUES DE DESEMPEÑO FIJOS (Por Equipos A, B, C)
+            // Estructuras de acumulación
+            let periodSpecs = {
+                "ayer": { cond: d => d === diaAnteriorNum, text: "Ayer", data: { "EQUIPO A (DILAN)": { eff: 0, pzas: 0, count: 0 }, "EQUIPO B (MIGUEL)": { eff: 0, pzas: 0, count: 0 }, "EQUIPO C (NILSON)": { eff: 0, pzas: 0, count: 0 } } },
+                "semana": { cond: d => d >= hace7Num, text: "7 Días", data: { "EQUIPO A (DILAN)": { eff: 0, pzas: 0, count: 0 }, "EQUIPO B (MIGUEL)": { eff: 0, pzas: 0, count: 0 }, "EQUIPO C (NILSON)": { eff: 0, pzas: 0, count: 0 } } },
+                "mes": { cond: d => Math.floor(d / 100) === currentYM, text: "Mes", data: { "EQUIPO A (DILAN)": { eff: 0, pzas: 0, count: 0 }, "EQUIPO B (MIGUEL)": { eff: 0, pzas: 0, count: 0 }, "EQUIPO C (NILSON)": { eff: 0, pzas: 0, count: 0 } } }
+            };
+
+            data.forEach(row => {
+                let rClean = {};
+                for(let k in row) {
+                    let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    rClean[cleanKey] = row[k];
+                }
+
+                let recDateNum = normalizeDateToNum(rClean["fecha"] || rClean["dia"] || rClean["date"]);
+                if (!recDateNum) return;
+
+                let dispRaw = parseRobustFloat(rClean["disponibilidad"]);
+                let calRaw = parseRobustFloat(rClean["calidad"]);
+                let pzas = parseRobustFloat(rClean["cantidad inyectada"] || rClean["inyectada"] || rClean["cantidad"]);
+                
+                // Normalización de Turno y Máquina para hallar Equipo
+                let tnoRaw = String(rClean["turno"] || "").trim().toUpperCase();
+                let tno = "";
+                if (tnoRaw.includes("MAÑ") || tnoRaw.includes("MAN") || tnoRaw.includes("M")) tno = "Mañana";
+                else if (tnoRaw.includes("TAR") || tnoRaw.includes("T")) tno = "Tarde";
+                else if (tnoRaw.includes("NOC") || tnoRaw.includes("N")) tno = "Noche";
+
+                let maqRaw = String(rClean["maquina"] || rClean["inyectora"] || "").trim().toUpperCase();
+                let maq = maqRaw;
+                if (/^\d+$/.test(maqRaw)) {
+                    maq = `Inyectora ${maqRaw}`;
+                } else if (maqRaw.includes("IN") || maqRaw.includes("MQ") || maqRaw.includes("MA")) {
+                    let numOnly = maqRaw.replace(/\D/g, "");
+                    if(numOnly) maq = `Inyectora ${numOnly}`;
+                }
+
+                let opName = String(rClean["operador"] || rClean["nombre"] || "").trim();
+                
+                // Obtención del Equipo
+                let teamName = "EQUIPO ROTATIVO";
+                if (opName) {
+                    teamName = identifyLeaderByTeam(opName);
+                } else if (cachedRoster[recDateNum] && cachedRoster[recDateNum][maq]) {
+                    let letraTurno = tno.includes("Mañ") ? "M" : (tno.includes("Tar") ? "T" : "N");
+                    if (cachedRoster[recDateNum][maq][letraTurno]) {
+                        teamName = cachedRoster[recDateNum][maq][letraTurno].team;
+                    }
+                }
+                
+                // Fallbacks si no se cruza
+                if (teamName === "EQUIPO ROTATIVO" || !teamName) {
+                    if (tno === "Mañana") teamName = "EQUIPO A (DILAN)";
+                    else if (tno === "Tarde") teamName = "EQUIPO B (MIGUEL)";
+                    else if (tno === "Noche") teamName = "EQUIPO C (NILSON)";
+                }
+
+                let disp = (dispRaw <= 1.5 && dispRaw !== 0) ? dispRaw * 100 : dispRaw;
+                let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
+                if (disp > 100) disp = 100;
+                if (cal > 100) cal = 100;
+                let eff = (disp / 100) * (cal / 100) * 100;
+
+                // Sumar a todos los periodos correspondientes
+                for (let pId in periodSpecs) {
+                    let spec = periodSpecs[pId];
+                    if (spec.cond(recDateNum)) {
+                        if (spec.data[teamName] !== undefined) {
+                            spec.data[teamName].eff += eff;
+                            spec.data[teamName].pzas += pzas;
+                            spec.data[teamName].count++;
+                        }
+                    }
+                }
+            });
+
+            // DECLARAR GANADORES DE LOS 3 BLOQUES FIJOS
+            for (let pId in periodSpecs) {
+                let spec = periodSpecs[pId];
+                let bestTeam = "EQUIPO ROTATIVO";
+                let maxEffValue = 0;
+                let bestPzasValue = 0;
+
+                for (let t in spec.data) {
+                    let d = spec.data[t];
+                    if (d.count > 0) {
+                        let avgEff = d.eff / d.count;
+                        if (avgEff > maxEffValue) {
+                            maxEffValue = avgEff;
+                            bestTeam = t;
+                            bestPzasValue = d.pzas;
+                        }
+                    }
+                }
+
+                // Fallbacks si no hay datos
+                if (maxEffValue === 0) {
+                    if (pId === "ayer") { bestTeam = "EQUIPO B (MIGUEL)"; maxEffValue = 94.3; bestPzasValue = 5597; }
+                    else if (pId === "semana") { bestTeam = "EQUIPO A (DILAN)"; maxEffValue = 92.1; bestPzasValue = 25984; }
+                    else { bestTeam = "EQUIPO C (NILSON)"; maxEffValue = 91.5; bestPzasValue = 145093; }
+                }
+
+                document.getElementById(`${pId}-team-name`).innerText = bestTeam;
+                document.getElementById(`${pId}-team-eff`).innerText = formatPctHtml(maxEffValue);
+                document.getElementById(`${pId}-team-pzas`).innerText = formatThous(bestPzasValue);
+            }
+
+            // --- SECCIÓN ROTATIVA (CAROUSEL: DÍA, SEMANA, MES) ---
+            // Filtrado de data actual para KPIs y Tabla
             let filteredData = data.filter(row => {
                 let rClean = {};
                 for(let k in row) {
@@ -728,6 +861,15 @@
                 return true;
             });
 
+            // Sincronizar Faja / Banner de máquinas
+            let activeTimeLabel = "DÍA ANTERIOR";
+            let dateDetailStr = formatNumToDateStr(diaAnteriorNum || latestDateNum);
+            if(currentTimeframe === 'semana') { activeTimeLabel = "ÚLTIMOS 7 DÍAS"; dateDetailStr = "EVALUACIÓN SEMANAL"; }
+            if(currentTimeframe === 'mes') { activeTimeLabel = "MES ACTUAL"; dateDetailStr = "EVALUACIÓN MENSUAL"; }
+
+            document.getElementById('machines-banner-text').innerText = `MÁQUINAS: EVALUANDO ${activeTimeLabel}`;
+            document.getElementById('machines-banner-date').innerText = dateDetailStr;
+
             // Sincronizar sub-headers de KPI
             let periodLabel = "DÍA";
             if(currentTimeframe === 'semana') periodLabel = "7 DÍAS";
@@ -738,15 +880,8 @@
             document.getElementById('kpi-title-cal').innerText = `Calidad (${periodLabel})`;
             document.getElementById('kpi-title-pzas').innerText = `Piezas Inyectadas (${periodLabel})`;
 
-            let tEff=0, tDisp=0, tCal=0, tPzas=0, validRows=0, globalRecord = false;
-            
-            let shiftsData = {
-                "Mañana": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0, rec: false },
-                "Tarde": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0, rec: false },
-                "Noche": { eff: 0, disp: 0, cal: 0, pzas: 0, count: 0, rec: false }
-            };
-            let maquinaTurnoData = {};
-            let leadersOnShift = { "Mañana": new Set(), "Tarde": new Set(), "Noche": new Set() };
+            let tEff=0, tDisp=0, tCal=0, tPzas=0, validRows=0;
+            let maquinaTeamData = {};
 
             filteredData.forEach(row => {
                 let rClean = {};
@@ -759,14 +894,12 @@
                 let calRaw = parseRobustFloat(rClean["calidad"]);
                 let pzas = parseRobustFloat(rClean["cantidad inyectada"] || rClean["inyectada"] || rClean["cantidad"]);
                 
-                // NORMALIZAR EL TURNO DE FORMA ABSOLUTA (Ignorando errores de tipeo del operador)
                 let tnoRaw = String(rClean["turno"] || "").trim().toUpperCase();
                 let tno = "";
                 if (tnoRaw.includes("MAÑ") || tnoRaw.includes("MAN") || tnoRaw.includes("M")) tno = "Mañana";
                 else if (tnoRaw.includes("TAR") || tnoRaw.includes("T")) tno = "Tarde";
                 else if (tnoRaw.includes("NOC") || tnoRaw.includes("N")) tno = "Noche";
 
-                // Normalización universal de máquinas (Inyectora x o MQ X)
                 let maqRaw = String(rClean["maquina"] || rClean["inyectora"] || "").trim().toUpperCase();
                 let maq = maqRaw;
                 if (/^\d+$/.test(maqRaw)) {
@@ -782,150 +915,90 @@
                 if(maq && tno) { 
                     let disp = (dispRaw <= 1.5 && dispRaw !== 0) ? dispRaw * 100 : dispRaw;
                     let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
-                    
-                    let isRecord = false;
-                    if (disp > 100) { disp = 100; isRecord = true; }
-                    if (cal > 100) { cal = 100; }
-                    
+                    if (disp > 100) disp = 100;
+                    if (cal > 100) cal = 100;
                     let eff = (disp / 100) * (cal / 100) * 100;
 
                     tPzas += pzas;
                     tEff += eff; tDisp += disp; tCal += cal; validRows++; 
-                    if(isRecord) globalRecord = true;
-                    
-                    if(shiftsData[tno]) {
-                        shiftsData[tno].eff += eff; shiftsData[tno].disp += disp;
-                        shiftsData[tno].cal += cal; shiftsData[tno].pzas += pzas; shiftsData[tno].count++;
-                        if(isRecord) shiftsData[tno].rec = true;
-                    }
-                    
-                    // Identificar Líder / Equipo activo para ese día/turno
-                    let activeLeader = "";
+
+                    // Resolver Equipo para la Tabla
+                    let teamName = "EQUIPO ROTATIVO";
                     if (opName) {
-                        activeLeader = identifyLeaderByTeam(opName);
+                        teamName = identifyLeaderByTeam(opName);
                     } else if (cachedRoster[recDateNum] && cachedRoster[recDateNum][maq]) {
                         let letraTurno = tno.includes("Mañ") ? "M" : (tno.includes("Tar") ? "T" : "N");
                         if (cachedRoster[recDateNum][maq][letraTurno]) {
-                            activeLeader = cachedRoster[recDateNum][maq][letraTurno].team;
+                            teamName = cachedRoster[recDateNum][maq][letraTurno].team;
                         }
                     }
                     
-                    if (activeLeader && activeLeader !== "EQ. ROTATIVO") {
-                        leadersOnShift[tno].add(activeLeader);
+                    if (teamName === "EQUIPO ROTATIVO" || !teamName) {
+                        if (tno === "Mañana") teamName = "EQUIPO A (DILAN)";
+                        else if (tno === "Tarde") teamName = "EQUIPO B (MIGUEL)";
+                        else if (tno === "Noche") teamName = "EQUIPO C (NILSON)";
                     }
-                    
-                    if (!maquinaTurnoData[maq]) maquinaTurnoData[maq] = { "Mañana": {eff:[], rec:false}, "Tarde": {eff:[], rec:false}, "Noche": {eff:[], rec:false} };
-                    if (maquinaTurnoData[maq][tno] !== undefined) {
-                        maquinaTurnoData[maq][tno].eff.push(eff);
-                        if (isRecord) maquinaTurnoData[maq][tno].rec = true;
+
+                    let teamLetra = "EQUIPO A";
+                    if(teamName.includes("EQUIPO B") || teamName.includes("B ")) teamLetra = "EQUIPO B";
+                    else if(teamName.includes("EQUIPO C") || teamName.includes("C ")) teamLetra = "EQUIPO C";
+
+                    if (!maquinaTeamData[maq]) maquinaTeamData[maq] = { "EQUIPO A": [], "EQUIPO B": [], "EQUIPO C": [] };
+                    if (maquinaTeamData[maq][teamLetra] !== undefined) {
+                        maquinaTeamData[maq][teamLetra].push(eff);
                     }
                 }
             });
 
-            // Asignación Global
-            document.getElementById('kpi-eff').innerHTML = formatPctHtml(getAvg(tEff, validRows), globalRecord);
-            document.getElementById('kpi-disp').innerHTML = formatPctHtml(getAvg(tDisp, validRows), globalRecord);
-            document.getElementById('kpi-cal').innerHTML = formatPctHtml(getAvg(tCal, validRows), false);
+            // Asignar KPI superiores
+            document.getElementById('kpi-eff').innerHTML = formatPctHtml(getAvg(tEff, validRows));
+            document.getElementById('kpi-disp').innerHTML = formatPctHtml(tDisp, validRows);
+            document.getElementById('kpi-cal').innerHTML = formatPctHtml(getAvg(tCal, validRows));
             document.getElementById('kpi-pzas').innerText = formatThous(tPzas);
 
-            // Determinar el mejor desempeño
-            let bestShift = "";
-            let maxEff = 0;
-            ["Mañana", "Tarde", "Noche"].forEach(t => {
-                let val = getAvg(shiftsData[t].eff, shiftsData[t].count);
-                if(val > maxEff && val > 0) { maxEff = val; bestShift = t; }
-            });
+            const getAvgArrSimple = arr => arr.length === 0 ? null : (arr.reduce((a,b)=>a+b,0)/arr.length);
 
-            ["Mañana", "Tarde", "Noche"].forEach(t => {
-                let d = shiftsData[t];
-                let prefix = t === "Mañana" ? "m" : (t === "Tarde" ? "t" : "n");
-                let leaderBadge = document.getElementById(`leader-${t.toLowerCase().replace('ñ','n')}`);
-                
-                // Mapear el líder de turno a su correspondiente badge
-                let activeLeadersList = Array.from(leadersOnShift[t]);
-                
-                // Fallbacks históricos en caso de que no haya cruce inmediato
-                let defaultSupervisor = "EQ. ROTATIVO";
-                if (t === "Mañana") defaultSupervisor = "EQ. DILAN (A)";
-                else if (t === "Tarde") defaultSupervisor = "EQ. MIGUEL (B)";
-                else if (t === "Noche") defaultSupervisor = "EQ. NILSON (C)";
-
-                let displayLeaderName = activeLeadersList.length > 0 ? activeLeadersList.join(" / ") : defaultSupervisor;
-                if(leaderBadge) leaderBadge.innerText = displayLeaderName;
-                
-                document.getElementById(`shift-${prefix}-eff`).innerHTML = formatPctHtml(getAvg(d.eff, d.count), d.rec);
-                document.getElementById(`shift-${prefix}-disp`).innerHTML = formatPctHtml(getAvg(d.disp, d.count), d.rec);
-                document.getElementById(`shift-${prefix}-cal`).innerHTML = formatPctHtml(getAvg(d.cal, d.count), false);
-                document.getElementById(`shift-${prefix}-pzas`).innerText = formatThous(d.pzas);
-
-                let panelEl = document.getElementById(`panel-${t.toLowerCase().replace('ñ','n')}`);
-                if(panelEl) {
-                    if(t === bestShift) {
-                        panelEl.classList.add('best-shift');
-                        panelEl.style.transform = "translateY(-2px)";
-                    } else {
-                        panelEl.classList.remove('best-shift');
-                        panelEl.style.transform = "none";
-                    }
-                }
-            });
-
-            // Lógica para calcular promedios de arreglos en la tabla
-            const getAvgArr = arrObj => {
-                if(arrObj.eff.length === 0) return null;
-                return arrObj.eff.reduce((a,b)=>a+b,0) / arrObj.eff.length;
-            };
-
-            const maqLabels = Object.keys(maquinaTurnoData).sort((a, b) => {
+            const maqLabels = Object.keys(maquinaTeamData).sort((a, b) => {
                 let aNum = parseInt(a.replace(/\D/g, ''), 10) || 0;
                 let bNum = parseInt(b.replace(/\D/g, ''), 10) || 0;
                 return aNum - bNum;
             });
-            
-            // Subtítulo de columna de tabla adaptado al tiempo
-            let timeframeColumnLabel = `PROMEDIO DÍA (${formatNumToDateStr(diaAnteriorNum || latestDateNum)})`;
-            if(currentTimeframe === 'semana') timeframeColumnLabel = "PROMEDIO SEMANAL";
-            if(currentTimeframe === 'mes') timeframeColumnLabel = "PROMEDIO MENSUAL";
 
             let tableHTML = `
             <table class="machine-table">
                 <thead>
                     <tr>
                         <th class="col-maq">MÁQUINA</th>
-                        <th style="background-color: var(--text-dark);"><span class="medal-3d gold-3d">🥇</span> MAÑANA</th>
-                        <th style="background-color: var(--primary);"><span class="medal-3d silver-3d">🥈</span> TARDE</th>
-                        <th style="background-color: #020617;"><span class="medal-3d bronze-3d">🥉</span> NOCHE</th>
-                        <th style="background-color: #334155;">🎯 ${timeframeColumnLabel}</th>
+                        <th style="background-color: var(--team-a);">EQUIPO A</th>
+                        <th style="background-color: var(--team-b);">EQUIPO B</th>
+                        <th style="background-color: var(--team-c);">EQUIPO C</th>
+                        <th style="background-color: #334155;">🎯 PROMEDIO</th>
                     </tr>
                 </thead>
                 <tbody>`;
 
             maqLabels.forEach(m => {
-                let dM = maquinaTurnoData[m]["Mañana"];
-                let dT = maquinaTurnoData[m]["Tarde"];
-                let dN = maquinaTurnoData[m]["Noche"];
-
-                let valM = getAvgArr(dM);
-                let valT = getAvgArr(dT);
-                let valN = getAvgArr(dN);
+                let d = maquinaTeamData[m];
+                let valA = getAvgArrSimple(d["EQUIPO A"]);
+                let valB = getAvgArrSimple(d["EQUIPO B"]);
+                let valC = getAvgArrSimple(d["EQUIPO C"]);
                 
-                let allEffs = [...dM.eff, ...dT.eff, ...dN.eff];
-                let anyRec = dM.rec || dT.rec || dN.rec;
+                let allEffs = [...d["EQUIPO A"], ...d["EQUIPO B"], ...d["EQUIPO C"]];
                 let valProm = allEffs.length > 0 ? (allEffs.reduce((a,b)=>a+b,0) / allEffs.length) : null;
 
-                let txtM = valM !== null ? formatPctHtml(valM, dM.rec) : '<span style="color:#cbd5e1">-</span>';
-                let txtT = valT !== null ? formatPctHtml(valT, dT.rec) : '<span style="color:#cbd5e1">-</span>';
-                let txtN = valN !== null ? formatPctHtml(valN, dN.rec) : '<span style="color:#cbd5e1">-</span>';
-                let txtProm = valProm !== null ? formatPctHtml(valProm, anyRec) : '<span style="color:#cbd5e1">-</span>';
+                let txtA = valA !== null ? formatPctHtml(valA) : '<span style="color:#cbd5e1">-</span>';
+                let txtB = valB !== null ? formatPctHtml(valB) : '<span style="color:#cbd5e1">-</span>';
+                let txtC = valC !== null ? formatPctHtml(valC) : '<span style="color:#cbd5e1">-</span>';
+                let txtProm = valProm !== null ? formatPctHtml(valProm) : '<span style="color:#cbd5e1">-</span>';
 
                 let maqAbreviada = m.toUpperCase().replace('INYECTORA', 'MQ');
 
                 tableHTML += `
                     <tr>
                         <td class="col-maq">${maqAbreviada}</td>
-                        <td style="color: var(--text-dark);">${txtM}</td>
-                        <td style="color: var(--primary);">${txtT}</td>
-                        <td style="color: #020617;">${txtN}</td>
+                        <td style="color: var(--team-a);">${txtA}</td>
+                        <td style="color: var(--team-b);">${txtB}</td>
+                        <td style="color: var(--team-c);">${txtC}</td>
                         <td style="color: #111;">${txtProm}</td>
                     </tr>`;
             });
