@@ -20,7 +20,7 @@
             --gold: #fbbf24;
             --silver: #94a3b8;
             --bronze: #b45309;
-            --success: #16a34a;
+            --alert: #dc2626;
         }
 
         body {
@@ -147,6 +147,7 @@
         .fill-3 { background: linear-gradient(90deg, #fde68a, #9a3412); } 
         .fill-4 { background: #38bdf8; }
         .fill-5 { background: #818cf8; }
+        .fill-alert { background: linear-gradient(90deg, #fca5a5, #ef4444); } /* Fila de Alerta */
 
         .fill-1::after {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
@@ -227,6 +228,7 @@
         .m-op-row.m { border-left: 5px solid var(--sober-m); }
         .m-op-row.t { border-left: 5px solid var(--sober-t); }
         .m-op-row.n { border-left: 5px solid var(--sober-n); }
+        .m-op-row.alert { border-left: 5px solid var(--alert); background-color: #fef2f2; }
 
         .m-avatar {
             width: 4.5vh; height: 4.5vh;
@@ -238,13 +240,14 @@
         .m-op-row.m .m-avatar { background-color: var(--sober-m); }
         .m-op-row.t .m-avatar { background-color: var(--sober-t); }
         .m-op-row.n .m-avatar { background-color: var(--sober-n); }
+        .m-op-row.alert .m-avatar { background-color: var(--alert); font-size: 2.5vh;}
 
         .m-details { flex-grow: 1; overflow: hidden;}
         .m-name { font-size: 2vh; font-weight: 900; margin: 0; text-transform: uppercase; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .m-shift { font-size: 1.2vh; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin-top: 2px;}
         .m-eff { font-size: 3vh; font-weight: 900; color: var(--primary); }
 
-        /* Estados Vacíos */
+        /* Estados Vacíos y Loader */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-light); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: var(--primary); font-size: 3vh; font-weight: bold;}
         
         .empty-machine { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; opacity: 0.6; text-align: center;}
@@ -256,7 +259,7 @@
 <body>
 
     <div id="loader">
-        <span>Sincronizando Base de Datos... ⏳</span>
+        <span>Escaneando Bases de Datos... ⏳</span>
     </div>
 
     <div class="header">
@@ -311,7 +314,7 @@
                 const script = document.createElement('script');
                 script.id = callbackName;
                 script.src = `${url}?callback=${callbackName}&_t=${Date.now()}`;
-                script.onerror = () => reject(`Error conectando a API`);
+                script.onerror = () => reject(`Error`);
                 document.body.appendChild(script);
             });
         }
@@ -324,9 +327,9 @@
             return parseFloat(str) || 0;
         }
 
-        // MOTOR DE FECHAS (Retorna YYYYMMDD)
+        // FECHAS UNIVERSALES (Devuelve formato número YYYYMMDD)
         function normalizeDateToNum(dateInput) {
-            if (dateInput === undefined || dateInput === null) return null;
+            if (!dateInput) return null;
             let str = String(dateInput).trim();
             if (str === "") return null;
             
@@ -365,7 +368,7 @@
         }
 
         function getAvatarInitials(name) {
-            if(!name || name.startsWith("MAQ ") || name === "NO ASIGNADO") return "?";
+            if(!name || name.includes("SIN NOMBRE")) return "!";
             let parts = name.trim().split(" ");
             if(parts.length >= 2) return parts[0][0] + parts[1][0];
             return parts[0][0];
@@ -388,43 +391,68 @@
 
             document.getElementById('fechaHoy').innerText = `SISTEMA ACTIVO: ${formatNumToDateStr(hoyNum)}`;
 
-            // 1. CARGAR ASIGNACIONES
+            // 1. ESCÁNER DE TURNOS (ROSTER) A PRUEBA DE BALAS
             let rosterMap = {}; 
             let lastKnownRoster = {}; 
 
             if (rosterData && rosterData.length > 0) {
-                let isObject = !Array.isArray(rosterData[0]);
-                let headers = isObject ? Object.keys(rosterData[0]) : rosterData[0];
+                // Paso 1: Encontrar las columnas que tienen fechas
+                let dateCols = {}; 
+                let headerRowIdx = 0;
                 
-                let dateCols = {};
-                for (let i = 0; i < headers.length; i++) {
-                    let normNum = normalizeDateToNum(headers[i]);
-                    if (normNum) dateCols[isObject ? headers[i] : i] = normNum;
+                for (let r=0; r < Math.min(5, rosterData.length); r++) {
+                    let isObj = !Array.isArray(rosterData[r]);
+                    let rowVals = isObj ? Object.keys(rosterData[r]) : rosterData[r];
+                    let foundDates = 0;
+                    
+                    for (let c=0; c < rowVals.length; c++) {
+                        let dNum = normalizeDateToNum(rowVals[c]);
+                        if (dNum && dNum > 20200000) foundDates++;
+                    }
+                    
+                    // Si la fila tiene muchas fechas, esta es la cabecera
+                    if (foundDates >= 5) {
+                        headerRowIdx = r;
+                        for (let c=0; c < rowVals.length; c++) {
+                            let dNum = normalizeDateToNum(rowVals[c]);
+                            if (dNum && dNum > 20200000) dateCols[isObj ? rowVals[c] : c] = dNum;
+                        }
+                        break;
+                    }
                 }
 
-                for (let i = isObject ? 0 : 1; i < rosterData.length; i++) {
+                // Paso 2: Extraer Operadores y sus Asignaciones
+                for (let i = (Array.isArray(rosterData[0]) ? headerRowIdx + 1 : 0); i < rosterData.length; i++) {
                     let row = rosterData[i];
-                    let operario = isObject ? (row["Operario"] || row["operario"] || row["Nombre"] || row["nombre"] || row[headers[1]]) : row[1];
-                    if (!operario) continue;
-                    operario = String(operario).trim();
-
-                    for (let key in dateCols) {
-                        let dateNum = dateCols[key];
-                        let asignacion = row[key];
-                        if (asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
-                            let parts = String(asignacion).split("(");
-                            let maqStr = parts[0].replace(/M/gi, '').replace(/maq/gi,'').trim();
-                            let turnoLetra = parts[1].replace(')', '').trim().toUpperCase();
-
-                            if (!rosterMap[dateNum]) rosterMap[dateNum] = {};
-                            let numeros = maqStr.split('-');
-                            numeros.forEach(num => {
+                    let isObj = !Array.isArray(row);
+                    let vals = isObj ? Object.values(row) : row;
+                    
+                    // Encontrar el nombre de la persona en la fila (Cualquier texto largo que no sea una máquina ni un turno)
+                    let operario = null;
+                    for(let v of vals) {
+                        let strVal = String(v).trim();
+                        if (strVal.includes(" ") && strVal.length > 5 && !/\d/.test(strVal) && !strVal.toLowerCase().includes("turno") && !strVal.toLowerCase().includes("libre")) {
+                            operario = strVal; break;
+                        }
+                    }
+                    if(!operario) continue;
+                    
+                    // Mapear sus asignaciones
+                    for(let key in dateCols) {
+                        let asignacion = String(row[key] || "").trim().toUpperCase();
+                        if (asignacion.includes("(") && asignacion.includes("M")) {
+                            let turnoLetra = asignacion.split('(')[1].replace(')','').trim();
+                            let maqStr = asignacion.split('(')[0].replace(/M/g,'').trim();
+                            
+                            maqStr.split('-').forEach(num => {
                                 let n = parseInt(num, 10);
                                 if (!isNaN(n)) {
-                                    if (!rosterMap[dateNum][n]) rosterMap[dateNum][n] = {};
-                                    rosterMap[dateNum][n][turnoLetra] = operario;
+                                    let dNum = dateCols[key];
+                                    if(!rosterMap[dNum]) rosterMap[dNum] = {};
+                                    if(!rosterMap[dNum][n]) rosterMap[dNum][n] = {};
+                                    rosterMap[dNum][n][turnoLetra] = operario;
                                     
-                                    if (!lastKnownRoster[n]) lastKnownRoster[n] = {};
+                                    if(!lastKnownRoster[n]) lastKnownRoster[n] = {};
                                     lastKnownRoster[n][turnoLetra] = operario;
                                 }
                             });
@@ -433,7 +461,7 @@
                 }
             }
 
-            // 2. PROCESAR EFICIENCIAS (NORMALIZADOR UNIVERSAL)
+            // 2. PROCESAR EFICIENCIAS
             let effByDate = {}; 
             let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {};
 
@@ -444,27 +472,27 @@
                 for (let i = isEffObj ? 0 : 1; i < effData.length; i++) {
                     let row = effData[i];
                     
-                    // Convertir cualquier formato de fila a un diccionario limpio
                     let rClean = {};
                     if (isEffObj) {
-                        for (let k in row) {
-                            let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "");
-                            rClean[cleanKey] = row[k];
-                        }
+                        for (let k in row) rClean[String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "")] = row[k];
                     } else {
-                        for (let j = 0; j < eHeaders.length; j++) {
-                            let cleanKey = String(eHeaders[j]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "");
-                            rClean[cleanKey] = row[j];
-                        }
+                        for (let j = 0; j < eHeaders.length; j++) rClean[String(eHeaders[j]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "")] = row[j];
                     }
 
-                    // Extracción ultra-robusta sin importar el nombre exacto de la columna
-                    let rendRaw = parseRobustFloat(rClean["disponibilidad"] || rClean["rendimiento"] || rClean["eficiencia"]);
-                    let calRaw = parseRobustFloat(rClean["calidad"]);
-                    let tno = String(rClean["turno"] || "").trim();
-                    let maqStr = String(rClean["maquina"] || rClean["inyectora"] || "").trim();
-                    let fechaRaw = rClean["fecha"] || rClean["dia"] || rClean["date"];
-                    let opDirecto = rClean["operador"] || rClean["operario"] || rClean["nombre"];
+                    const getCol = (keywords) => {
+                        for (let k in rClean) {
+                            for(let w of keywords) {
+                                if (k.includes(w)) return rClean[k];
+                            }
+                        }
+                        return null;
+                    };
+
+                    let rendRaw = parseRobustFloat(getCol(["disponibilidad", "rendimiento", "eficiencia"]));
+                    let calRaw = parseRobustFloat(getCol(["calidad"]));
+                    let tno = String(getCol(["turno"]) || "").trim().toUpperCase();
+                    let maqStr = String(getCol(["maquina", "inyectora"]) || "").trim();
+                    let fechaRaw = getCol(["fecha", "dia", "date"]);
 
                     let recDateNum = normalizeDateToNum(fechaRaw);
                     if (!recDateNum) recDateNum = hoyNum; 
@@ -473,17 +501,30 @@
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
                         if (isNaN(maqNum)) continue;
 
-                        let letraTurno = tno.toLowerCase().includes("mañ") ? "M" : (tno.toLowerCase().includes("tar") ? "T" : "N");
+                        let letraTurno = tno.includes("MAÑ") ? "M" : (tno.includes("TAR") ? "T" : "N");
 
-                        // BUSCAR OPERADOR (Cruce Fuerte)
-                        let opNombre = "NO ASIGNADO";
+                        // *** IDENTIFICACIÓN DEL OPERADOR ***
+                        let opNombre = null;
                         
-                        if (opDirecto && String(opDirecto).trim() !== "") {
-                            opNombre = String(opDirecto).trim();
-                        } else if (rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
+                        // 1: Buscar si lo escribieron a mano en Eficiencia
+                        let opVal = getCol(["operador", "operario", "nombre", "responsable"]);
+                        if (opVal && String(opVal).trim() !== "") opNombre = String(opVal).trim();
+                        
+                        // 2: Cruce con Roster (El más confiable)
+                        if (!opNombre && rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
                             opNombre = rosterMap[recDateNum][maqNum][letraTurno];
-                        } else if (lastKnownRoster[maqNum] && lastKnownRoster[maqNum][letraTurno]) {
+                        }
+                        
+                        // 3: Memoria Histórica
+                        if (!opNombre && lastKnownRoster[maqNum] && lastKnownRoster[maqNum][letraTurno]) {
                             opNombre = lastKnownRoster[maqNum][letraTurno];
+                        }
+
+                        // SALVAVIDAS ANTI-PANTALLA BLANCA
+                        let isMissing = false;
+                        if (!opNombre) {
+                            opNombre = `MAQ ${maqNum} (${letraTurno}) SIN NOMBRE`;
+                            isMissing = true;
                         }
 
                         // Cálculo
@@ -495,33 +536,28 @@
 
                         if (!effByDate[recDateNum]) effByDate[recDateNum] = {};
                         if (!effByDate[recDateNum][maqNum]) effByDate[recDateNum][maqNum] = {};
-                        effByDate[recDateNum][maqNum][letraTurno] = { name: opNombre, eff: eff };
+                        
+                        effByDate[recDateNum][maqNum][letraTurno] = { name: opNombre, eff: eff, missing: isMissing };
 
-                        // Matemática Acumulativa (Ignora Fantasmas)
-                        if (opNombre !== "NO ASIGNADO" && !opNombre.toUpperCase().includes("OPERADOR")) {
-                            
-                            const addStat = (dict, name, val) => {
-                                if (!dict[name]) dict[name] = { sum: 0, count: 0 };
-                                dict[name].sum += val; dict[name].count++;
-                            };
+                        // Añadir TODO al ranking (Incluso si falta el nombre, para que se grafique la máquina ganadora)
+                        const addStat = (dict, name, val) => {
+                            if (!dict[name]) dict[name] = { sum: 0, count: 0, isMissing: isMissing };
+                            dict[name].sum += val; dict[name].count++;
+                        };
 
-                            addStat(rankGlobal, opNombre, eff);
-                            
-                            let recYM = Math.floor(recDateNum / 100);
-                            if (recYM === currentYM) addStat(rankMes, opNombre, eff);
-                            
-                            if (recDateNum >= hace7Num) addStat(rankSemana, opNombre, eff);
-                            
-                            if (recDateNum < hoyNum) {
-                                if (!rankAyer[recDateNum]) rankAyer[recDateNum] = {};
-                                addStat(rankAyer[recDateNum], opNombre, eff);
-                            }
+                        addStat(rankGlobal, opNombre, eff);
+                        let recYM = Math.floor(recDateNum / 100);
+                        if (recYM === currentYM) addStat(rankMes, opNombre, eff);
+                        if (recDateNum >= hace7Num) addStat(rankSemana, opNombre, eff);
+                        if (recDateNum < hoyNum) {
+                            if (!rankAyer[recDateNum]) rankAyer[recDateNum] = {};
+                            addStat(rankAyer[recDateNum], opNombre, eff);
                         }
                     }
                 }
             }
 
-            // Panel Derecho: Encuentra la fecha más reciente con datos
+            // Seleccionar fecha Panel Derecho
             let allRecDates = Object.keys(effByDate).map(Number).sort((a,b) => b - a);
             let latestDateNum = allRecDates.length > 0 ? allRecDates[0] : hoyNum;
 
@@ -541,7 +577,7 @@
             const getTop5 = (dict) => {
                 let arr = [];
                 for(let name in dict) {
-                    arr.push({ name: name, eff: dict[name].sum / dict[name].count });
+                    arr.push({ name: name, eff: dict[name].sum / dict[name].count, missing: dict[name].isMissing });
                 }
                 return arr.sort((a,b) => b.eff - a.eff).slice(0, 5);
             };
@@ -551,7 +587,6 @@
             let listSemana = getTop5(rankSemana);
             let listMes = getTop5(rankMes);
 
-            // Resguardo
             if (listAyer.length === 0) listAyer = listMes.length > 0 ? listMes : listGlobal;
             if (listSemana.length === 0) listSemana = listMes.length > 0 ? listMes : listGlobal;
             if (listMes.length === 0) listMes = listGlobal;
@@ -579,8 +614,8 @@
                     let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
                     list.forEach((item, index) => {
                         let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
-                        let colorClass = `fill-${index+1}`;
-                        let colorNombre = index === 0 ? 'var(--gold)' : (index === 1 ? '#64748b' : (index===2 ? 'var(--bronze)' : '#222'));
+                        let colorClass = item.missing ? `fill-alert` : `fill-${index+1}`;
+                        let colorNombre = item.missing ? 'var(--alert)' : (index === 0 ? 'var(--gold)' : (index === 1 ? '#64748b' : (index===2 ? 'var(--bronze)' : '#222')));
                         
                         html += `
                         <div class="bar-row">
@@ -659,14 +694,14 @@
 
             const getOpHtml = (opData, shiftLabel, cls) => {
                 if(!opData) return ''; 
-                let isMissing = opData.name === "NO ASIGNADO";
                 let init = getAvatarInitials(opData.name);
-                let colorName = isMissing ? "var(--primary)" : "#222";
-                let nameStr = opData.name;
+                let rowClass = opData.missing ? `${cls} alert` : cls;
+                let colorName = opData.missing ? "var(--alert)" : "#222";
+                let nameStr = opData.missing ? "FALTA INGRESAR NOMBRE" : opData.name;
                 let effStr = opData.eff.toFixed(1).replace('.',',') + '%';
                 
                 return `
-                <div class="m-op-row ${cls}">
+                <div class="m-op-row ${rowClass}">
                     <div class="m-avatar">${init}</div>
                     <div class="m-details">
                         <p class="m-name" style="color: ${colorName};">${nameStr}</p>
