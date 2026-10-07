@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ranking Dinámico - Libus</title>
     <style>
+        /* =========================================================
+           VARIABLES CORPORATIVAS Y DE COLOR
+           ========================================================= */
         :root {
             --primary: #e6005a;
             --bg-light: #f4f7f6;
@@ -21,22 +24,30 @@
             --team-a: #0ea5e9; /* Azul Dilan */
             --team-b: #f97316; /* Naranja Miguel */
             --team-c: #10b981; /* Verde Nilson */
+            
+            --sober-m: #475569; 
+            --sober-t: #64748b; 
+            --sober-n: #0f172a; 
         }
 
+        /* =========================================================
+           BASE ADAPTATIVA (FULLSCREEN YODECK)
+           ========================================================= */
+        * { box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-light);
             color: var(--text-dark);
             margin: 0;
             padding: 2vh 2vw;
-            height: 100vh;
+            height: 100vh; /* Ocupa exactamente el 100% de la TV */
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-sizing: border-box;
         }
 
-        /* HEADER CORPORATIVO LIBUS */
+        /* HEADER */
         .header {
             display: flex;
             justify-content: space-between;
@@ -44,24 +55,28 @@
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 1.5vh;
             margin-bottom: 2vh;
+            height: 8vh; /* Altura fija para no robar espacio */
+            flex-shrink: 0;
         }
-        .logo { height: min(40px, 5vh); }
-        .title-box { text-align: center; flex-grow: 1; }
-        .title { margin: 0; font-size: min(32px, 4vh); font-weight: 900; color: #111; letter-spacing: 1px; text-transform: uppercase;}
-        .subtitle { color: var(--primary); font-weight: bold; font-size: min(16px, 2vh); margin-top: 5px; text-transform: uppercase;}
-        .clock { font-size: min(1.5vw, 3vh); font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.5vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
+        .logo { height: 100%; max-height: 50px; object-fit: contain; }
+        .title-box { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .title { margin: 0; font-size: 3.5vh; font-weight: 900; color: #111; letter-spacing: 1px; text-transform: uppercase; line-height: 1;}
+        .subtitle { color: var(--primary); font-weight: bold; font-size: 1.8vh; margin-top: 4px; text-transform: uppercase;}
+        .clock { font-size: 2.5vh; font-weight: bold; color: var(--text-muted); background: #e2e8f0; padding: 0.8vh 1.5vw; border-radius: 20px; letter-spacing: 2px;}
 
         /* LAYOUT PRINCIPAL (60% / 40%) */
         .main-container {
             display: flex;
             gap: 2vw;
-            flex-grow: 1;
-            height: calc(100% - 10vh);
+            flex-grow: 1; /* Ocupa todo el espacio restante */
+            height: calc(100vh - 12vh);
         }
 
-        /* PANEL IZQUIERDO: TOP ACUMULADO (CARRUSEL) */
+        /* =========================================================
+           PANEL IZQUIERDO: TOP ACUMULADO (CARRUSEL)
+           ========================================================= */
         .ranking-panel {
-            flex: 6;
+            flex: 6; /* Proporción 60% */
             background: var(--card-bg);
             border-radius: 12px;
             border-top: 5px solid var(--primary);
@@ -78,42 +93,48 @@
             padding: 2vh;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
         .ranking-title { font-size: 3vh; font-weight: 900; color: #111; margin: 0; text-transform: uppercase; }
         .ranking-subtitle { font-size: 1.5vh; color: var(--text-muted); margin-top: 5px; font-weight: bold; text-transform: uppercase; }
-        .ranking-body { flex-grow: 1; position: relative; }
+        
+        /* Contenedor Adaptativo */
+        .ranking-body { flex-grow: 1; position: relative; height: 100%; }
 
         .carousel-view {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            padding: 2vh 3vw; display: flex; flex-direction: column; justify-content: center; gap: 2.5vh;
+            padding: 3vh 4vw; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-evenly; /* Rellena los espacios en blanco automáticamente */
             opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out;
+            height: 100%;
         }
-        .carousel-view.team-view { gap: 4vh; padding: 4vh 4vw; }
         .carousel-view.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
-        .bar-row { display: flex; flex-direction: column; gap: 6px; }
+        .bar-row { display: flex; flex-direction: column; gap: 1vh; width: 100%; }
         .bar-info { display: flex; justify-content: space-between; align-items: flex-end; }
-        .bar-rank-name { display: flex; align-items: center; gap: 1vw; font-size: 2.2vh; font-weight: 900; text-transform: uppercase; color: #222;}
-        .bar-medal { font-size: 3vh; width: 4vh; text-align: center; }
-        .bar-score { font-size: 2.5vh; font-weight: 900; color: #111;}
+        .bar-rank-name { display: flex; align-items: center; gap: 1vw; font-size: 2.8vh; font-weight: 900; text-transform: uppercase; color: #222;}
+        .bar-medal { font-size: 3.5vh; width: 4.5vh; text-align: center; }
+        .bar-score { font-size: 3.2vh; font-weight: 900; color: #111;}
         
-        .bar-track { width: 100%; height: 2vh; background: #f1f5f9; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
-        .team-view .bar-track { height: 3vh; }
+        .bar-track { width: 100%; height: 2.5vh; background: #f1f5f9; border-radius: 15px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .team-view .bar-track { height: 4vh; } /* Líderes: barras más gruesas porque son solo 3 y hay espacio */
+        .team-view .bar-rank-name { font-size: 3.5vh; }
+        .team-view .bar-score { font-size: 4vh; }
         
-        .bar-fill { height: 100%; width: 0%; border-radius: 10px; transition: width 1.5s cubic-bezier(0.1, 0.7, 0.1, 1); position: relative; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; border-radius: 15px; transition: width 1.5s cubic-bezier(0.1, 0.7, 0.1, 1); position: relative; overflow: hidden; }
 
-        /* Colores Base Rankings Personas */
+        /* Degradados */
         .fill-1 { background: linear-gradient(90deg, #fef08a, #d97706); } 
         .fill-2 { background: linear-gradient(90deg, #f1f5f9, #64748b); } 
         .fill-3 { background: linear-gradient(90deg, #fde68a, #9a3412); } 
         .fill-4 { background: #38bdf8; }
         .fill-5 { background: #818cf8; }
         
-        /* Colores Base Equipos */
         .fill-team-A { background: linear-gradient(90deg, #38bdf8, var(--team-a)); }
         .fill-team-B { background: linear-gradient(90deg, #fdba74, var(--team-b)); }
         .fill-team-C { background: linear-gradient(90deg, #6ee7b7, var(--team-c)); }
-        .fill-alert { background: linear-gradient(90deg, #fca5a5, var(--alert)); }
 
         .fill-1::after, .fill-team-A::after, .fill-team-B::after, .fill-team-C::after {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
@@ -122,9 +143,11 @@
         }
         @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
 
-        /* PANEL DERECHO: CARRUSEL MÁQUINAS EN VIVO */
+        /* =========================================================
+           PANEL DERECHO: CARRUSEL MÁQUINAS EN VIVO
+           ========================================================= */
         .machines-panel {
-            flex: 4;
+            flex: 4; /* Proporción 40% */
             background: var(--card-bg);
             border-radius: 12px;
             border-top: 5px solid #111;
@@ -134,49 +157,58 @@
         }
 
         .m-carousel-header {
-            text-align: center; padding: 2vh; background: #fafbfc; color: #111; font-size: 2vh;
+            text-align: center; padding: 2vh; background: #fafbfc; color: #111; font-size: 2.2vh;
             font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-bottom: 2px solid var(--border-color);
+            flex-shrink: 0;
         }
 
-        .m-carousel-container { flex-grow: 1; position: relative; background: #ffffff; }
+        .m-carousel-container { flex-grow: 1; position: relative; background: #ffffff; height: 100%; }
 
         .machine-slide {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            padding: 2.5vh; display: flex; flex-direction: column; gap: 2vh;
-            opacity: 0; transform: translateX(30px); transition: all 0.6s ease-out; justify-content: center;
+            padding: 3vh 2.5vw; 
+            display: flex; flex-direction: column; 
+            justify-content: space-evenly; /* Ocupa el alto inteligentemente */
+            opacity: 0; transform: translateX(30px); transition: all 0.6s ease-out;
+            height: 100%;
         }
         .machine-slide.active { opacity: 1; transform: translateX(0); }
 
         .m-card-title {
-            text-align: center; font-size: 3.5vh; font-weight: 900; color: #111;
+            text-align: center; font-size: 4vh; font-weight: 900; color: #111;
             margin-bottom: 2vh; text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 1vh;
+            flex-shrink: 0;
         }
 
         .m-op-row {
-            background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px;
-            padding: 1.5vh; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px;
+            padding: 2vh 1.5vw; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            flex: 1; /* Esto hace que las cajas de turnos crezcan si hay espacio */
+            max-height: 12vh;
         }
-        .m-op-row.rank-1 { border-left: 6px solid var(--gold); background-color: #fffbeb; }
-        .m-op-row.rank-2 { border-left: 6px solid var(--silver); background-color: #f8fafc; }
-        .m-op-row.rank-3 { border-left: 6px solid var(--bronze); background-color: #fff7ed; }
-        .m-op-row.alert { border-left: 6px solid var(--alert); background-color: #fef2f2; }
+        .m-op-row.rank-1 { border-left: 8px solid var(--gold); background-color: #fffbeb; }
+        .m-op-row.rank-2 { border-left: 8px solid var(--silver); background-color: #f8fafc; }
+        .m-op-row.rank-3 { border-left: 8px solid var(--bronze); background-color: #fff7ed; }
+        .m-op-row.alert { border-left: 8px solid var(--alert); background-color: #fef2f2; }
 
-        .m-rank-icon { font-size: 3vh; width: 4vh; text-align: center; margin-right: 1vw; }
-        .m-details { flex-grow: 1; overflow: hidden;}
-        .m-name { font-size: 2.2vh; font-weight: 900; margin: 0; text-transform: uppercase; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .m-team { font-size: 1.2vh; font-weight: bold; text-transform: uppercase; margin-top: 2px;}
-        .m-eff { font-size: 3.5vh; font-weight: 900; color: #111; }
+        .m-rank-icon { font-size: 3.5vh; width: 5vh; text-align: center; margin-right: 1.5vw; }
+        .m-details { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;}
+        .m-name { font-size: 2.5vh; font-weight: 900; margin: 0; text-transform: uppercase; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .m-team { font-size: 1.5vh; font-weight: bold; text-transform: uppercase; margin-top: 4px;}
+        .m-eff { font-size: 4vh; font-weight: 900; color: #111; }
 
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-light); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: var(--primary); font-size: 3vh; font-weight: bold;}
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; opacity: 0.6; text-align: center;}
-        .empty-state span { font-size: 5vh; margin-bottom: 10px;}
-        .empty-state p { font-size: 2vh; font-weight: bold; color: var(--text-muted); margin: 0;}
+        /* Loader & Empty States */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-light); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: var(--primary); font-size: 3.5vh; font-weight: bold;}
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; opacity: 0.6; text-align: center; margin: auto;}
+        .empty-state span { font-size: 6vh; margin-bottom: 15px;}
+        .empty-state p { font-size: 2.5vh; font-weight: bold; color: var(--text-muted); margin: 0;}
+
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <span>Evaluando Desempeño y Cruzando Fechas... ⏳</span>
+        <span>Extrayendo Datos Estrictos y Adaptando Pantalla... ⏳</span>
     </div>
 
     <div class="header">
@@ -193,7 +225,7 @@
         <div class="ranking-panel">
             <div class="ranking-header">
                 <h2 class="ranking-title" id="rkTitle">CARGANDO...</h2>
-                <div class="ranking-subtitle">Evaluación de Eficiencia Efectiva Neta</div>
+                <div class="ranking-subtitle">Evaluación de Eficiencia Efectiva Neta (Datos Oficiales)</div>
             </div>
             <div class="ranking-body" id="rankingBody">
                 <!-- Vistas inyectadas por JS -->
@@ -214,7 +246,7 @@
         const EFF_API = 'https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec';
 
         // ---------------------------------------------------------
-        // DICCIONARIO INTELIGENTE OFICIAL (INMUNE A ERRORES)
+        // DICCIONARIO INTELIGENTE DE PERSONAL Y EQUIPOS
         // ---------------------------------------------------------
         const PERSONNEL = [
             // EQUIPO DILAN BANDES (A)
@@ -265,7 +297,7 @@
                 const script = document.createElement('script');
                 script.id = callbackName;
                 script.src = `${url}?callback=${callbackName}&_t=${Date.now()}`;
-                script.onerror = () => reject(`Error`);
+                script.onerror = () => reject(`Error conectando a Google Sheets`);
                 document.body.appendChild(script);
             });
         }
@@ -278,7 +310,7 @@
             return parseFloat(str) || 0;
         }
 
-        // Formatea fechas a número YYYYMMDD exacto sin importar la zona horaria
+        // Extractor de Fechas a Prueba de Zonas Horarias (Retorna YYYYMMDD)
         function normalizeDateToNum(dateInput) {
             if (!dateInput) return null;
             let str = String(dateInput).trim();
@@ -316,7 +348,7 @@
             .then(([rosterData, effData]) => {
                 processData(rosterData, effData);
             }).catch(err => {
-                document.getElementById('loader').innerHTML = "❌ Error de conexión. Recargue la página.";
+                document.getElementById('loader').innerHTML = "❌ Error de conexión con Planillas. Recargue.";
             });
         }
 
@@ -328,31 +360,44 @@
 
             document.getElementById('fechaHoy').innerText = `SISTEMA ACTIVO: ${formatNumToDateStr(hoyNum)}`;
 
-            // 1. ESCÁNER DE TURNOS (MEMORIA 3D: FECHA > MAQUINA > TURNO)
-            let rosterMap = {}; // rosterMap[dateNum][maqNum][letraTurno] = operarioObj
+            // 1. CARGAR ASIGNACIONES
+            let rosterMap = {}; 
+            let dateCols = {};
 
             if (rosterData && rosterData.length > 0) {
                 let isObject = !Array.isArray(rosterData[0]);
-                let headers = isObject ? Object.keys(rosterData[0]) : rosterData[0];
                 
-                let dateCols = {}; 
-                headers.forEach((h, idx) => {
-                    let dNum = normalizeDateToNum(h);
-                    if (dNum) dateCols[isObject ? h : idx] = dNum;
-                });
+                if (isObject) {
+                    Object.keys(rosterData[0]).forEach(k => {
+                        let d = normalizeDateToNum(k);
+                        if(d) dateCols[k] = d;
+                    });
+                } else {
+                    let bestRow = -1, maxDates = 0;
+                    for(let r=0; r < Math.min(10, rosterData.length); r++) {
+                        let count = 0;
+                        rosterData[r].forEach(c => { if(normalizeDateToNum(c)) count++; });
+                        if(count > maxDates) { maxDates = count; bestRow = r; }
+                    }
+                    if(bestRow > -1) {
+                        rosterData[bestRow].forEach((c, idx) => {
+                            let d = normalizeDateToNum(c);
+                            if(d) dateCols[idx] = d;
+                        });
+                    }
+                }
 
                 for (let i = isObject ? 0 : 1; i < rosterData.length; i++) {
                     let row = rosterData[i];
                     let vals = isObject ? Object.values(row) : row;
                     
-                    let operarioObj = null;
+                    let opObj = null;
                     for (let v of vals) {
                         let matched = identifyPerson(v);
-                        if (matched) { operarioObj = matched; break; }
+                        if (matched) { opObj = matched; break; }
                     }
-                    if (!operarioObj) continue;
+                    if (!opObj) continue; 
                     
-                    // Asigna en la coordenada exacta de Fecha y Máquina
                     for (let key in dateCols) {
                         let dateNum = dateCols[key];
                         let asignacion = String(row[key] || "").trim().toUpperCase();
@@ -368,7 +413,7 @@
                                 let n = parseInt(num, 10);
                                 if (!isNaN(n)) {
                                     if (!rosterMap[dateNum][n]) rosterMap[dateNum][n] = {};
-                                    rosterMap[dateNum][n][turnoLetra] = operarioObj;
+                                    rosterMap[dateNum][n][turnoLetra] = opObj;
                                 }
                             });
                         }
@@ -376,16 +421,30 @@
                 }
             }
 
-            // 2. PROCESAR EFICIENCIAS
+            // 2. PROCESAR EFICIENCIAS (MODO AUDITORÍA ESTRICTA)
             let effByDate = {}; // Panel Derecho (Máquinas)
-            let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {}; // Stats Personas
-            let teamAyer = {}, teamSemana = {}, teamMes = {}; // Stats Equipos
+            let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {}; // Operadores
+            let teamAyer = {}, teamSemana = {}, teamMes = {}; // Líderes
 
             if (effData && effData.length > 0) {
                 let isEffObj = !Array.isArray(effData[0]);
-                let eHeaders = isEffObj ? Object.keys(effData[0]) : effData[0];
+                let eHeaders = [];
+                let effStartIndex = 0;
+                
+                if (isEffObj) {
+                    eHeaders = Object.keys(effData[0]);
+                } else {
+                    for(let r=0; r < Math.min(5, effData.length); r++) {
+                        let rowStr = effData[r].join(" ").toLowerCase();
+                        if(rowStr.includes("maquina") || rowStr.includes("turno")) {
+                            eHeaders = effData[r];
+                            effStartIndex = r + 1;
+                            break;
+                        }
+                    }
+                }
 
-                for (let i = isEffObj ? 0 : 1; i < effData.length; i++) {
+                for (let i = effStartIndex; i < effData.length; i++) {
                     let row = effData[i];
                     let rClean = {};
                     if (isEffObj) {
@@ -401,6 +460,7 @@
                         return null;
                     };
 
+                    // Extraer los datos reales
                     let rendRaw = parseRobustFloat(getCol(["disponibilidad", "rendimiento", "eficiencia"]) || (isEffObj ? 0 : row[3]));
                     let calRaw = parseRobustFloat(getCol(["calidad"]) || (isEffObj ? 0 : row[4]));
                     let tno = String(getCol(["turno"]) || (isEffObj ? '' : row[1]) || "").trim().toUpperCase();
@@ -408,39 +468,44 @@
                     let fechaRaw = getCol(["fecha", "dia", "date"]) || (isEffObj ? '' : row[0]);
 
                     let recDateNum = normalizeDateToNum(fechaRaw);
-                    if (!recDateNum) recDateNum = hoyNum; 
+                    if (!recDateNum) continue; // SIN INVENTOS. Si no hay fecha, se ignora.
 
                     if (maqStr && tno && (rendRaw > 0 || calRaw > 0)) {
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
                         if (isNaN(maqNum)) continue;
                         let letraTurno = tno.includes("MAÑ") ? "M" : (tno.includes("TAR") ? "T" : "N");
 
-                        // IDENTIFICACIÓN DEL OPERADOR (Cruce Fuerte con Fechas)
+                        // IDENTIFICAR OPERADOR REAL
                         let opObj = null;
                         
-                        // 1. Tratar de identificarlo si escribieron el nombre en la planilla
+                        // 1. En Planilla de Eficiencia
                         for(let key in rClean) {
                             let match = identifyPerson(rClean[key]);
                             if (match) { opObj = match; break; }
                         }
 
-                        // 2. Si no, Buscar exactamente en el cruce de ese Día, en esa Máquina
+                        // 2. Cruce en Roster por Día/Maq/Turno
                         if (!opObj && rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
                             opObj = rosterMap[recDateNum][maqNum][letraTurno];
                         }
 
-                        // 3. Fallback en caso de planilla incompleta
                         let isMissing = false;
                         if (!opObj) {
-                            opObj = { name: "NO ASIGNADO", team: "REGISTRO INCOMPLETO", tColor: "var(--alert)", tClass: "fill-alert" };
+                            opObj = { name: "NO ASIGNADO", team: "SIN REGISTRO EN PLANILLA", tColor: "var(--text-muted)", tClass: "" };
                             isMissing = true;
                         }
 
+                        // ==========================================
+                        // MATEMÁTICA ESTRICTA (TOPE MAX 100%)
+                        // ==========================================
+                        // Convertir a base 100 si vienen en decimal (0.95 -> 95)
                         let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
                         let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
-                        if (rend > 100) rend = 100;
-                        if (cal > 100) cal = 100;
+                        
                         let eff = (rend / 100) * (cal / 100) * 100;
+                        
+                        // REGLA: NADIE PUEDE HACER MÁS DEL 100%
+                        if (eff > 100) eff = 100.0;
 
                         if (!effByDate[recDateNum]) effByDate[recDateNum] = {};
                         if (!effByDate[recDateNum][maqNum]) effByDate[recDateNum][maqNum] = [];
@@ -454,6 +519,7 @@
                             eff: eff
                         });
 
+                        // CERO INVENTOS: Solo sumar al Top 5 si la persona ES REAL
                         if (!isMissing) {
                             const addStat = (dict, keyName, val) => {
                                 if (!dict[keyName]) dict[keyName] = { sum: 0, count: 0, obj: opObj };
@@ -471,7 +537,7 @@
                                 addStat(rankAyer[recDateNum], opObj.name, eff);
                             }
 
-                            // Acumulados de su Equipo
+                            // Acumulados Equipos (Líderes)
                             if (recYM === currentYM) addStat(teamMes, opObj.team, eff);
                             if (recDateNum >= hace7Num) addStat(teamSemana, opObj.team, eff);
                             if (recDateNum < hoyNum) {
@@ -483,14 +549,15 @@
                 }
             }
 
-            // Seleccionar Día
+            // Seleccionar Día de Máquinas en Vivo
             let allRecDates = Object.keys(effByDate).map(Number).sort((a,b) => b - a);
             let latestDateNum = allRecDates.length > 0 ? allRecDates[0] : hoyNum;
 
             document.getElementById('mPanelTitle').innerText = (latestDateNum === hoyNum) ? 
-                `🟢 TOP OPERADORES EN MÁQUINA (HOY)` : 
-                `🟢 TOP OPERADORES EN MÁQUINA (${formatNumToDateStr(latestDateNum)})`;
+                `🟢 MÁQUINAS EN LÍNEA (HOY)` : 
+                `🟢 PRODUCCIÓN EN MÁQUINA (${formatNumToDateStr(latestDateNum)})`;
 
+            // Encontrar "Ayer" Real
             let bestRankAyer = {}, bestTeamAyer = {};
             let ultimaFechaCerradaNum = null;
             let sortedFechasAyer = Object.keys(rankAyer).map(Number).sort((a,b) => b - a);
@@ -500,7 +567,7 @@
                 bestTeamAyer = teamAyer[ultimaFechaCerradaNum] || {};
             }
 
-            // 3. ORDENAR Y PREPARAR
+            // ORDENAR RANKINGS
             const getTopList = (dict, limit) => {
                 let arr = [];
                 for(let key in dict) {
@@ -510,11 +577,10 @@
             };
 
             let viewsData = {
-                fechaAyerStr: ultimaFechaCerradaNum ? formatNumToDateStr(ultimaFechaCerradaNum) : "---",
+                fechaAyerStr: ultimaFechaCerradaNum ? formatNumToDateStr(ultimaFechaCerradaNum) : "SIN CIERRE PREVIO",
                 opAyer: getTopList(bestRankAyer, 5),
                 opSemana: getTopList(rankSemana, 5),
                 opMes: getTopList(rankMes, 5),
-                opGlobal: getTopList(rankGlobal, 5),
                 teamAyer: getTopList(bestTeamAyer, 3),
                 teamSemana: getTopList(teamSemana, 3),
                 teamMes: getTopList(teamMes, 3)
@@ -526,7 +592,9 @@
             document.getElementById('loader').style.display = 'none';
         }
 
-        // PANEL IZQUIERDO
+        // ===============================================
+        // RENDER PANEL IZQUIERDO (ADAPTATIVO)
+        // ===============================================
         function renderLeaderboards(data) {
             let container = document.getElementById('rankingBody');
             let fullHtml = '';
@@ -534,17 +602,21 @@
             const createView = (id, list, title, isTeamMode) => {
                 let html = `<div class="carousel-view ${isTeamMode ? 'team-view' : ''}" id="rk-${id}" data-title="${title}">`;
                 
+                // SIN INVENTOS: Si no hay datos, lo muestra vacío transparentemente
                 if (list.length === 0) {
                     html += `
                     <div class="empty-state">
-                        <span>📊</span><p>RECABANDO DATOS PARA ESTE PERIODO</p>
+                        <span>📊</span><p>SIN DATOS PARA ESTE PERIODO</p>
                     </div>`;
                 } else {
                     let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
                     list.forEach((item, index) => {
+                        // 1 SOLO DECIMAL EXACTO
                         let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
+                        
                         let colorClass = isTeamMode ? item.obj.tClass : `fill-${index+1}`;
                         let colorNombre = (index === 0 && !isTeamMode) ? 'var(--gold)' : (isTeamMode ? item.obj.tColor : '#222');
+                        if (isTeamMode && index > 0) colorNombre = '#222';
                         
                         html += `
                         <div class="bar-row">
@@ -603,7 +675,9 @@
             }, 8000); 
         }
 
-        // PANEL DERECHO
+        // ===============================================
+        // RENDER PANEL DERECHO (ADAPTATIVO)
+        // ===============================================
         function renderMachines(statsFecha) {
             let container = document.getElementById('machinesContainer');
             let fullHtml = '';
@@ -613,9 +687,8 @@
             if(maqKeys.length === 0) {
                 container.innerHTML = `
                 <div class="machine-slide active" style="justify-content:center; position:relative; transform:none;">
-                    <div class="empty-state" style="margin:auto;">
-                        <span style="font-size: 5vh; color:#666;">⏳</span>
-                        <p style="color:#666;">ESPERANDO REGISTROS<br>DE PRODUCCIÓN</p>
+                    <div class="empty-state">
+                        <span>⏳</span><p>ESPERANDO REGISTROS DE PRODUCCIÓN</p>
                     </div>
                 </div>`;
                 return;
@@ -623,6 +696,7 @@
 
             maqKeys.forEach((m, idx) => {
                 let shiftsArray = statsFecha[m];
+                // Ranking interno por máquina de mayor a menor
                 shiftsArray.sort((a,b) => b.eff - a.eff);
 
                 let slideHtml = `
@@ -633,6 +707,8 @@
                 shiftsArray.forEach((op, rankIdx) => {
                     let rankClass = op.missing ? 'alert' : `rank-${rankIdx + 1}`;
                     let shiftLabel = op.shift === 'M' ? '☀ TURNO MAÑANA' : (op.shift === 'T' ? '🌤 TURNO TARDE' : '🌙 TURNO NOCHE');
+                    // 1 SOLO DECIMAL EXACTO
+                    let effStr = op.eff.toFixed(1).replace('.',',') + '%';
                     
                     slideHtml += `
                     <div class="m-op-row ${rankClass}">
@@ -641,7 +717,7 @@
                             <p class="m-name" style="color: ${op.missing ? 'var(--alert)' : '#222'}">${op.name}</p>
                             <p class="m-team" style="color: ${op.tColor || 'var(--text-muted)'}">${op.teamInfo || ''} • ${shiftLabel}</p>
                         </div>
-                        <div class="m-eff">${op.eff.toFixed(1).replace('.',',')}%</div>
+                        <div class="m-eff">${effStr}</div>
                     </div>`;
                 });
 
