@@ -256,7 +256,7 @@
 <body>
 
     <div id="loader">
-        <span>Sincronizando Escáner de Datos... ⏳</span>
+        <span>Sincronizando Base de Datos... ⏳</span>
     </div>
 
     <div class="header">
@@ -282,7 +282,7 @@
 
         <!-- PANEL DERECHO: MÁQUINAS EN VIVO -->
         <div class="machines-panel">
-            <div class="m-carousel-header" id="mPanelTitle">🟢 ÚLTIMA PRODUCCIÓN EN LÍNEA</div>
+            <div class="m-carousel-header" id="mPanelTitle">🟢 PRODUCCIÓN EN LÍNEA</div>
             <div class="m-carousel-container" id="machinesContainer">
                 <!-- Slides inyectados por JS -->
             </div>
@@ -317,23 +317,21 @@
         }
 
         function parseRobustFloat(val) {
-            if (!val) return 0;
+            if (val === undefined || val === null || val === "") return 0;
             let str = String(val).replace(/%/g, '').trim(); 
             if (str.includes(',') && !str.includes('.')) str = str.replace(',', '.');
             else if (str.includes('.') && str.includes(',')) str = str.replace(/\./g, '').replace(',', '.');
             return parseFloat(str) || 0;
         }
 
-        // MOTOR EXTRACTOR DE FECHAS DE ALTA PRECISIÓN (Retorna número YYYYMMDD)
+        // MOTOR DE FECHAS (Retorna YYYYMMDD)
         function normalizeDateToNum(dateInput) {
             if (dateInput === undefined || dateInput === null) return null;
             let str = String(dateInput).trim();
             if (str === "") return null;
             
-            // Si es ISO (2026-10-06T...)
             if (str.includes('T')) str = str.split('T')[0];
             
-            // Si tiene guiones
             if (str.includes('-')) {
                 let p = str.split('-');
                 if (p.length >= 3) {
@@ -341,7 +339,6 @@
                     if (p[2].length === 4) return parseInt(p[2] + p[1].padStart(2,'0') + p[0].substring(0,2).padStart(2,'0'), 10);
                 }
             }
-            // Si tiene barras (DD/MM/YYYY)
             if (str.includes('/')) {
                 let p = str.split(' ')[0].split('/');
                 if (p.length >= 2) {
@@ -352,7 +349,6 @@
                     return parseInt(y + m + d, 10);
                 }
             }
-            // Si es un simple número de día (1 al 31)
             if (/^\d{1,2}$/.test(str)) {
                 let d = str.padStart(2, '0');
                 let m = String(new Date().getMonth() + 1).padStart(2, '0');
@@ -387,141 +383,104 @@
         function processData(rosterData, effData) {
             let hoyDate = new Date();
             let hoyNum = parseInt(`${hoyDate.getFullYear()}${String(hoyDate.getMonth()+1).padStart(2,'0')}${String(hoyDate.getDate()).padStart(2,'0')}`);
-            let hace7Num = hoyNum - 7; // Lógica filtro semana
+            let hace7Num = hoyNum - 7; 
             let currentYM = Math.floor(hoyNum / 100); 
 
             document.getElementById('fechaHoy').innerText = `SISTEMA ACTIVO: ${formatNumToDateStr(hoyNum)}`;
 
-            // 1. ESCÁNER INTELIGENTE DE TURNOS (ROSTER)
+            // 1. CARGAR ASIGNACIONES
             let rosterMap = {}; 
             let lastKnownRoster = {}; 
 
             if (rosterData && rosterData.length > 0) {
                 let isObject = !Array.isArray(rosterData[0]);
-                let dateCols = [];
-                let startRow = 1;
+                let headers = isObject ? Object.keys(rosterData[0]) : rosterData[0];
                 
-                // Si la planilla devuelve Objetos
-                if (isObject) {
-                    let keys = Object.keys(rosterData[0]);
-                    keys.forEach(k => {
-                        let normNum = normalizeDateToNum(k);
-                        if(normNum) dateCols.push({key: k, dateNum: normNum});
-                    });
-                    startRow = 0;
-                } 
-                // Si devuelve Arreglos, escanea las primeras 5 filas buscando el calendario
-                else {
-                    let maxDates = 0;
-                    let bestRow = 0;
-                    for (let r = 0; r < Math.min(5, rosterData.length); r++) {
-                        let tempDates = [];
-                        for (let c = 0; c < rosterData[r].length; c++) {
-                            let normNum = normalizeDateToNum(rosterData[r][c]);
-                            if(normNum) tempDates.push({key: c, dateNum: normNum});
-                        }
-                        if (tempDates.length > maxDates) {
-                            maxDates = tempDates.length;
-                            dateCols = tempDates;
-                            bestRow = r;
-                        }
-                    }
-                    startRow = bestRow + 1;
+                let dateCols = {};
+                for (let i = 0; i < headers.length; i++) {
+                    let normNum = normalizeDateToNum(headers[i]);
+                    if (normNum) dateCols[isObject ? headers[i] : i] = normNum;
                 }
 
-                if(dateCols.length > 0) {
-                    let firstDateColIndex = isObject ? null : Math.min(...dateCols.map(d => d.key));
-                    
-                    for (let i = startRow; i < rosterData.length; i++) {
-                        let row = rosterData[i];
-                        
-                        let operario = null;
-                        if (isObject) {
-                            operario = row["Operario"] || row["operario"] || row["Nombre"] || row["nombre"] || row[Object.keys(row)[1]];
-                        } else {
-                            // Busca inteligentemente el nombre en las celdas anteriores a los días del mes
-                            for (let c = firstDateColIndex - 1; c >= 0; c--) {
-                                let val = String(row[c]).trim();
-                                if (val.length > 3 && /[a-zA-Z]/.test(val)) {
-                                    operario = val;
-                                    break;
+                for (let i = isObject ? 0 : 1; i < rosterData.length; i++) {
+                    let row = rosterData[i];
+                    let operario = isObject ? (row["Operario"] || row["operario"] || row["Nombre"] || row["nombre"] || row[headers[1]]) : row[1];
+                    if (!operario) continue;
+                    operario = String(operario).trim();
+
+                    for (let key in dateCols) {
+                        let dateNum = dateCols[key];
+                        let asignacion = row[key];
+                        if (asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
+                            let parts = String(asignacion).split("(");
+                            let maqStr = parts[0].replace(/M/gi, '').replace(/maq/gi,'').trim();
+                            let turnoLetra = parts[1].replace(')', '').trim().toUpperCase();
+
+                            if (!rosterMap[dateNum]) rosterMap[dateNum] = {};
+                            let numeros = maqStr.split('-');
+                            numeros.forEach(num => {
+                                let n = parseInt(num, 10);
+                                if (!isNaN(n)) {
+                                    if (!rosterMap[dateNum][n]) rosterMap[dateNum][n] = {};
+                                    rosterMap[dateNum][n][turnoLetra] = operario;
+                                    
+                                    if (!lastKnownRoster[n]) lastKnownRoster[n] = {};
+                                    lastKnownRoster[n][turnoLetra] = operario;
                                 }
-                            }
-                            if(!operario) operario = row[0];
+                            });
                         }
-                        
-                        if (!operario) continue;
-                        operario = String(operario).trim();
-
-                        // Registrar Máquinas asignadas a este operador
-                        dateCols.forEach(colObj => {
-                            let asignacion = isObject ? row[colObj.key] : row[colObj.key];
-                            if (asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
-                                let parts = String(asignacion).split("(");
-                                let maqStr = parts[0].replace(/M/gi, '').replace(/maq/gi,'').trim();
-                                let turnoLetra = parts[1].replace(')', '').trim().toUpperCase();
-
-                                if (!rosterMap[colObj.dateNum]) rosterMap[colObj.dateNum] = {};
-                                
-                                let numeros = maqStr.split('-');
-                                numeros.forEach(num => {
-                                    let n = parseInt(num, 10);
-                                    if (!isNaN(n)) {
-                                        if (!rosterMap[colObj.dateNum][n]) rosterMap[colObj.dateNum][n] = {};
-                                        rosterMap[colObj.dateNum][n][turnoLetra] = operario;
-
-                                        if (!lastKnownRoster[n]) lastKnownRoster[n] = {};
-                                        lastKnownRoster[n][turnoLetra] = operario;
-                                    }
-                                });
-                            }
-                        });
                     }
                 }
             }
 
-            // 2. PROCESAR EFICIENCIAS
+            // 2. PROCESAR EFICIENCIAS (NORMALIZADOR UNIVERSAL)
             let effByDate = {}; 
             let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {};
 
             if (effData && effData.length > 0) {
-                // Descifrar cabeceras de Eficiencia
                 let isEffObj = !Array.isArray(effData[0]);
                 let eHeaders = isEffObj ? Object.keys(effData[0]) : effData[0];
-                let idxFecha=0, idxTurno=1, idxMaq=2, idxDisp=3, idxCal=4;
-                
-                if(!isEffObj) {
-                    eHeaders.forEach((h, i) => {
-                        let lh = String(h).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        if(lh.includes("fecha")) idxFecha = i;
-                        if(lh.includes("turno")) idxTurno = i;
-                        if(lh.includes("maquina")) idxMaq = i;
-                        if(lh.includes("disponibilidad")) idxDisp = i;
-                        if(lh.includes("calidad")) idxCal = i;
-                    });
-                }
 
                 for (let i = isEffObj ? 0 : 1; i < effData.length; i++) {
                     let row = effData[i];
                     
-                    let getVal = (idx, name) => isEffObj ? row[Object.keys(row).find(k=>k.toLowerCase().includes(name))] : row[idx];
+                    // Convertir cualquier formato de fila a un diccionario limpio
+                    let rClean = {};
+                    if (isEffObj) {
+                        for (let k in row) {
+                            let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "");
+                            rClean[cleanKey] = row[k];
+                        }
+                    } else {
+                        for (let j = 0; j < eHeaders.length; j++) {
+                            let cleanKey = String(eHeaders[j]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "");
+                            rClean[cleanKey] = row[j];
+                        }
+                    }
 
-                    let rendRaw = parseRobustFloat(getVal(idxDisp, "disponibilidad"));
-                    let calRaw = parseRobustFloat(getVal(idxCal, "calidad"));
-                    let tno = String(getVal(idxTurno, "turno") || "").trim();
-                    let maqStr = String(getVal(idxMaq, "maquina") || "").trim();
-                    
-                    let recDateNum = normalizeDateToNum(getVal(idxFecha, "fecha"));
+                    // Extracción ultra-robusta sin importar el nombre exacto de la columna
+                    let rendRaw = parseRobustFloat(rClean["disponibilidad"] || rClean["rendimiento"] || rClean["eficiencia"]);
+                    let calRaw = parseRobustFloat(rClean["calidad"]);
+                    let tno = String(rClean["turno"] || "").trim();
+                    let maqStr = String(rClean["maquina"] || rClean["inyectora"] || "").trim();
+                    let fechaRaw = rClean["fecha"] || rClean["dia"] || rClean["date"];
+                    let opDirecto = rClean["operador"] || rClean["operario"] || rClean["nombre"];
+
+                    let recDateNum = normalizeDateToNum(fechaRaw);
                     if (!recDateNum) recDateNum = hoyNum; 
 
-                    if (maqStr && tno) {
+                    if (maqStr && tno && (rendRaw > 0 || calRaw > 0)) {
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
+                        if (isNaN(maqNum)) continue;
+
                         let letraTurno = tno.toLowerCase().includes("mañ") ? "M" : (tno.toLowerCase().includes("tar") ? "T" : "N");
 
                         // BUSCAR OPERADOR (Cruce Fuerte)
                         let opNombre = "NO ASIGNADO";
                         
-                        if (rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
+                        if (opDirecto && String(opDirecto).trim() !== "") {
+                            opNombre = String(opDirecto).trim();
+                        } else if (rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
                             opNombre = rosterMap[recDateNum][maqNum][letraTurno];
                         } else if (lastKnownRoster[maqNum] && lastKnownRoster[maqNum][letraTurno]) {
                             opNombre = lastKnownRoster[maqNum][letraTurno];
@@ -562,7 +521,7 @@
                 }
             }
 
-            // Seleccionar Panel Derecho
+            // Panel Derecho: Encuentra la fecha más reciente con datos
             let allRecDates = Object.keys(effByDate).map(Number).sort((a,b) => b - a);
             let latestDateNum = allRecDates.length > 0 ? allRecDates[0] : hoyNum;
 
