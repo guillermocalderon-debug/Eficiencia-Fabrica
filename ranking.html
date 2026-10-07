@@ -55,7 +55,7 @@
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 1.5vh;
             margin-bottom: 2vh;
-            height: 8vh; /* Altura fija para no robar espacio */
+            height: 8vh;
             flex-shrink: 0;
         }
         .logo { height: 100%; max-height: 50px; object-fit: contain; }
@@ -68,7 +68,7 @@
         .main-container {
             display: flex;
             gap: 2vw;
-            flex-grow: 1; /* Ocupa todo el espacio restante */
+            flex-grow: 1;
             height: calc(100vh - 12vh);
         }
 
@@ -76,7 +76,7 @@
            PANEL IZQUIERDO: TOP ACUMULADO (CARRUSEL)
            ========================================================= */
         .ranking-panel {
-            flex: 6; /* Proporción 60% */
+            flex: 6; 
             background: var(--card-bg);
             border-radius: 12px;
             border-top: 5px solid var(--primary);
@@ -98,7 +98,6 @@
         .ranking-title { font-size: 3vh; font-weight: 900; color: #111; margin: 0; text-transform: uppercase; }
         .ranking-subtitle { font-size: 1.5vh; color: var(--text-muted); margin-top: 5px; font-weight: bold; text-transform: uppercase; }
         
-        /* Contenedor Adaptativo */
         .ranking-body { flex-grow: 1; position: relative; height: 100%; }
 
         .carousel-view {
@@ -106,7 +105,7 @@
             padding: 3vh 4vw; 
             display: flex; 
             flex-direction: column; 
-            justify-content: space-evenly; /* Rellena los espacios en blanco automáticamente */
+            justify-content: space-evenly; 
             opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out;
             height: 100%;
         }
@@ -119,13 +118,12 @@
         .bar-score { font-size: 3.2vh; font-weight: 900; color: #111;}
         
         .bar-track { width: 100%; height: 2.5vh; background: #f1f5f9; border-radius: 15px; overflow: hidden; border: 1px solid #e2e8f0; }
-        .team-view .bar-track { height: 4vh; } /* Líderes: barras más gruesas porque son solo 3 y hay espacio */
+        .team-view .bar-track { height: 4vh; } 
         .team-view .bar-rank-name { font-size: 3.5vh; }
         .team-view .bar-score { font-size: 4vh; }
         
         .bar-fill { height: 100%; width: 0%; border-radius: 15px; transition: width 1.5s cubic-bezier(0.1, 0.7, 0.1, 1); position: relative; overflow: hidden; }
 
-        /* Degradados */
         .fill-1 { background: linear-gradient(90deg, #fef08a, #d97706); } 
         .fill-2 { background: linear-gradient(90deg, #f1f5f9, #64748b); } 
         .fill-3 { background: linear-gradient(90deg, #fde68a, #9a3412); } 
@@ -144,10 +142,10 @@
         @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
 
         /* =========================================================
-           PANEL DERECHO: CARRUSEL MÁQUINAS EN VIVO
+           PANEL DERECHO: CARRUSEL MÁQUINAS EN VIVO (TOP 5)
            ========================================================= */
         .machines-panel {
-            flex: 4; /* Proporción 40% */
+            flex: 4; 
             background: var(--card-bg);
             border-radius: 12px;
             border-top: 5px solid #111;
@@ -168,7 +166,7 @@
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             padding: 3vh 2.5vw; 
             display: flex; flex-direction: column; 
-            justify-content: space-evenly; /* Ocupa el alto inteligentemente */
+            justify-content: space-evenly; 
             opacity: 0; transform: translateX(30px); transition: all 0.6s ease-out;
             height: 100%;
         }
@@ -183,15 +181,16 @@
         .m-op-row {
             background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px;
             padding: 2vh 1.5vw; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            flex: 1; /* Esto hace que las cajas de turnos crezcan si hay espacio */
-            max-height: 12vh;
+            flex: 1; max-height: 12vh;
         }
         .m-op-row.rank-1 { border-left: 8px solid var(--gold); background-color: #fffbeb; }
         .m-op-row.rank-2 { border-left: 8px solid var(--silver); background-color: #f8fafc; }
         .m-op-row.rank-3 { border-left: 8px solid var(--bronze); background-color: #fff7ed; }
+        .m-op-row.rank-4 { border-left: 8px solid var(--text-muted); }
+        .m-op-row.rank-5 { border-left: 8px solid var(--text-muted); }
         .m-op-row.alert { border-left: 8px solid var(--alert); background-color: #fef2f2; }
 
-        .m-rank-icon { font-size: 3.5vh; width: 5vh; text-align: center; margin-right: 1.5vw; }
+        .m-rank-icon { font-size: 3.5vh; width: 5vh; text-align: center; margin-right: 1.5vw; font-weight: bold; color: var(--text-muted);}
         .m-details { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;}
         .m-name { font-size: 2.5vh; font-weight: 900; margin: 0; text-transform: uppercase; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .m-team { font-size: 1.5vh; font-weight: bold; text-transform: uppercase; margin-top: 4px;}
@@ -203,12 +202,39 @@
         .empty-state span { font-size: 6vh; margin-bottom: 15px;}
         .empty-state p { font-size: 2.5vh; font-weight: bold; color: var(--text-muted); margin: 0;}
 
+        /* =========================================================
+           RESPONSIVE DESIGN (MÓVILES Y TABLETS VERTICALES)
+           ========================================================= */
+        @media (max-width: 1024px) {
+            body { height: auto; overflow-y: auto; padding: 15px; }
+            .header { flex-direction: column; height: auto; gap: 15px; text-align: center; margin-bottom: 30px; }
+            .logo { height: 40px; }
+            .title { font-size: 24px; }
+            .subtitle { font-size: 14px; }
+            .clock { font-size: 16px; padding: 10px 20px; }
+            .main-container { flex-direction: column; height: auto; gap: 30px; }
+            .ranking-panel, .machines-panel { width: 100%; min-height: 60vh; }
+            .ranking-title { font-size: 20px; }
+            .ranking-subtitle { font-size: 12px; }
+            .bar-rank-name, .team-view .bar-rank-name { font-size: 16px; }
+            .bar-score, .team-view .bar-score { font-size: 18px; }
+            .bar-medal { font-size: 20px; width: 30px; }
+            .m-card-title { font-size: 24px; }
+            .m-name { font-size: 18px; }
+            .m-team { font-size: 12px; }
+            .m-eff { font-size: 24px; }
+            .m-rank-icon { font-size: 22px; width: 35px; }
+            .carousel-view { padding: 20px; }
+            .machine-slide { padding: 20px; }
+            .m-op-row { padding: 15px; max-height: none; }
+        }
+
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <span>Extrayendo Datos Estrictos y Adaptando Pantalla... ⏳</span>
+        <span>Extrayendo Historial Completo por Máquina... ⏳</span>
     </div>
 
     <div class="header">
@@ -234,7 +260,7 @@
 
         <!-- PANEL DERECHO: CARRUSEL MÁQUINAS -->
         <div class="machines-panel">
-            <div class="m-carousel-header" id="mPanelTitle">🟢 TOP OPERADORES EN MÁQUINA</div>
+            <div class="m-carousel-header" id="mPanelTitle">🟢 TOP 5 OPERADORES POR MÁQUINA</div>
             <div class="m-carousel-container" id="machinesContainer">
                 <!-- Slides inyectados por JS -->
             </div>
@@ -246,24 +272,21 @@
         const EFF_API = 'https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec';
 
         // ---------------------------------------------------------
-        // DICCIONARIO INTELIGENTE DE PERSONAL Y EQUIPOS
+        // DICCIONARIO INTELIGENTE OFICIAL
         // ---------------------------------------------------------
         const PERSONNEL = [
-            // EQUIPO DILAN BANDES (A)
             { keys: ["dilan"], name: "Dilan Bandes", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["martha"], name: "Martha Zúñiga", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["joel"], name: "Joel Santana", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["magaly"], name: "Magaly Fuentes", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             
-            // EQUIPO MIGUEL REYES (B)
             { keys: ["miguel"], name: "Miguel Reyes", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["efrain"], name: "Efraín Zuleta", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["marisol"], name: "Marisol Carrillo", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             
-            // EQUIPO NILSON CHIQUITO (C)
             { keys: ["nilson"], name: "Nilson Chiquito", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "fill-team-C" },
             { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "fill-team-C" },
             { keys: ["julio"], name: "Julio Alegría", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "fill-team-C" },
@@ -310,7 +333,7 @@
             return parseFloat(str) || 0;
         }
 
-        // Extractor de Fechas a Prueba de Zonas Horarias (Retorna YYYYMMDD)
+        // Extractor Inmortal de Fechas
         function normalizeDateToNum(dateInput) {
             if (!dateInput) return null;
             let str = String(dateInput).trim();
@@ -341,6 +364,13 @@
             let str = String(num);
             if(str.length !== 8) return "";
             return `${str.substring(6,8)}/${str.substring(4,6)}/${str.substring(0,4)}`;
+        }
+
+        function getAvatarInitials(name) {
+            if(!name || name.includes("ASIGNADO")) return "⚠️";
+            let parts = name.trim().split(" ");
+            if(parts.length >= 2) return parts[0][0] + parts[1][0];
+            return parts[0][0];
         }
 
         function startEngine() {
@@ -421,8 +451,8 @@
                 }
             }
 
-            // 2. PROCESAR EFICIENCIAS (MODO AUDITORÍA ESTRICTA)
-            let effByDate = {}; // Panel Derecho (Máquinas)
+            // 2. PROCESAR EFICIENCIAS
+            let machineRank = {}; // Panel Derecho (Top 5 Histórico/Mes por Máquina)
             let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {}; // Operadores
             let teamAyer = {}, teamSemana = {}, teamMes = {}; // Líderes
 
@@ -460,7 +490,6 @@
                         return null;
                     };
 
-                    // Extraer los datos reales
                     let rendRaw = parseRobustFloat(getCol(["disponibilidad", "rendimiento", "eficiencia"]) || (isEffObj ? 0 : row[3]));
                     let calRaw = parseRobustFloat(getCol(["calidad"]) || (isEffObj ? 0 : row[4]));
                     let tno = String(getCol(["turno"]) || (isEffObj ? '' : row[1]) || "").trim().toUpperCase();
@@ -468,23 +497,26 @@
                     let fechaRaw = getCol(["fecha", "dia", "date"]) || (isEffObj ? '' : row[0]);
 
                     let recDateNum = normalizeDateToNum(fechaRaw);
-                    if (!recDateNum) continue; // SIN INVENTOS. Si no hay fecha, se ignora.
+                    
+                    // RESGUARDO: Si no hay fecha, pero hay eficiencia, asumimos hoy para no perder el esfuerzo
+                    if (!recDateNum && (rendRaw > 0 || calRaw > 0)) {
+                        recDateNum = hoyNum;
+                    } else if (!recDateNum) {
+                        continue;
+                    }
 
                     if (maqStr && tno && (rendRaw > 0 || calRaw > 0)) {
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
                         if (isNaN(maqNum)) continue;
                         let letraTurno = tno.includes("MAÑ") ? "M" : (tno.includes("TAR") ? "T" : "N");
 
-                        // IDENTIFICAR OPERADOR REAL
                         let opObj = null;
                         
-                        // 1. En Planilla de Eficiencia
                         for(let key in rClean) {
                             let match = identifyPerson(rClean[key]);
                             if (match) { opObj = match; break; }
                         }
 
-                        // 2. Cruce en Roster por Día/Maq/Turno
                         if (!opObj && rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
                             opObj = rosterMap[recDateNum][maqNum][letraTurno];
                         }
@@ -498,28 +530,23 @@
                         // ==========================================
                         // MATEMÁTICA ESTRICTA (TOPE MAX 100%)
                         // ==========================================
-                        // Convertir a base 100 si vienen en decimal (0.95 -> 95)
                         let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
                         let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
                         
                         let eff = (rend / 100) * (cal / 100) * 100;
-                        
-                        // REGLA: NADIE PUEDE HACER MÁS DEL 100%
                         if (eff > 100) eff = 100.0;
 
-                        if (!effByDate[recDateNum]) effByDate[recDateNum] = {};
-                        if (!effByDate[recDateNum][maqNum]) effByDate[recDateNum][maqNum] = [];
-                        
-                        effByDate[recDateNum][maqNum].push({
-                            shift: letraTurno,
-                            name: opObj.name,
-                            teamInfo: opObj.team,
-                            tColor: opObj.tColor,
-                            missing: isMissing,
-                            eff: eff
-                        });
+                        // ==========================================
+                        // AGREGAR AL RANKING POR MÁQUINA (PANEL DERECHO)
+                        // ==========================================
+                        if (!machineRank[maqNum]) machineRank[maqNum] = {};
+                        if (!machineRank[maqNum][opObj.name]) {
+                            machineRank[maqNum][opObj.name] = { sum: 0, count: 0, obj: opObj, missing: isMissing };
+                        }
+                        machineRank[maqNum][opObj.name].sum += eff;
+                        machineRank[maqNum][opObj.name].count++;
 
-                        // CERO INVENTOS: Solo sumar al Top 5 si la persona ES REAL
+                        // SÓLO ACUMULAR EN EL TOP 5 A PERSONAS REALES (CERO INVENTOS)
                         if (!isMissing) {
                             const addStat = (dict, keyName, val) => {
                                 if (!dict[keyName]) dict[keyName] = { sum: 0, count: 0, obj: opObj };
@@ -548,14 +575,6 @@
                     }
                 }
             }
-
-            // Seleccionar Día de Máquinas en Vivo
-            let allRecDates = Object.keys(effByDate).map(Number).sort((a,b) => b - a);
-            let latestDateNum = allRecDates.length > 0 ? allRecDates[0] : hoyNum;
-
-            document.getElementById('mPanelTitle').innerText = (latestDateNum === hoyNum) ? 
-                `🟢 MÁQUINAS EN LÍNEA (HOY)` : 
-                `🟢 PRODUCCIÓN EN MÁQUINA (${formatNumToDateStr(latestDateNum)})`;
 
             // Encontrar "Ayer" Real
             let bestRankAyer = {}, bestTeamAyer = {};
@@ -587,7 +606,7 @@
             };
 
             renderLeaderboards(viewsData);
-            renderMachines(effByDate[latestDateNum] || {});
+            renderMachines(machineRank);
 
             document.getElementById('loader').style.display = 'none';
         }
@@ -602,11 +621,10 @@
             const createView = (id, list, title, isTeamMode) => {
                 let html = `<div class="carousel-view ${isTeamMode ? 'team-view' : ''}" id="rk-${id}" data-title="${title}">`;
                 
-                // SIN INVENTOS: Si no hay datos, lo muestra vacío transparentemente
                 if (list.length === 0) {
                     html += `
                     <div class="empty-state">
-                        <span>📊</span><p>SIN DATOS PARA ESTE PERIODO</p>
+                        <span>📊</span><p>SIN DATOS REGISTRADOS PARA ESTE PERIODO</p>
                     </div>`;
                 } else {
                     let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
@@ -628,7 +646,7 @@
                                 <div class="bar-score" style="color: ${colorNombre};">${scoreText}</div>
                             </div>
                             <div class="bar-track">
-                                <div class="bar-fill ${colorClass}" data-width="${item.eff}"></div>
+                                <div class="bar-fill ${colorClass}" data-width="${item.eff > 100 ? 100 : item.eff}"></div>
                             </div>
                         </div>`;
                     });
@@ -676,13 +694,13 @@
         }
 
         // ===============================================
-        // RENDER PANEL DERECHO (ADAPTATIVO)
+        // RENDER PANEL DERECHO: TOP 5 HISTÓRICO POR MÁQUINA
         // ===============================================
-        function renderMachines(statsFecha) {
+        function renderMachines(machineRank) {
             let container = document.getElementById('machinesContainer');
             let fullHtml = '';
             
-            let maqKeys = Object.keys(statsFecha).map(Number).sort((a,b)=>a-b);
+            let maqKeys = Object.keys(machineRank).map(Number).sort((a,b)=>a-b);
 
             if(maqKeys.length === 0) {
                 container.innerHTML = `
@@ -695,27 +713,37 @@
             }
 
             maqKeys.forEach((m, idx) => {
-                let shiftsArray = statsFecha[m];
-                // Ranking interno por máquina de mayor a menor
-                shiftsArray.sort((a,b) => b.eff - a.eff);
+                // Sacar a los operadores de esa máquina y promediar su eficiencia histórica
+                let ops = [];
+                for (let name in machineRank[m]) {
+                    ops.push({
+                        name: name,
+                        eff: machineRank[m][name].sum / machineRank[m][name].count,
+                        obj: machineRank[m][name].obj,
+                        missing: machineRank[m][name].missing
+                    });
+                }
+                
+                // Ordenar por eficiencia y tomar el TOP 5
+                ops.sort((a,b) => b.eff - a.eff);
+                let top5 = ops.slice(0, 5);
 
                 let slideHtml = `
                 <div class="machine-slide" id="mq-${idx}">
                     <div class="m-card-title">MÁQUINA ${m}</div>`;
                 
-                let medals = ['🥇', '🥈', '🥉'];
-                shiftsArray.forEach((op, rankIdx) => {
+                let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
+                top5.forEach((op, rankIdx) => {
                     let rankClass = op.missing ? 'alert' : `rank-${rankIdx + 1}`;
-                    let shiftLabel = op.shift === 'M' ? '☀ TURNO MAÑANA' : (op.shift === 'T' ? '🌤 TURNO TARDE' : '🌙 TURNO NOCHE');
-                    // 1 SOLO DECIMAL EXACTO
                     let effStr = op.eff.toFixed(1).replace('.',',') + '%';
+                    let rankIcon = !op.missing ? (medals[rankIdx] || `${rankIdx+1}°`) : '⚠️';
                     
                     slideHtml += `
                     <div class="m-op-row ${rankClass}">
-                        <div class="m-rank-icon">${!op.missing ? (medals[rankIdx] || '') : '⚠️'}</div>
+                        <div class="m-rank-icon">${rankIcon}</div>
                         <div class="m-details">
                             <p class="m-name" style="color: ${op.missing ? 'var(--alert)' : '#222'}">${op.name}</p>
-                            <p class="m-team" style="color: ${op.tColor || 'var(--text-muted)'}">${op.teamInfo || ''} • ${shiftLabel}</p>
+                            <p class="m-team" style="color: ${op.obj.tColor || 'var(--text-muted)'}">${op.obj.team || ''}</p>
                         </div>
                         <div class="m-eff">${effStr}</div>
                     </div>`;
