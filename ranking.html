@@ -20,6 +20,7 @@
             --gold: #fbbf24;
             --silver: #94a3b8;
             --bronze: #b45309;
+            --success: #16a34a;
         }
 
         body {
@@ -141,9 +142,9 @@
             overflow: hidden;
         }
 
-        .fill-1 { background: linear-gradient(90deg, #fef08a, #d97706); } /* Oro */
-        .fill-2 { background: linear-gradient(90deg, #f1f5f9, #64748b); } /* Plata */
-        .fill-3 { background: linear-gradient(90deg, #fde68a, #9a3412); } /* Bronce */
+        .fill-1 { background: linear-gradient(90deg, #fef08a, #d97706); } 
+        .fill-2 { background: linear-gradient(90deg, #f1f5f9, #64748b); } 
+        .fill-3 { background: linear-gradient(90deg, #fde68a, #9a3412); } 
         .fill-4 { background: #38bdf8; }
         .fill-5 { background: #818cf8; }
 
@@ -232,13 +233,14 @@
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             font-size: 1.8vh; font-weight: bold; margin-right: 1vw; color: #fff;
+            flex-shrink: 0;
         }
         .m-op-row.m .m-avatar { background-color: var(--sober-m); }
         .m-op-row.t .m-avatar { background-color: var(--sober-t); }
         .m-op-row.n .m-avatar { background-color: var(--sober-n); }
 
-        .m-details { flex-grow: 1; }
-        .m-name { font-size: 2vh; font-weight: 900; margin: 0; text-transform: uppercase; color: #222;}
+        .m-details { flex-grow: 1; overflow: hidden;}
+        .m-name { font-size: 2vh; font-weight: 900; margin: 0; text-transform: uppercase; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .m-shift { font-size: 1.2vh; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin-top: 2px;}
         .m-eff { font-size: 3vh; font-weight: 900; color: var(--primary); }
 
@@ -254,7 +256,7 @@
 <body>
 
     <div id="loader">
-        <span>Extrayendo Identificadores... ⏳</span>
+        <span>Sincronizando Escáner de Datos... ⏳</span>
     </div>
 
     <div class="header">
@@ -280,7 +282,7 @@
 
         <!-- PANEL DERECHO: MÁQUINAS EN VIVO -->
         <div class="machines-panel">
-            <div class="m-carousel-header" id="mPanelTitle">🟢 PRODUCCIÓN EN LÍNEA</div>
+            <div class="m-carousel-header" id="mPanelTitle">🟢 ÚLTIMA PRODUCCIÓN EN LÍNEA</div>
             <div class="m-carousel-container" id="machinesContainer">
                 <!-- Slides inyectados por JS -->
             </div>
@@ -309,7 +311,7 @@
                 const script = document.createElement('script');
                 script.id = callbackName;
                 script.src = `${url}?callback=${callbackName}&_t=${Date.now()}`;
-                script.onerror = () => reject(`Error`);
+                script.onerror = () => reject(`Error conectando a API`);
                 document.body.appendChild(script);
             });
         }
@@ -322,14 +324,16 @@
             return parseFloat(str) || 0;
         }
 
-        // MOTOR EXTRACTOR DE FECHAS SEGURO (YYYYMMDD numérico)
+        // MOTOR EXTRACTOR DE FECHAS DE ALTA PRECISIÓN (Retorna número YYYYMMDD)
         function normalizeDateToNum(dateInput) {
             if (dateInput === undefined || dateInput === null) return null;
             let str = String(dateInput).trim();
             if (str === "") return null;
             
+            // Si es ISO (2026-10-06T...)
             if (str.includes('T')) str = str.split('T')[0];
             
+            // Si tiene guiones
             if (str.includes('-')) {
                 let p = str.split('-');
                 if (p.length >= 3) {
@@ -337,6 +341,7 @@
                     if (p[2].length === 4) return parseInt(p[2] + p[1].padStart(2,'0') + p[0].substring(0,2).padStart(2,'0'), 10);
                 }
             }
+            // Si tiene barras (DD/MM/YYYY)
             if (str.includes('/')) {
                 let p = str.split(' ')[0].split('/');
                 if (p.length >= 2) {
@@ -347,6 +352,7 @@
                     return parseInt(y + m + d, 10);
                 }
             }
+            // Si es un simple número de día (1 al 31)
             if (/^\d{1,2}$/.test(str)) {
                 let d = str.padStart(2, '0');
                 let m = String(new Date().getMonth() + 1).padStart(2, '0');
@@ -363,7 +369,7 @@
         }
 
         function getAvatarInitials(name) {
-            if(!name || name === "NO ASIGNADO" || name === "OPERADOR") return "?";
+            if(!name || name.startsWith("MAQ ") || name === "NO ASIGNADO") return "?";
             let parts = name.trim().split(" ");
             if(parts.length >= 2) return parts[0][0] + parts[1][0];
             return parts[0][0];
@@ -381,133 +387,159 @@
         function processData(rosterData, effData) {
             let hoyDate = new Date();
             let hoyNum = parseInt(`${hoyDate.getFullYear()}${String(hoyDate.getMonth()+1).padStart(2,'0')}${String(hoyDate.getDate()).padStart(2,'0')}`);
-            let hace7Num = hoyNum - 7; // Simple matemática para filtro
+            let hace7Num = hoyNum - 7; // Lógica filtro semana
             let currentYM = Math.floor(hoyNum / 100); 
 
             document.getElementById('fechaHoy').innerText = `SISTEMA ACTIVO: ${formatNumToDateStr(hoyNum)}`;
 
-            // 1. EXTRACTOR DE NOMBRES INMORTAL (ROSTER)
-            let rosterMap = {}; // rosterMap[dateNum][maqNum][letraTurno] = "Yamile Bermudez"
-            let lastKnownRoster = {}; // lastKnownRoster[maqNum][letraTurno] = "Yamile Bermudez" (Memoria Histórica)
+            // 1. ESCÁNER INTELIGENTE DE TURNOS (ROSTER)
+            let rosterMap = {}; 
+            let lastKnownRoster = {}; 
 
             if (rosterData && rosterData.length > 0) {
                 let isObject = !Array.isArray(rosterData[0]);
-                let headers = isObject ? Object.keys(rosterData[0]) : rosterData[0];
+                let dateCols = [];
+                let startRow = 1;
                 
-                let dateCols = []; 
-                for(let i = 0; i < headers.length; i++) {
-                    let normNum = normalizeDateToNum(headers[i]);
-                    if (normNum) {
-                        dateCols.push({ key: isObject ? headers[i] : i, dateNum: normNum });
+                // Si la planilla devuelve Objetos
+                if (isObject) {
+                    let keys = Object.keys(rosterData[0]);
+                    keys.forEach(k => {
+                        let normNum = normalizeDateToNum(k);
+                        if(normNum) dateCols.push({key: k, dateNum: normNum});
+                    });
+                    startRow = 0;
+                } 
+                // Si devuelve Arreglos, escanea las primeras 5 filas buscando el calendario
+                else {
+                    let maxDates = 0;
+                    let bestRow = 0;
+                    for (let r = 0; r < Math.min(5, rosterData.length); r++) {
+                        let tempDates = [];
+                        for (let c = 0; c < rosterData[r].length; c++) {
+                            let normNum = normalizeDateToNum(rosterData[r][c]);
+                            if(normNum) tempDates.push({key: c, dateNum: normNum});
+                        }
+                        if (tempDates.length > maxDates) {
+                            maxDates = tempDates.length;
+                            dateCols = tempDates;
+                            bestRow = r;
+                        }
                     }
+                    startRow = bestRow + 1;
                 }
 
-                for (let i = isObject ? 0 : 1; i < rosterData.length; i++) {
-                    let row = rosterData[i];
+                if(dateCols.length > 0) {
+                    let firstDateColIndex = isObject ? null : Math.min(...dateCols.map(d => d.key));
                     
-                    // Buscar Inteligente del Nombre del Operador en el Excel de Turnos
-                    let operario = null;
-                    if (isObject) {
-                        operario = row["Operario"] || row["operario"] || row["Nombre"] || row["nombre"] || row[headers[1]] || row[headers[0]];
-                    } else {
-                        operario = row[1];
-                        if (!operario && row.length > 0) operario = row[0];
-                    }
-                    
-                    if (!operario) continue;
-                    operario = String(operario).trim();
-
-                    dateCols.forEach(colObj => {
-                        let asignacion = row[colObj.key];
-                        if (asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
-                            let parts = String(asignacion).split("(");
-                            let maqStr = parts[0].replace(/M/gi, '').trim();
-                            let turnoLetra = parts[1].replace(')', '').trim().toUpperCase();
-
-                            if (!rosterMap[colObj.dateNum]) rosterMap[colObj.dateNum] = {};
-                            
-                            let numeros = maqStr.split('-');
-                            numeros.forEach(num => {
-                                let n = parseInt(num, 10);
-                                if (!isNaN(n)) {
-                                    if (!rosterMap[colObj.dateNum][n]) rosterMap[colObj.dateNum][n] = {};
-                                    rosterMap[colObj.dateNum][n][turnoLetra] = operario;
-
-                                    if (!lastKnownRoster[n]) lastKnownRoster[n] = {};
-                                    lastKnownRoster[n][turnoLetra] = operario;
+                    for (let i = startRow; i < rosterData.length; i++) {
+                        let row = rosterData[i];
+                        
+                        let operario = null;
+                        if (isObject) {
+                            operario = row["Operario"] || row["operario"] || row["Nombre"] || row["nombre"] || row[Object.keys(row)[1]];
+                        } else {
+                            // Busca inteligentemente el nombre en las celdas anteriores a los días del mes
+                            for (let c = firstDateColIndex - 1; c >= 0; c--) {
+                                let val = String(row[c]).trim();
+                                if (val.length > 3 && /[a-zA-Z]/.test(val)) {
+                                    operario = val;
+                                    break;
                                 }
-                            });
+                            }
+                            if(!operario) operario = row[0];
                         }
-                    });
+                        
+                        if (!operario) continue;
+                        operario = String(operario).trim();
+
+                        // Registrar Máquinas asignadas a este operador
+                        dateCols.forEach(colObj => {
+                            let asignacion = isObject ? row[colObj.key] : row[colObj.key];
+                            if (asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
+                                let parts = String(asignacion).split("(");
+                                let maqStr = parts[0].replace(/M/gi, '').replace(/maq/gi,'').trim();
+                                let turnoLetra = parts[1].replace(')', '').trim().toUpperCase();
+
+                                if (!rosterMap[colObj.dateNum]) rosterMap[colObj.dateNum] = {};
+                                
+                                let numeros = maqStr.split('-');
+                                numeros.forEach(num => {
+                                    let n = parseInt(num, 10);
+                                    if (!isNaN(n)) {
+                                        if (!rosterMap[colObj.dateNum][n]) rosterMap[colObj.dateNum][n] = {};
+                                        rosterMap[colObj.dateNum][n][turnoLetra] = operario;
+
+                                        if (!lastKnownRoster[n]) lastKnownRoster[n] = {};
+                                        lastKnownRoster[n][turnoLetra] = operario;
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             }
 
             // 2. PROCESAR EFICIENCIAS
-            let effByDate = {}; // Agrupación para Panel Derecho
+            let effByDate = {}; 
             let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {};
 
             if (effData && effData.length > 0) {
-                effData.forEach(row => {
-                    let rClean = {};
-                    for (let k in row) {
-                        let cleanKey = String(k).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "");
-                        rClean[cleanKey] = row[k];
-                    }
+                // Descifrar cabeceras de Eficiencia
+                let isEffObj = !Array.isArray(effData[0]);
+                let eHeaders = isEffObj ? Object.keys(effData[0]) : effData[0];
+                let idxFecha=0, idxTurno=1, idxMaq=2, idxDisp=3, idxCal=4;
+                
+                if(!isEffObj) {
+                    eHeaders.forEach((h, i) => {
+                        let lh = String(h).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        if(lh.includes("fecha")) idxFecha = i;
+                        if(lh.includes("turno")) idxTurno = i;
+                        if(lh.includes("maquina")) idxMaq = i;
+                        if(lh.includes("disponibilidad")) idxDisp = i;
+                        if(lh.includes("calidad")) idxCal = i;
+                    });
+                }
 
-                    let rendRaw = parseRobustFloat(rClean["disponibilidad"]);
-                    let calRaw = parseRobustFloat(rClean["calidad"]);
-                    let tno = String(rClean["turno"] || "").trim();
-                    let maqStr = String(rClean["maquina"] || "").trim();
+                for (let i = isEffObj ? 0 : 1; i < effData.length; i++) {
+                    let row = effData[i];
                     
-                    let recDateNum = normalizeDateToNum(rClean["fecha"]);
-                    // Si el registro de eficiencia no tiene fecha, lo asignamos a hoy
-                    if (!recDateNum) recDateNum = hoyNum;
+                    let getVal = (idx, name) => isEffObj ? row[Object.keys(row).find(k=>k.toLowerCase().includes(name))] : row[idx];
+
+                    let rendRaw = parseRobustFloat(getVal(idxDisp, "disponibilidad"));
+                    let calRaw = parseRobustFloat(getVal(idxCal, "calidad"));
+                    let tno = String(getVal(idxTurno, "turno") || "").trim();
+                    let maqStr = String(getVal(idxMaq, "maquina") || "").trim();
+                    
+                    let recDateNum = normalizeDateToNum(getVal(idxFecha, "fecha"));
+                    if (!recDateNum) recDateNum = hoyNum; 
 
                     if (maqStr && tno) {
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
                         let letraTurno = tno.toLowerCase().includes("mañ") ? "M" : (tno.toLowerCase().includes("tar") ? "T" : "N");
 
-                        // *** BÚSQUEDA IMPLACABLE DEL NOMBRE DE LA PERSONA ***
-                        let opNombre = null;
-
-                        // 1. Buscamos primero en el mismo Excel de Eficiencia por si acaso el usuario lo digitó ahí
-                        for (let k in rClean) {
-                            if (k.includes("operador") || k.includes("operario") || k.includes("nombre")) {
-                                if (rClean[k] && String(rClean[k]).trim() !== "") {
-                                    let origKey = Object.keys(row).find(key => String(key).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "") === k);
-                                    opNombre = String(row[origKey]).trim();
-                                    break;
-                                }
-                            }
-                        }
-
-                        // 2. Si no lo encuentra, lo cruzamos con el Roster Exacto de esa Fecha
-                        if (!opNombre && rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
+                        // BUSCAR OPERADOR (Cruce Fuerte)
+                        let opNombre = "NO ASIGNADO";
+                        
+                        if (rosterMap[recDateNum] && rosterMap[recDateNum][maqNum] && rosterMap[recDateNum][maqNum][letraTurno]) {
                             opNombre = rosterMap[recDateNum][maqNum][letraTurno];
-                        }
-
-                        // 3. Memoria Histórica: Si el operario no estaba agendado hoy, saca el último conocido para esa máquina
-                        if (!opNombre && lastKnownRoster[maqNum] && lastKnownRoster[maqNum][letraTurno]) {
+                        } else if (lastKnownRoster[maqNum] && lastKnownRoster[maqNum][letraTurno]) {
                             opNombre = lastKnownRoster[maqNum][letraTurno];
                         }
 
-                        // 4. Fallback final
-                        if (!opNombre) opNombre = "NO ASIGNADO";
-
-                        // Matemática de Eficiencia Neta
+                        // Cálculo
                         let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
                         let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
                         if (rend > 100) rend = 100;
                         if (cal > 100) cal = 100;
                         let eff = (rend / 100) * (cal / 100) * 100;
 
-                        // Guardar para carrusel en vivo
                         if (!effByDate[recDateNum]) effByDate[recDateNum] = {};
                         if (!effByDate[recDateNum][maqNum]) effByDate[recDateNum][maqNum] = {};
                         effByDate[recDateNum][maqNum][letraTurno] = { name: opNombre, eff: eff };
 
-                        // Matemática Acumulativa (Solo personas reales)
-                        if (opNombre !== "NO ASIGNADO" && opNombre.toUpperCase() !== "OPERADOR") {
+                        // Matemática Acumulativa (Ignora Fantasmas)
+                        if (opNombre !== "NO ASIGNADO" && !opNombre.toUpperCase().includes("OPERADOR")) {
                             
                             const addStat = (dict, name, val) => {
                                 if (!dict[name]) dict[name] = { sum: 0, count: 0 };
@@ -521,17 +553,16 @@
                             
                             if (recDateNum >= hace7Num) addStat(rankSemana, opNombre, eff);
                             
-                            // Guardar para Ayer (Buscamos todas las fechas anteriores a hoy)
                             if (recDateNum < hoyNum) {
                                 if (!rankAyer[recDateNum]) rankAyer[recDateNum] = {};
                                 addStat(rankAyer[recDateNum], opNombre, eff);
                             }
                         }
                     }
-                });
+                }
             }
 
-            // Seleccionar Panel Derecho: La fecha más reciente con datos
+            // Seleccionar Panel Derecho
             let allRecDates = Object.keys(effByDate).map(Number).sort((a,b) => b - a);
             let latestDateNum = allRecDates.length > 0 ? allRecDates[0] : hoyNum;
 
@@ -539,7 +570,6 @@
                 `🟢 PRODUCCIÓN EN LÍNEA (HOY)` : 
                 `🟢 ÚLTIMA PRODUCCIÓN (${formatNumToDateStr(latestDateNum)})`;
 
-            // Buscar fecha del día anterior cerrado más reciente para el TOP 5 "Ayer"
             let bestAyerData = {};
             let ultimaFechaCerradaNum = null;
             let sortedFechasAyer = Object.keys(rankAyer).map(Number).sort((a,b) => b - a);
@@ -548,7 +578,7 @@
                 bestAyerData = rankAyer[ultimaFechaCerradaNum];
             }
 
-            // 3. GENERAR LISTAS TOP 5 (Garantizadas)
+            // 3. GENERAR LISTAS TOP 5
             const getTop5 = (dict) => {
                 let arr = [];
                 for(let name in dict) {
@@ -562,12 +592,11 @@
             let listSemana = getTop5(rankSemana);
             let listMes = getTop5(rankMes);
 
-            // Resguardo Extremo: Si no hay gente en la semana, hereda del histórico mensual o global
+            // Resguardo
             if (listAyer.length === 0) listAyer = listMes.length > 0 ? listMes : listGlobal;
             if (listSemana.length === 0) listSemana = listMes.length > 0 ? listMes : listGlobal;
             if (listMes.length === 0) listMes = listGlobal;
 
-            // 4. DIBUJAR VISTAS
             renderLeaderboards(listAyer, listSemana, listMes, listGlobal, ultimaFechaCerradaNum ? formatNumToDateStr(ultimaFechaCerradaNum) : null);
             renderMachines(effByDate[latestDateNum] || {});
 
