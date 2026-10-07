@@ -513,6 +513,11 @@
         let rotationTimer = 0;
         const ROTATION_DURATION = 12; // 12 segundos por pantalla
 
+        function getSafeDateAgo(baseDate, days) {
+            let d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate() - days);
+            return parseInt(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
+        }
+
         function changeTimeframe(tf) {
             currentTimeframe = tf;
             rotationTimer = 0; // Reinicia la barra
@@ -654,6 +659,12 @@
             return null;
         }
 
+        function formatNumToDateStr(num) {
+            let str = String(num);
+            if(str.length !== 8) return "";
+            return `${str.substring(6,8)}/${str.substring(4,6)}/${str.substring(0,4)}`;
+        }
+
         // Función de Formateo Final para Pantalla
         const formatPctHtml = (val, hasRecord) => {
             if (val === null || isNaN(val)) return '<span style="color:#cbd5e1">-</span>';
@@ -676,7 +687,7 @@
 
             let hoyDate = new Date();
             let hoyNum = parseInt(`${hoyDate.getFullYear()}${String(hoyDate.getMonth()+1).padStart(2,'0')}${String(hoyDate.getDate()).padStart(2,'0')}`);
-            let hace7Num = hoyNum - 7; 
+            let hace7Num = getSafeDateAgo(hoyDate, 7); 
             let currentYM = Math.floor(hoyNum / 100); 
 
             // Primer barrido para determinar la fecha "Día Anterior" real del set de datos
@@ -690,10 +701,10 @@
                 let recDateNum = normalizeDateToNum(rClean["fecha"] || rClean["dia"] || rClean["date"]);
                 if (recDateNum) allValidDates.push(recDateNum);
             });
-            allValidDates.sort((a,b) => b - a);
+            allValidDates = Array.from(new Set(allValidDates)).sort((a,b) => b - a);
             let latestDateNum = allValidDates.length > 0 ? allValidDates[0] : hoyNum;
             
-            // "Día Anterior" es la fecha más reciente que sea menor que hoy
+            // "Día Anterior" es la fecha más reciente que sea menor que hoy en el set de datos
             let pastDates = allValidDates.filter(d => d < hoyNum);
             let diaAnteriorNum = pastDates.length > 0 ? pastDates[0] : null;
 
@@ -755,9 +766,9 @@
                 else if (tnoRaw.includes("TAR") || tnoRaw.includes("T")) tno = "Tarde";
                 else if (tnoRaw.includes("NOC") || tnoRaw.includes("N")) tno = "Noche";
 
+                // Normalización universal de máquinas (Inyectora x o MQ X)
                 let maqRaw = String(rClean["maquina"] || rClean["inyectora"] || "").trim().toUpperCase();
                 let maq = maqRaw;
-                // Si viene solo un número "3", lo convertimos a "Inyectora 3" para uniformar
                 if (/^\d+$/.test(maqRaw)) {
                     maq = `Inyectora ${maqRaw}`;
                 } else if (maqRaw.includes("IN") || maqRaw.includes("MQ") || maqRaw.includes("MA")) {
@@ -793,7 +804,6 @@
                     if (opName) {
                         activeLeader = identifyLeaderByTeam(opName);
                     } else if (cachedRoster[recDateNum] && cachedRoster[recDateNum][maq]) {
-                        // Buscar asignación de turno (M, T, N) para ese día y máquina
                         let letraTurno = tno.includes("Mañ") ? "M" : (tno.includes("Tar") ? "T" : "N");
                         if (cachedRoster[recDateNum][maq][letraTurno]) {
                             activeLeader = cachedRoster[recDateNum][maq][letraTurno].team;
@@ -867,7 +877,6 @@
             };
 
             const maqLabels = Object.keys(maquinaTurnoData).sort((a, b) => {
-                // Ordenador inteligente por número (MQ 1, MQ 2...) en lugar de alfabético crudo
                 let aNum = parseInt(a.replace(/\D/g, ''), 10) || 0;
                 let bNum = parseInt(b.replace(/\D/g, ''), 10) || 0;
                 return aNum - bNum;
