@@ -63,7 +63,7 @@
         }
         .logo { height: 100%; max-height: 45px; object-fit: contain; }
         .title-box { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-        .title { font-size: 3.5vh; font-weight: 900; color: #000; letter-spacing: 1px; text-transform: uppercase; line-height: 1; }
+        .title { margin: 0; font-size: 3.5vh; font-weight: 900; color: #000; letter-spacing: 1px; text-transform: uppercase; line-height: 1; }
         .subtitle { color: var(--primary); font-weight: bold; font-size: 1.8vh; margin-top: 4px; text-transform: uppercase; letter-spacing: 3px; }
         .clock { font-size: 2.4vh; font-weight: bold; color: var(--text-dark); background: #ffffff; padding: 0.8vh 1.5vw; border-radius: 30px; letter-spacing: 2px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
@@ -124,6 +124,7 @@
             height: 100%;
             max-width: 15%;
             position: relative;
+            min-width: 0; /* Permite flexión flexible */
         }
         .view-lideres .col-item { max-width: 25%; } /* Menos columnas, más anchas */
 
@@ -276,31 +277,111 @@
             text-transform: uppercase;
         }
 
-        /* =========================================================
-           RESPONSIVE DESIGN (MÓVILES Y TABLETS VERTICALES)
-           ========================================================= */
-        @media (max-width: 1024px) {
-            body { height: auto; overflow-y: auto; padding: 15px; }
-            .header { flex-direction: column; height: auto; gap: 15px; text-align: center; margin-bottom: 25px; }
-            .logo { height: 40px; }
-            .title { font-size: 24px; }
-            .subtitle { font-size: 14px; }
-            .clock { font-size: 16px; padding: 10px 20px; }
-            .main-container { flex-direction: column; height: auto; gap: 30px; }
-            .ranking-panel, .machines-panel { width: 100%; min-height: 60vh; }
-            .ranking-title { font-size: 20px; }
-            .ranking-subtitle { font-size: 12px; }
-            .col-item { max-width: 18%; }
-            .col-score { font-size: 1.6vh; }
-            .col-bar-3d-wrapper { height: 12vh; }
-            .col-name { font-size: 1.1vh; }
-        }
-
         /* Loader & Empty States */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-light); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: var(--primary); font-size: 3.5vh; font-weight: bold;}
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; opacity: 0.6; text-align: center; margin: auto;}
         .empty-state span { font-size: 5vh; margin-bottom: 10px;}
         .empty-state p { font-size: 2vh; font-weight: bold; color: var(--text-muted); margin: 0;}
+
+        /* =========================================================
+           RESPONSIVE DESIGN (MÓVILES Y TABLETS VERTICALES)
+           ========================================================= */
+        @media (max-width: 1024px) {
+            body {
+                height: auto; /* Permite hacer scroll */
+                overflow-y: auto; 
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                height: auto;
+                gap: 15px;
+                text-align: center;
+                margin-bottom: 25px;
+            }
+            .logo { height: 40px; }
+            .title { font-size: 24px; }
+            .subtitle { font-size: 14px; }
+            .clock { font-size: 16px; padding: 10px 20px; }
+
+            .grid-container {
+                display: flex;
+                flex-direction: column; /* Apila cuadrantes */
+                height: auto;
+                gap: 25px;
+            }
+
+            .quadrant {
+                width: 100%;
+                min-height: 380px; /* Asegura un área estable para las columnas */
+                padding: 20px 15px;
+            }
+            
+            .q-title { font-size: 18px; }
+            .q-subtitle { font-size: 11px; }
+
+            .q-body {
+                flex-direction: row; /* Fuerza a las columnas a estar una al lado de la otra */
+                gap: 8px;
+                align-items: flex-end;
+                justify-content: space-evenly;
+                height: auto;
+                min-height: 250px;
+                padding-top: 10px;
+            }
+
+            .col-item {
+                max-width: 18%; /* Permite que utilicen el ancho completo del espacio */
+                flex: 1;
+                min-width: 0;
+            }
+            .view-lideres .col-item { max-width: 28%; }
+
+            .col-score {
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+
+            .col-bar-3d-wrapper {
+                height: 120px; /* Tamaño físico seguro para móvil */
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .col-medal {
+                font-size: 18px;
+                width: 24px;
+                height: 24px;
+                margin-bottom: 4px;
+            }
+
+            .col-name {
+                font-size: 10px;
+                white-space: normal; /* Permite saltar de línea */
+                display: -webkit-box;
+                -webkit-line-clamp: 2; /* Máximo dos líneas */
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                line-height: 1.2;
+                height: 24px; /* Espacio exacto para dos líneas sin pisar el resto */
+                text-overflow: ellipsis;
+            }
+
+            .col-sub {
+                font-size: 8px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 2px;
+            }
+
+            .col-badge {
+                font-size: 8px;
+                padding: 1px 3px;
+                margin-top: 2px;
+            }
+        }
 
     </style>
 </head>
@@ -370,7 +451,7 @@
             return null;
         }
 
-        let maqInterval;
+        let rkInterval, mqInterval;
         let globalDataCache = null; 
 
         setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('es-CL'); }, 1000);
@@ -663,7 +744,7 @@
                     let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
                     
                     let isMedal = index < 3;
-                    let displayLabelOrMedal = isMedal ? `<span class="col-medal">${medals[index]}</span>` : `<div style="font-size:1.1vh; font-weight:800; color:var(--text-muted); padding:3px 0;">${index+1}°</div>`;
+                    let displayLabelOrMedal = isMedal ? `<span class="col-medal">${medals[index]}</span>` : `<div class="col-medal" style="font-size:1.1vh; font-weight:800; color:var(--text-muted); padding:3px 0;">${index+1}°</div>`;
                     
                     let col3DClass = isTeamMode ? item.obj.tClass : `rank-${index+1}`;
                     let colorNombre = (index === 0 && !isTeamMode) ? 'var(--gold-dark)' : (isTeamMode ? item.obj.tColor : '#1e293b');
