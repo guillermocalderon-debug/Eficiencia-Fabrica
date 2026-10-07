@@ -41,7 +41,7 @@
             color: var(--text-dark);
             margin: 0;
             padding: 2vh 2vw;
-            height: 100vh; /* Ocupa exactamente el 100% de la TV */
+            height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -142,7 +142,7 @@
         @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
 
         /* =========================================================
-           PANEL DERECHO: CARRUSEL MÁQUINAS EN VIVO (TOP 5)
+           PANEL DERECHO: 3 VISUALES POR MÁQUINA
            ========================================================= */
         .machines-panel {
             flex: 4; 
@@ -174,9 +174,16 @@
 
         .m-card-title {
             text-align: center; font-size: 4vh; font-weight: 900; color: #111;
-            margin-bottom: 2vh; text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 1vh;
+            margin-bottom: 0.5vh; text-transform: uppercase; 
             flex-shrink: 0;
         }
+
+        .m-card-subtitle {
+            text-align: center; font-size: 1.8vh; font-weight: 900; color: var(--text-muted);
+            text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5vh; margin-bottom: 1vh;
+            letter-spacing: 0.5px;
+        }
+        .m-card-subtitle.highlight { color: var(--primary); }
 
         .m-op-row {
             background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px;
@@ -186,9 +193,10 @@
         .m-op-row.rank-1 { border-left: 8px solid var(--gold); background-color: #fffbeb; }
         .m-op-row.rank-2 { border-left: 8px solid var(--silver); background-color: #f8fafc; }
         .m-op-row.rank-3 { border-left: 8px solid var(--bronze); background-color: #fff7ed; }
-        .m-op-row.rank-4 { border-left: 8px solid var(--text-muted); }
-        .m-op-row.rank-5 { border-left: 8px solid var(--text-muted); }
         .m-op-row.alert { border-left: 8px solid var(--alert); background-color: #fef2f2; }
+        .m-op-row.shift-M { border-left: 8px solid var(--sober-m); }
+        .m-op-row.shift-T { border-left: 8px solid var(--sober-t); }
+        .m-op-row.shift-N { border-left: 8px solid var(--sober-n); }
 
         .m-rank-icon { font-size: 3.5vh; width: 5vh; text-align: center; margin-right: 1.5vw; font-weight: bold; color: var(--text-muted);}
         .m-details { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;}
@@ -220,6 +228,7 @@
             .bar-score, .team-view .bar-score { font-size: 18px; }
             .bar-medal { font-size: 20px; width: 30px; }
             .m-card-title { font-size: 24px; }
+            .m-card-subtitle { font-size: 12px; }
             .m-name { font-size: 18px; }
             .m-team { font-size: 12px; }
             .m-eff { font-size: 24px; }
@@ -234,7 +243,7 @@
 <body>
 
     <div id="loader">
-        <span>Extrayendo Historial Completo por Máquina... ⏳</span>
+        <span>Generando Vistas de Auditoría... ⏳</span>
     </div>
 
     <div class="header">
@@ -251,16 +260,16 @@
         <div class="ranking-panel">
             <div class="ranking-header">
                 <h2 class="ranking-title" id="rkTitle">CARGANDO...</h2>
-                <div class="ranking-subtitle">Evaluación de Eficiencia Efectiva Neta (Datos Oficiales)</div>
+                <div class="ranking-subtitle">Evaluación de Eficiencia Efectiva Neta (Auditoría)</div>
             </div>
             <div class="ranking-body" id="rankingBody">
                 <!-- Vistas inyectadas por JS -->
             </div>
         </div>
 
-        <!-- PANEL DERECHO: CARRUSEL MÁQUINAS -->
+        <!-- PANEL DERECHO: CARRUSEL MÁQUINAS (3 VISUALES) -->
         <div class="machines-panel">
-            <div class="m-carousel-header" id="mPanelTitle">🟢 TOP 5 OPERADORES POR MÁQUINA</div>
+            <div class="m-carousel-header">🟢 RENDIMIENTO POR MÁQUINA</div>
             <div class="m-carousel-container" id="machinesContainer">
                 <!-- Slides inyectados por JS -->
             </div>
@@ -272,21 +281,24 @@
         const EFF_API = 'https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec';
 
         // ---------------------------------------------------------
-        // DICCIONARIO INTELIGENTE OFICIAL
+        // DICCIONARIO INTELIGENTE DE PERSONAL Y EQUIPOS
         // ---------------------------------------------------------
         const PERSONNEL = [
+            // EQUIPO DILAN BANDES (A)
             { keys: ["dilan"], name: "Dilan Bandes", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["martha"], name: "Martha Zúñiga", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["joel"], name: "Joel Santana", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             { keys: ["magaly"], name: "Magaly Fuentes", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "fill-team-A" },
             
+            // EQUIPO MIGUEL REYES (B)
             { keys: ["miguel"], name: "Miguel Reyes", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["efrain"], name: "Efraín Zuleta", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             { keys: ["marisol"], name: "Marisol Carrillo", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "fill-team-B" },
             
+            // EQUIPO NILSON CHIQUITO (C)
             { keys: ["nilson"], name: "Nilson Chiquito", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "fill-team-C" },
             { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "fill-team-C" },
             { keys: ["julio"], name: "Julio Alegría", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "fill-team-C" },
@@ -333,7 +345,6 @@
             return parseFloat(str) || 0;
         }
 
-        // Extractor Inmortal de Fechas
         function normalizeDateToNum(dateInput) {
             if (!dateInput) return null;
             let str = String(dateInput).trim();
@@ -451,10 +462,13 @@
                 }
             }
 
-            // 2. PROCESAR EFICIENCIAS
-            let machineRank = {}; // Panel Derecho (Top 5 Histórico/Mes por Máquina)
-            let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {}; // Operadores
-            let teamAyer = {}, teamSemana = {}, teamMes = {}; // Líderes
+            // 2. PROCESAR EFICIENCIAS (MODO AUDITORÍA ESTRICTA)
+            let effByDate = {}; // Para el visual "Día Anterior"
+            let machineRankSemana = {}; // Top 3 Semana por Máquina
+            let machineRankMes = {}; // Top 3 Mes por Máquina
+            
+            let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {}; // Operadores Panel Izq
+            let teamAyer = {}, teamSemana = {}, teamMes = {}; // Líderes Panel Izq
 
             if (effData && effData.length > 0) {
                 let isEffObj = !Array.isArray(effData[0]);
@@ -497,13 +511,7 @@
                     let fechaRaw = getCol(["fecha", "dia", "date"]) || (isEffObj ? '' : row[0]);
 
                     let recDateNum = normalizeDateToNum(fechaRaw);
-                    
-                    // RESGUARDO: Si no hay fecha, pero hay eficiencia, asumimos hoy para no perder el esfuerzo
-                    if (!recDateNum && (rendRaw > 0 || calRaw > 0)) {
-                        recDateNum = hoyNum;
-                    } else if (!recDateNum) {
-                        continue;
-                    }
+                    if (!recDateNum) continue; 
 
                     if (maqStr && tno && (rendRaw > 0 || calRaw > 0)) {
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
@@ -532,30 +540,40 @@
                         // ==========================================
                         let rend = (rendRaw <= 1.5 && rendRaw !== 0) ? rendRaw * 100 : rendRaw;
                         let cal = (calRaw <= 1.5 && calRaw !== 0) ? calRaw * 100 : calRaw;
-                        
                         let eff = (rend / 100) * (cal / 100) * 100;
                         if (eff > 100) eff = 100.0;
 
-                        // ==========================================
-                        // AGREGAR AL RANKING POR MÁQUINA (PANEL DERECHO)
-                        // ==========================================
-                        if (!machineRank[maqNum]) machineRank[maqNum] = {};
-                        if (!machineRank[maqNum][opObj.name]) {
-                            machineRank[maqNum][opObj.name] = { sum: 0, count: 0, obj: opObj, missing: isMissing };
-                        }
-                        machineRank[maqNum][opObj.name].sum += eff;
-                        machineRank[maqNum][opObj.name].count++;
+                        // Guardar para Visual 1: Producción Exacta por Día
+                        if (!effByDate[recDateNum]) effByDate[recDateNum] = {};
+                        if (!effByDate[recDateNum][maqNum]) effByDate[recDateNum][maqNum] = [];
+                        effByDate[recDateNum][maqNum].push({
+                            shift: letraTurno, name: opObj.name, teamInfo: opObj.team, tColor: opObj.tColor, missing: isMissing, eff: eff
+                        });
 
-                        // SÓLO ACUMULAR EN EL TOP 5 A PERSONAS REALES (CERO INVENTOS)
+                        // CERO INVENTOS: Solo sumar al Top 5 a PERSONAS REALES
                         if (!isMissing) {
+                            let recYM = Math.floor(recDateNum / 100);
+
+                            // Acumular para Visual 2 y 3: Rankings de Máquina
+                            if (recDateNum >= hace7Num) {
+                                if (!machineRankSemana[maqNum]) machineRankSemana[maqNum] = {};
+                                if (!machineRankSemana[maqNum][opObj.name]) machineRankSemana[maqNum][opObj.name] = { sum: 0, count: 0, obj: opObj };
+                                machineRankSemana[maqNum][opObj.name].sum += eff;
+                                machineRankSemana[maqNum][opObj.name].count++;
+                            }
+                            if (recYM === currentYM) {
+                                if (!machineRankMes[maqNum]) machineRankMes[maqNum] = {};
+                                if (!machineRankMes[maqNum][opObj.name]) machineRankMes[maqNum][opObj.name] = { sum: 0, count: 0, obj: opObj };
+                                machineRankMes[maqNum][opObj.name].sum += eff;
+                                machineRankMes[maqNum][opObj.name].count++;
+                            }
+
+                            // Acumulados Panel Izquierdo
                             const addStat = (dict, keyName, val) => {
                                 if (!dict[keyName]) dict[keyName] = { sum: 0, count: 0, obj: opObj };
                                 dict[keyName].sum += val; dict[keyName].count++;
                             };
 
-                            let recYM = Math.floor(recDateNum / 100);
-
-                            // Acumulados Operador
                             addStat(rankGlobal, opObj.name, eff);
                             if (recYM === currentYM) addStat(rankMes, opObj.name, eff);
                             if (recDateNum >= hace7Num) addStat(rankSemana, opObj.name, eff);
@@ -564,7 +582,6 @@
                                 addStat(rankAyer[recDateNum], opObj.name, eff);
                             }
 
-                            // Acumulados Equipos (Líderes)
                             if (recYM === currentYM) addStat(teamMes, opObj.team, eff);
                             if (recDateNum >= hace7Num) addStat(teamSemana, opObj.team, eff);
                             if (recDateNum < hoyNum) {
@@ -586,33 +603,30 @@
                 bestTeamAyer = teamAyer[ultimaFechaCerradaNum] || {};
             }
 
-            // ORDENAR RANKINGS
+            // Preparar Listas Panel Izquierdo
             const getTopList = (dict, limit) => {
                 let arr = [];
-                for(let key in dict) {
-                    arr.push({ name: key, eff: dict[key].sum / dict[key].count, obj: dict[key].obj });
-                }
+                for(let key in dict) { arr.push({ name: key, eff: dict[key].sum / dict[key].count, obj: dict[key].obj }); }
                 return arr.sort((a,b) => b.eff - a.eff).slice(0, limit);
             };
 
-            let viewsData = {
+            let leftData = {
                 fechaAyerStr: ultimaFechaCerradaNum ? formatNumToDateStr(ultimaFechaCerradaNum) : "SIN CIERRE PREVIO",
-                opAyer: getTopList(bestRankAyer, 5),
-                opSemana: getTopList(rankSemana, 5),
-                opMes: getTopList(rankMes, 5),
-                teamAyer: getTopList(bestTeamAyer, 3),
-                teamSemana: getTopList(teamSemana, 3),
-                teamMes: getTopList(teamMes, 3)
+                opAyer: getTopList(bestRankAyer, 5), opSemana: getTopList(rankSemana, 5), opMes: getTopList(rankMes, 5),
+                teamAyer: getTopList(bestTeamAyer, 3), teamSemana: getTopList(teamSemana, 3), teamMes: getTopList(teamMes, 3)
             };
 
-            renderLeaderboards(viewsData);
-            renderMachines(machineRank);
+            renderLeaderboards(leftData);
+            
+            // Preparar Listas Panel Derecho (Las 3 Visuales por Máquina)
+            let rightSlides = generateMachineSlides(effByDate[ultimaFechaCerradaNum || hoyNum] || {}, machineRankSemana, machineRankMes, ultimaFechaCerradaNum);
+            renderMachines(rightSlides);
 
             document.getElementById('loader').style.display = 'none';
         }
 
         // ===============================================
-        // RENDER PANEL IZQUIERDO (ADAPTATIVO)
+        // RENDER PANEL IZQUIERDO
         // ===============================================
         function renderLeaderboards(data) {
             let container = document.getElementById('rankingBody');
@@ -620,18 +634,12 @@
 
             const createView = (id, list, title, isTeamMode) => {
                 let html = `<div class="carousel-view ${isTeamMode ? 'team-view' : ''}" id="rk-${id}" data-title="${title}">`;
-                
                 if (list.length === 0) {
-                    html += `
-                    <div class="empty-state">
-                        <span>📊</span><p>SIN DATOS REGISTRADOS PARA ESTE PERIODO</p>
-                    </div>`;
+                    html += `<div class="empty-state"><span>📊</span><p>SIN DATOS REGISTRADOS PARA ESTE PERIODO</p></div>`;
                 } else {
                     let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
                     list.forEach((item, index) => {
-                        // 1 SOLO DECIMAL EXACTO
                         let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
-                        
                         let colorClass = isTeamMode ? item.obj.tClass : `fill-${index+1}`;
                         let colorNombre = (index === 0 && !isTeamMode) ? 'var(--gold)' : (isTeamMode ? item.obj.tColor : '#222');
                         if (isTeamMode && index > 0) colorNombre = '#222';
@@ -669,19 +677,15 @@
             if (views.length === 0) return;
             
             const showRk = (index) => {
-                views.forEach(v => {
-                    v.classList.remove('active');
-                    v.querySelectorAll('.bar-fill').forEach(b => b.style.width = '0%');
-                });
+                views.forEach(v => v.classList.remove('active'));
+                views.forEach(v => v.querySelectorAll('.bar-fill').forEach(b => b.style.width = '0%'));
                 
                 let activeView = document.getElementById(`rk-${index}`);
                 activeView.classList.add('active');
                 document.getElementById('rkTitle').innerText = activeView.getAttribute('data-title');
                 
                 setTimeout(() => {
-                    activeView.querySelectorAll('.bar-fill').forEach(b => {
-                        b.style.width = b.getAttribute('data-width') + '%';
-                    });
+                    activeView.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.getAttribute('data-width') + '%'; });
                 }, 100);
             };
 
@@ -694,15 +698,110 @@
         }
 
         // ===============================================
-        // RENDER PANEL DERECHO: TOP 5 HISTÓRICO POR MÁQUINA
+        // PREPARAR LAS 3 VISUALES PARA EL PANEL DERECHO
         // ===============================================
-        function renderMachines(machineRank) {
-            let container = document.getElementById('machinesContainer');
-            let fullHtml = '';
-            
-            let maqKeys = Object.keys(machineRank).map(Number).sort((a,b)=>a-b);
+        function generateMachineSlides(dailyData, rankSemana, rankMes, fechaNum) {
+            let allSlides = [];
+            let maqSet = new Set([...Object.keys(dailyData), ...Object.keys(rankSemana), ...Object.keys(rankMes)]);
+            let maqKeys = Array.from(maqSet).map(Number).sort((a,b)=>a-b);
+            let fechaStr = fechaNum ? formatNumToDateStr(fechaNum) : 'HOY';
 
-            if(maqKeys.length === 0) {
+            maqKeys.forEach((m) => {
+                // VISUAL 1: PRODUCCIÓN DEL DÍA ANTERIOR
+                if (dailyData[m]) {
+                    let shiftsArray = [...dailyData[m]];
+                    shiftsArray.sort((a,b) => b.eff - a.eff);
+                    let rowsHtml = shiftsArray.map(op => {
+                        let rankClass = op.missing ? 'alert' : `shift-${op.shift}`;
+                        let shiftLabel = op.shift === 'M' ? '☀ TURNO MAÑANA' : (op.shift === 'T' ? '🌤 TURNO TARDE' : '🌙 TURNO NOCHE');
+                        let effStr = op.eff.toFixed(1).replace('.',',') + '%';
+                        return `
+                        <div class="m-op-row ${rankClass}">
+                            <div class="m-rank-icon">${op.missing ? '⚠️' : '📍'}</div>
+                            <div class="m-details">
+                                <p class="m-name" style="color: ${op.missing ? 'var(--alert)' : '#222'}">${op.name}</p>
+                                <p class="m-team" style="color: ${op.tColor || 'var(--text-muted)'}">${op.teamInfo || ''} • ${shiftLabel}</p>
+                            </div>
+                            <div class="m-eff">${effStr}</div>
+                        </div>`;
+                    }).join('');
+
+                    allSlides.push(`
+                    <div class="machine-slide">
+                        <div class="m-card-title">MÁQUINA ${m}</div>
+                        <div class="m-card-subtitle highlight">📊 PRODUCCIÓN DÍA ANTERIOR (${fechaStr})</div>
+                        ${rowsHtml}
+                    </div>`);
+                }
+
+                // VISUAL 2: TOP 3 SEMANAL
+                if (rankSemana[m]) {
+                    let ops = [];
+                    for(let k in rankSemana[m]) ops.push({ name: k, eff: rankSemana[m][k].sum / rankSemana[m][k].count, obj: rankSemana[m][k].obj });
+                    ops.sort((a,b) => b.eff - a.eff);
+                    let top3 = ops.slice(0, 3);
+                    
+                    let medals = ['🥇', '🥈', '🥉'];
+                    let rowsHtml = top3.map((op, idx) => {
+                        let effStr = op.eff.toFixed(1).replace('.',',') + '%';
+                        return `
+                        <div class="m-op-row rank-${idx+1}">
+                            <div class="m-rank-icon">${medals[idx]}</div>
+                            <div class="m-details">
+                                <p class="m-name">${op.name}</p>
+                                <p class="m-team" style="color: ${op.obj.tColor || 'var(--text-muted)'}">${op.obj.team || ''}</p>
+                            </div>
+                            <div class="m-eff">${effStr}</div>
+                        </div>`;
+                    }).join('');
+
+                    allSlides.push(`
+                    <div class="machine-slide">
+                        <div class="m-card-title">MÁQUINA ${m}</div>
+                        <div class="m-card-subtitle">🏆 TOP 3 OPERADORES (ÚLTIMOS 7 DÍAS)</div>
+                        ${rowsHtml}
+                    </div>`);
+                }
+
+                // VISUAL 3: TOP 3 MENSUAL
+                if (rankMes[m]) {
+                    let ops = [];
+                    for(let k in rankMes[m]) ops.push({ name: k, eff: rankMes[m][k].sum / rankMes[m][k].count, obj: rankMes[m][k].obj });
+                    ops.sort((a,b) => b.eff - a.eff);
+                    let top3 = ops.slice(0, 3);
+                    
+                    let medals = ['🥇', '🥈', '🥉'];
+                    let rowsHtml = top3.map((op, idx) => {
+                        let effStr = op.eff.toFixed(1).replace('.',',') + '%';
+                        return `
+                        <div class="m-op-row rank-${idx+1}">
+                            <div class="m-rank-icon">${medals[idx]}</div>
+                            <div class="m-details">
+                                <p class="m-name">${op.name}</p>
+                                <p class="m-team" style="color: ${op.obj.tColor || 'var(--text-muted)'}">${op.obj.team || ''}</p>
+                            </div>
+                            <div class="m-eff">${effStr}</div>
+                        </div>`;
+                    }).join('');
+
+                    allSlides.push(`
+                    <div class="machine-slide">
+                        <div class="m-card-title">MÁQUINA ${m}</div>
+                        <div class="m-card-subtitle">🏆 TOP 3 OPERADORES (MES ACTUAL)</div>
+                        ${rowsHtml}
+                    </div>`);
+                }
+            });
+            return allSlides;
+        }
+
+        // ===============================================
+        // RENDER CARRUSEL DERECHO
+        // ===============================================
+        function renderMachines(slidesHtmlArray) {
+            let container = document.getElementById('machinesContainer');
+            
+            if(slidesHtmlArray.length === 0) {
                 container.innerHTML = `
                 <div class="machine-slide active" style="justify-content:center; position:relative; transform:none;">
                     <div class="empty-state">
@@ -712,57 +811,12 @@
                 return;
             }
 
-            maqKeys.forEach((m, idx) => {
-                // Sacar a los operadores de esa máquina y promediar su eficiencia histórica
-                let ops = [];
-                for (let name in machineRank[m]) {
-                    ops.push({
-                        name: name,
-                        eff: machineRank[m][name].sum / machineRank[m][name].count,
-                        obj: machineRank[m][name].obj,
-                        missing: machineRank[m][name].missing
-                    });
-                }
-                
-                // Ordenar por eficiencia y tomar el TOP 5
-                ops.sort((a,b) => b.eff - a.eff);
-                let top5 = ops.slice(0, 5);
-
-                let slideHtml = `
-                <div class="machine-slide" id="mq-${idx}">
-                    <div class="m-card-title">MÁQUINA ${m}</div>`;
-                
-                let medals = ['🥇', '🥈', '🥉', '4°', '5°'];
-                top5.forEach((op, rankIdx) => {
-                    let rankClass = op.missing ? 'alert' : `rank-${rankIdx + 1}`;
-                    let effStr = op.eff.toFixed(1).replace('.',',') + '%';
-                    let rankIcon = !op.missing ? (medals[rankIdx] || `${rankIdx+1}°`) : '⚠️';
-                    
-                    slideHtml += `
-                    <div class="m-op-row ${rankClass}">
-                        <div class="m-rank-icon">${rankIcon}</div>
-                        <div class="m-details">
-                            <p class="m-name" style="color: ${op.missing ? 'var(--alert)' : '#222'}">${op.name}</p>
-                            <p class="m-team" style="color: ${op.obj.tColor || 'var(--text-muted)'}">${op.obj.team || ''}</p>
-                        </div>
-                        <div class="m-eff">${effStr}</div>
-                    </div>`;
-                });
-
-                slideHtml += `</div>`;
-                fullHtml += slideHtml;
-            });
-            
-            container.innerHTML = fullHtml;
+            container.innerHTML = slidesHtmlArray.join('');
 
             clearInterval(mqInterval);
             let slides = document.querySelectorAll('.machine-slide');
             if(slides.length === 0) return;
-            
-            if(slides.length === 1) {
-                slides[0].classList.add('active'); 
-                return;
-            }
+            if(slides.length === 1) { slides[0].classList.add('active'); return; }
 
             const showMq = (index) => {
                 slides.forEach(s => s.classList.remove('active'));
