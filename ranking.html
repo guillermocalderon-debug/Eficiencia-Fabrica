@@ -106,7 +106,7 @@
             display: flex; 
             flex-direction: row; 
             justify-content: space-evenly;
-            align-items: flex-end; /* Alinea los gráficos al suelo */
+            align-items: flex-end; 
             width: 100%;
             gap: 1vw;
             padding-top: 1.5vh;
@@ -124,39 +124,35 @@
             height: 100%;
             max-width: 15%;
             position: relative;
-            min-width: 0; /* Permite flexión flexible */
+            min-width: 0; 
         }
-        .view-lideres .col-item { max-width: 25%; } /* Menos columnas, más anchas */
+        .view-lideres .col-item { max-width: 25%; } 
 
-        /* PUNTUACIÓN FLOTANTE */
         .col-score {
             font-size: 2.2vh;
             font-weight: 900;
-            color: #000;
             margin-bottom: 0.8vh;
             text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
             transform: translateY(-2px);
             z-index: 5;
         }
 
-        /* CONTENEDOR 3D DE LA COLUMNA */
         .col-bar-3d-wrapper {
             width: 100%;
-            height: 15vh; /* Altura máxima del gráfico */
+            height: 15vh; 
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             position: relative;
-            background: #f8fafc; /* Rastro suave de fondo */
+            background: #f8fafc; 
             border-radius: 6px;
             border: 1px dashed rgba(0,0,0,0.04);
             margin-bottom: 1.5vh;
         }
 
-        /* LA COLUMNA 3D FÍSICA */
         .col-bar-3d {
             width: 100%;
-            height: 0%; /* Crecimiento animado por JS */
+            height: 0%; 
             position: relative;
             transition: height 1.5s cubic-bezier(0.1, 0.7, 0.1, 1);
             transform-style: preserve-3d;
@@ -164,54 +160,21 @@
         }
 
         /* Gradientes y Reflejos 3D para cada Puesto */
-        .col-bar-3d.rank-1 {
-            background: linear-gradient(to right, #b45309 0%, #fcd34d 25%, #fffbeb 50%, #f59e0b 80%, #92400e 100%);
-            box-shadow: 2px 5px 12px rgba(180, 83, 9, 0.35);
-        }
-        .col-bar-3d.rank-2 {
-            background: linear-gradient(to right, #475569 0%, #cbd5e1 25%, #ffffff 50%, #94a3b8 80%, #334155 100%);
-            box-shadow: 2px 5px 12px rgba(71, 85, 105, 0.25);
-        }
-        .col-bar-3d.rank-3 {
-            background: linear-gradient(to right, #9a3412 0%, #f97316 25%, #ffedd5 50%, #ea580c 80%, #7c2d12 100%);
-            box-shadow: 2px 5px 12px rgba(154, 52, 18, 0.3);
-        }
-        .col-bar-3d.rank-4 {
-            background: linear-gradient(to right, #0369a1 0%, #38bdf8 25%, #e0f2fe 50%, #0284c7 80%, #0c4a6e 100%);
-            box-shadow: 2px 5px 10px rgba(3, 105, 161, 0.2);
-        }
-        .col-bar-3d.rank-5 {
-            background: linear-gradient(to right, #4338ca 0%, #818cf8 25%, #e0e7ff 50%, #4f46e5 80%, #312e81 100%);
-            box-shadow: 2px 5px 10px rgba(67, 56, 202, 0.2);
-        }
-        .col-bar-3d.rank-rest {
-            background: linear-gradient(to right, #64748b 0%, #94a3b8 50%, #475569 100%);
-        }
+        .col-bar-3d.rank-1 { background: linear-gradient(to right, #b45309 0%, #fcd34d 25%, #fffbeb 50%, #f59e0b 80%, #92400e 100%); box-shadow: 2px 5px 12px rgba(180, 83, 9, 0.35); }
+        .col-bar-3d.rank-2 { background: linear-gradient(to right, #475569 0%, #cbd5e1 25%, #ffffff 50%, #94a3b8 80%, #334155 100%); box-shadow: 2px 5px 12px rgba(71, 85, 105, 0.25); }
+        .col-bar-3d.rank-3 { background: linear-gradient(to right, #9a3412 0%, #f97316 25%, #ffedd5 50%, #ea580c 80%, #7c2d12 100%); box-shadow: 2px 5px 12px rgba(154, 52, 18, 0.3); }
+        .col-bar-3d.rank-4 { background: linear-gradient(to right, #0369a1 0%, #38bdf8 25%, #e0f2fe 50%, #0284c7 80%, #0c4a6e 100%); box-shadow: 2px 5px 10px rgba(3, 105, 161, 0.2); }
+        .col-bar-3d.rank-5 { background: linear-gradient(to right, #4338ca 0%, #818cf8 25%, #e0e7ff 50%, #4f46e5 80%, #312e81 100%); box-shadow: 2px 5px 10px rgba(67, 56, 202, 0.2); }
+        .col-bar-3d.rank-rest { background: linear-gradient(to right, #64748b 0%, #94a3b8 50%, #475569 100%); }
 
         /* Equipos / Líderes en 3D */
-        .col-bar-3d.team-A {
-            background: linear-gradient(to right, #0369a1 0%, #38bdf8 25%, #f0f9ff 50%, #0284c7 80%, #082f49 100%);
-            box-shadow: 3px 5px 15px rgba(2, 132, 199, 0.35);
-        }
-        .col-bar-3d.team-B {
-            background: linear-gradient(to right, #9a3412 0%, #fb923c 25%, #fff7ed 50%, #ea580c 80%, #431407 100%);
-            box-shadow: 3px 5px 15px rgba(234, 88, 12, 0.35);
-        }
-        .col-bar-3d.team-C {
-            background: linear-gradient(to right, #065f46 0%, #34d399 25%, #ecfdf5 50%, #059669 80%, #064e3b 100%);
-            box-shadow: 3px 5px 15px rgba(5, 150, 105, 0.35);
-        }
+        .col-bar-3d.team-A { background: linear-gradient(to right, #0369a1 0%, #38bdf8 25%, #f0f9ff 50%, #0284c7 80%, #082f49 100%); box-shadow: 3px 5px 15px rgba(2, 132, 199, 0.35); }
+        .col-bar-3d.team-B { background: linear-gradient(to right, #9a3412 0%, #fb923c 25%, #fff7ed 50%, #ea580c 80%, #431407 100%); box-shadow: 3px 5px 15px rgba(234, 88, 12, 0.35); }
+        .col-bar-3d.team-C { background: linear-gradient(to right, #065f46 0%, #34d399 25%, #ecfdf5 50%, #059669 80%, #064e3b 100%); box-shadow: 3px 5px 15px rgba(5, 150, 105, 0.35); }
 
-        /* Tapa 3D Redonda (Efecto Cilindro) */
         .col-bar-cap {
-            position: absolute;
-            top: -4px;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.4);
-            z-index: 2;
+            position: absolute; top: -4px; left: 0; width: 100%; height: 8px;
+            border-radius: 50%; border: 1px solid rgba(255,255,255,0.4); z-index: 2;
         }
         .rank-1 .col-bar-cap { background: radial-gradient(circle, #fffbeb 10%, #f59e0b 80%, #b45309 100%); }
         .rank-2 .col-bar-cap { background: radial-gradient(circle, #ffffff 10%, #94a3b8 80%, #475569 100%); }
@@ -224,62 +187,15 @@
         .team-B .col-bar-cap { background: radial-gradient(circle, #fff7ed 10%, #ea580c 80%, #9a3412 100%); }
         .team-C .col-bar-cap { background: radial-gradient(circle, #ecfdf5 10%, #059669 80%, #065f46 100%); }
 
-        /* Sombra Base */
         .col-bar-shadow {
-            position: absolute;
-            bottom: -5px;
-            left: 5%;
-            width: 90%;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 50%;
-            filter: blur(1.5px);
-            z-index: -1;
+            position: absolute; bottom: -5px; left: 5%; width: 90%; height: 6px;
+            background: rgba(0, 0, 0, 0.15); border-radius: 50%; filter: blur(1.5px); z-index: -1;
         }
 
-        /* METADATOS Y ADORNOS DE BASE */
-        .col-medal {
-            font-size: 2.5vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.5vh;
-            line-height: 1;
-        }
-
-        .col-name {
-            font-size: 1.4vh;
-            font-weight: 800;
-            color: #000;
-            text-align: center;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-transform: uppercase;
-        }
-
-        .col-sub {
-            font-size: 1vh;
-            font-weight: bold;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .col-badge {
-            font-size: 1vh;
-            font-weight: bold;
-            padding: 2px 4px;
-            border-radius: 4px;
-            color: #fff;
-            margin-top: 0.4vh;
-            text-transform: uppercase;
-        }
+        .col-medal { font-size: 2.5vh; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5vh; line-height: 1; }
+        .col-name { font-size: 1.4vh; font-weight: 800; color: #000; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
+        .col-sub { font-size: 1vh; font-weight: bold; color: var(--text-muted); text-transform: uppercase; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-badge { font-size: 1vh; font-weight: bold; padding: 2px 4px; border-radius: 4px; color: #fff; margin-top: 0.4vh; text-transform: uppercase; }
 
         /* Loader & Empty States */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-light); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: var(--primary); font-size: 3.5vh; font-weight: bold;}
@@ -287,106 +203,28 @@
         .empty-state span { font-size: 5vh; margin-bottom: 10px;}
         .empty-state p { font-size: 2vh; font-weight: bold; color: var(--text-muted); margin: 0;}
 
-        /* =========================================================
-           RESPONSIVE DESIGN (MÓVILES Y TABLETS VERTICALES)
-           ========================================================= */
+        /* MÓVILES */
         @media (max-width: 1024px) {
-            body {
-                height: auto; /* Permite hacer scroll */
-                overflow-y: auto; 
-                padding: 15px;
-            }
-            
-            .header {
-                flex-direction: column;
-                height: auto;
-                gap: 15px;
-                text-align: center;
-                margin-bottom: 25px;
-            }
+            body { height: auto; overflow-y: auto; padding: 15px; }
+            .header { flex-direction: column; height: auto; gap: 15px; text-align: center; margin-bottom: 25px; }
             .logo { height: 40px; }
             .title { font-size: 24px; }
             .subtitle { font-size: 14px; }
             .clock { font-size: 16px; padding: 10px 20px; }
-
-            .grid-container {
-                display: flex;
-                flex-direction: column; /* Apila cuadrantes */
-                height: auto;
-                gap: 25px;
-            }
-
-            .quadrant {
-                width: 100%;
-                min-height: 380px; /* Asegura un área estable para las columnas */
-                padding: 20px 15px;
-            }
-            
+            .grid-container { display: flex; flex-direction: column; height: auto; gap: 25px; }
+            .quadrant { width: 100%; min-height: 380px; padding: 20px 15px; }
             .q-title { font-size: 18px; }
             .q-subtitle { font-size: 11px; }
-
-            .q-body {
-                flex-direction: row; /* Fuerza a las columnas a estar una al lado de la otra */
-                gap: 8px;
-                align-items: flex-end;
-                justify-content: space-evenly;
-                height: auto;
-                min-height: 250px;
-                padding-top: 10px;
-            }
-
-            .col-item {
-                max-width: 18%; /* Permite que utilicen el ancho completo del espacio */
-                flex: 1;
-                min-width: 0;
-            }
+            .q-body { flex-direction: row; gap: 8px; align-items: flex-end; justify-content: space-evenly; height: auto; min-height: 250px; padding-top: 10px; }
+            .col-item { max-width: 18%; flex: 1; min-width: 0; }
             .view-lideres .col-item { max-width: 28%; }
-
-            .col-score {
-                font-size: 14px;
-                margin-bottom: 5px;
-            }
-
-            .col-bar-3d-wrapper {
-                height: 120px; /* Tamaño físico seguro para móvil */
-                margin-bottom: 10px;
-                width: 100%;
-            }
-
-            .col-medal {
-                font-size: 18px;
-                width: 24px;
-                height: 24px;
-                margin-bottom: 4px;
-            }
-
-            .col-name {
-                font-size: 10px;
-                white-space: normal; /* Permite saltar de línea */
-                display: -webkit-box;
-                -webkit-line-clamp: 2; /* Máximo dos líneas */
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                line-height: 1.2;
-                height: 24px; /* Espacio exacto para dos líneas sin pisar el resto */
-                text-overflow: ellipsis;
-            }
-
-            .col-sub {
-                font-size: 8px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                margin-top: 2px;
-            }
-
-            .col-badge {
-                font-size: 8px;
-                padding: 1px 3px;
-                margin-top: 2px;
-            }
+            .col-score { font-size: 14px; margin-bottom: 5px; }
+            .col-bar-3d-wrapper { height: 120px; margin-bottom: 10px; width: 100%; }
+            .col-medal { font-size: 18px; width: 24px; height: 24px; margin-bottom: 4px; }
+            .col-name { font-size: 10px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2; height: 24px; text-overflow: ellipsis; }
+            .col-sub { font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+            .col-badge { font-size: 8px; padding: 1px 3px; margin-top: 2px; }
         }
-
     </style>
 </head>
 <body>
@@ -409,41 +247,33 @@
     </div>
 
     <script>
-        // ---------------------------------------------------------
-        // RUTEO DE PANTALLA (Lee el link: ?pantalla=operadores)
-        // ---------------------------------------------------------
         const urlParams = new URLSearchParams(window.location.search);
         let currentView = urlParams.get('pantalla');
-        if (!currentView) currentView = 'operadores'; // Default
+        if (!currentView) currentView = 'operadores'; 
         currentView = currentView.toLowerCase();
-
-        // Aplicar clase al body para CSS específico
         document.body.classList.add('view-' + currentView);
 
-        // ---------------------------------------------------------
-        // CONFIGURACIÓN E INTELIGENCIA DE DATOS
-        // ---------------------------------------------------------
         const ROSTER_API = 'https://script.google.com/macros/s/AKfycbzxBhGp2oElpCW6YzacSbDhqGvbih0X0dBZmnipIkscPp2uJx2CqRQstESXu7M0iZ1gLA/exec';
         const EFF_API = 'https://script.google.com/macros/s/AKfycbzCdptPfonJ8qAg9Bv2GbmpiE7xqNxtcYAZDjfmtgrh6wwj2XWkygecktqV7uxKm0QZ/exec';
 
         const PERSONNEL = [
-            { keys: ["dilan"], name: "Dilan Bandes", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "team-A" },
-            { keys: ["martha"], name: "Martha Zúñiga", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "team-A" },
-            { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "team-A" },
-            { keys: ["joel"], name: "Joel Santana", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "team-A" },
-            { keys: ["magaly"], name: "Magaly Fuentes", team: "EQUIPO DILAN (TURNO A)", tColor: "var(--team-a)", tClass: "team-A" },
+            { keys: ["dilan"], name: "Dilan Bandes", team: "EQUIPO A (DILAN)", tColor: "var(--team-a)", tClass: "team-A" },
+            { keys: ["martha"], name: "Martha Zúñiga", team: "EQUIPO A (DILAN)", tColor: "var(--team-a)", tClass: "team-A" },
+            { keys: ["corrotea", "gustabo c", "gustavo c"], name: "Gustavo Corrotea", team: "EQUIPO A (DILAN)", tColor: "var(--team-a)", tClass: "team-A" },
+            { keys: ["joel"], name: "Joel Santana", team: "EQUIPO A (DILAN)", tColor: "var(--team-a)", tClass: "team-A" },
+            { keys: ["magaly"], name: "Magaly Fuentes", team: "EQUIPO A (DILAN)", tColor: "var(--team-a)", tClass: "team-A" },
             
-            { keys: ["miguel"], name: "Miguel Reyes", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "team-B" },
-            { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "team-B" },
-            { keys: ["efrain"], name: "Efraín Zuleta", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "team-B" },
-            { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "team-B" },
-            { keys: ["marisol"], name: "Marisol Carrillo", team: "EQUIPO MIGUEL (TURNO B)", tColor: "var(--team-b)", tClass: "team-B" },
+            { keys: ["miguel"], name: "Miguel Reyes", team: "EQUIPO B (MIGUEL)", tColor: "var(--team-b)", tClass: "team-B" },
+            { keys: ["adolfo", "gustavo a", "gustabo a"], name: "Gustavo Adolfo R.", team: "EQUIPO B (MIGUEL)", tColor: "var(--team-b)", tClass: "team-B" },
+            { keys: ["efrain"], name: "Efraín Zuleta", team: "EQUIPO B (MIGUEL)", tColor: "var(--team-b)", tClass: "team-B" },
+            { keys: ["yamile"], name: "Yamile Bermúdez", team: "EQUIPO B (MIGUEL)", tColor: "var(--team-b)", tClass: "team-B" },
+            { keys: ["marisol"], name: "Marisol Carrillo", team: "EQUIPO B (MIGUEL)", tColor: "var(--team-b)", tClass: "team-B" },
             
-            { keys: ["nilson"], name: "Nilson Chiquito", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "team-C" },
-            { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "team-C" },
-            { keys: ["julio"], name: "Julio Alegría", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "team-C" },
-            { keys: ["edgar"], name: "Edgar Balcazar", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "team-C" },
-            { keys: ["freddy", "fredi"], name: "Freddy Gómez", team: "EQUIPO NILSON (TURNO C)", tColor: "var(--team-c)", tClass: "team-C" }
+            { keys: ["nilson"], name: "Nilson Chiquito", team: "EQUIPO C (NILSON)", tColor: "var(--team-c)", tClass: "team-C" },
+            { keys: ["genesis", "jenesis"], name: "Génesis León", team: "EQUIPO C (NILSON)", tColor: "var(--team-c)", tClass: "team-C" },
+            { keys: ["julio"], name: "Julio Alegría", team: "EQUIPO C (NILSON)", tColor: "var(--team-c)", tClass: "team-C" },
+            { keys: ["edgar"], name: "Edgar Balcazar", team: "EQUIPO C (NILSON)", tColor: "var(--team-c)", tClass: "team-C" },
+            { keys: ["freddy", "fredi"], name: "Freddy Gómez", team: "EQUIPO C (NILSON)", tColor: "var(--team-c)", tClass: "team-C" }
         ];
 
         function identifyPerson(text) {
@@ -514,7 +344,6 @@
             return `${str.substring(6,8)}/${str.substring(4,6)}/${str.substring(0,4)}`;
         }
 
-        // --- MOTOR DE FECHAS REAL ---
         function getSafeDateAgo(baseDate, days) {
             let d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate() - days);
             return parseInt(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
@@ -523,9 +352,13 @@
         function startEngine() {
             Promise.all([fetchJSONP(ROSTER_API, 'roster'), fetchJSONP(EFF_API, 'eff')])
             .then(([rosterData, effData]) => {
-                processData(rosterData, effData);
+                try {
+                    processData(rosterData, effData);
+                } catch(e) {
+                    document.getElementById('loader').innerHTML = `❌ Error interno renderizando datos.`;
+                }
             }).catch(err => {
-                document.getElementById('loader').innerHTML = `❌ Error de conexión con Planillas. Recargue.<br><span style="font-size:14px">${err.message || err}</span>`;
+                document.getElementById('loader').innerHTML = `❌ Error de conexión con Planillas. Recargue.`;
             });
         }
 
@@ -628,7 +461,6 @@
                     else if (tnoRaw.includes("TAR") || tnoRaw.includes("T")) tno = "Tarde";
                     else if (tnoRaw.includes("NOC") || tnoRaw.includes("N")) tno = "Noche";
 
-                    // NORMALIZADOR FLEXIBLE DE MÁQUINAS
                     let maqRaw = String(getCol(["maquina", "inyectora"]) || (isEffObj ? '' : row[2]) || "").trim().toUpperCase();
                     let maq = maqRaw;
                     if (/^\d+$/.test(maqRaw)) {
@@ -703,12 +535,11 @@
                     opObj = rosterMap[item.dateNum][item.maqName][letraTurno];
                 }
 
-                // Fallback robusto
                 if (!opObj) {
                     let fallbackTeam = "EQUIPO ROTATIVO";
-                    if (item.tno === "Mañana") fallbackTeam = "EQUIPO DILAN (TURNO A)";
-                    else if (item.tno === "Tarde") fallbackTeam = "EQUIPO MIGUEL (TURNO B)";
-                    else if (item.tno === "Noche") fallbackTeam = "EQUIPO NILSON (TURNO C)";
+                    if (item.tno === "Mañana") fallbackTeam = "EQUIPO A (DILAN)";
+                    else if (item.tno === "Tarde") fallbackTeam = "EQUIPO B (MIGUEL)";
+                    else if (item.tno === "Noche") fallbackTeam = "EQUIPO C (NILSON)";
                     
                     opObj = { name: "NO ASIGNADO", team: fallbackTeam, tColor: "var(--text-muted)", tClass: "rank-rest" };
                 }
@@ -738,7 +569,6 @@
                 }
             });
 
-            // Ordenamiento inteligente de máquinas (MQ 1, MQ 2...)
             let maqKeysSorted = Object.keys(maqStats.global).sort((a, b) => {
                 let aNum = parseInt(a.replace(/\D/g, ''), 10) || 0;
                 let bNum = parseInt(b.replace(/\D/g, ''), 10) || 0;
@@ -787,9 +617,14 @@
                     let displayLabelOrMedal = isMedal ? `<span class="col-medal">${medals[index]}</span>` : `<div style="font-size:1.1vh; font-weight:800; color:var(--text-muted); padding:3px 0;">${index+1}°</div>`;
                     
                     let col3DClass = isTeamMode ? item.obj.tClass : `rank-${index+1}`;
-
-                    let colorNombre = (index === 0 && !isTeamMode) ? 'var(--gold-dark)' : (isTeamMode ? item.obj.tColor : '#1e293b');
-                    if (isTeamMode && index > 0) colorNombre = '#f1f5f9';
+                    
+                    // CORRECCIÓN DE COLOR: Siempre usar el color del equipo para los Líderes
+                    let colorNombre = '#1e293b'; 
+                    if (isTeamMode) {
+                        colorNombre = item.obj.tColor;
+                    } else {
+                        if (index === 0) colorNombre = 'var(--gold-dark)';
+                    }
                     
                     let badgeLabel = isTeamMode ? item.name.split(" ")[1] || "TEAM" : '';
                     let badgeColor = isTeamMode ? item.obj.tColor : '';
