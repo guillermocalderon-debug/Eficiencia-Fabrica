@@ -159,7 +159,7 @@
             flex: 4;
             background: var(--card-bg);
             border-radius: 12px;
-            border-top: 5px solid var(--primary); /* Ajustado a la paleta */
+            border-top: 5px solid #111;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border: 1px solid var(--border-color);
             display: flex;
@@ -280,7 +280,7 @@
 
         <!-- PANEL DERECHO: MÁQUINAS EN VIVO -->
         <div class="machines-panel">
-            <div class="m-carousel-header" id="mPanelTitle">🟢 PRODUCCIÓN EN LÍNEA</div>
+            <div class="m-carousel-header" id="mPanelTitle">🟢 ÚLTIMA PRODUCCIÓN EN LÍNEA</div>
             <div class="m-carousel-container" id="machinesContainer">
                 <!-- Slides inyectados por JS -->
             </div>
@@ -322,41 +322,30 @@
             return parseFloat(str) || 0;
         }
 
-        // MOTOR REPARADO: Parsea fechas ignorando la zona horaria para que no se atrase un día
+        // MOTOR UNIVERSAL DE FECHAS
         function normalizeDateStr(dateInput) {
             if (!dateInput) return null;
             let str = String(dateInput).trim();
-            if (!str || str === "undefined" || str === "null") return null;
+            if (!str) return null;
 
-            // Formato ISO: "2026-10-06T03:00:00.000Z" o "2026-10-06"
-            if (str.includes('-') && (str.includes('T') || str.length === 10)) {
-                let clean = str.split('T')[0]; 
-                let parts = clean.split('-');
-                if (parts.length === 3) {
-                    let y = parts[0], m = parts[1].padStart(2, '0'), d = parts[2].padStart(2, '0');
-                    return `${d}/${m}/${y}`;
+            if (str.includes('T')) {
+                let d = new Date(str);
+                if (!isNaN(d.getTime())) {
+                    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
                 }
-            }
-            // Formato Excel Latam: "06/10/2026" o "6/10/26" o "06/10"
-            if (str.includes('/')) {
-                let clean = str.split(' ')[0];
-                let parts = clean.split('/');
-                if (parts.length >= 2) {
-                    let d = parts[0].padStart(2, '0');
-                    let m = parts[1].padStart(2, '0');
+            } else if (str.includes('-')) {
+                let parts = str.split('-');
+                if(parts.length === 3) return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
+            } else if (str.includes('/')) {
+                let parts = str.split(' ')[0].split('/');
+                if(parts.length >= 2) {
+                    let d = parts[0].padStart(2,'0');
+                    let m = parts[1].padStart(2,'0');
                     let y = parts.length === 3 ? parts[2] : String(new Date().getFullYear());
                     if (y.length === 2) y = "20" + y;
                     return `${d}/${m}/${y}`;
                 }
             }
-            // Formato solo número de día: "6"
-            if (/^\d{1,2}$/.test(str)) {
-                let d = str.padStart(2, '0');
-                let m = String(new Date().getMonth() + 1).padStart(2, '0');
-                let y = String(new Date().getFullYear());
-                return `${d}/${m}/${y}`;
-            }
-
             return null;
         }
 
@@ -368,7 +357,7 @@
         }
 
         function getAvatarInitials(name) {
-            if(!name || name.startsWith("MAQ ")) return "?";
+            if(!name || name.startsWith("MAQ ") || name === "NO ASIGNADO") return "?";
             let parts = name.trim().split(" ");
             if(parts.length >= 2) return parts[0][0] + parts[1][0];
             return parts[0][0];
@@ -394,21 +383,27 @@
 
             document.getElementById('fechaHoy').innerText = `SISTEMA ACTIVO: ${hoyNorm}`;
 
-            // 1. CARGAR ASIGNACIONES
+            // 1. CARGAR ASIGNACIONES (MÉTODO UNIVERSAL ANTI-ERROR)
             let rosterMap = {};
             if (rosterData && rosterData.length > 0) {
-                let headers = rosterData[0];
-                let dateCols = {};
-                for (let i = 2; i < headers.length; i++) {
-                    let norm = normalizeDateStr(headers[i]);
-                    if (norm) dateCols[i] = norm;
-                }
-                for (let i = 1; i < rosterData.length; i++) {
-                    let operario = rosterData[i][1];
+                let isObject = !Array.isArray(rosterData[0]);
+                let headers = isObject ? Object.keys(rosterData[0]) : rosterData[0];
+                
+                let dateCols = {}; 
+                headers.forEach(h => {
+                    let norm = normalizeDateStr(h);
+                    if (norm) dateCols[h] = norm;
+                });
+
+                for (let i = isObject ? 0 : 1; i < rosterData.length; i++) {
+                    let row = rosterData[i];
+                    let operario = isObject ? (row["Operario"] || row["operario"] || row[headers[1]]) : row[1];
                     if (!operario) continue;
-                    for (let col in dateCols) {
-                        let dateStr = dateCols[col];
-                        let asignacion = rosterData[i][col];
+
+                    for (let rawHeader in dateCols) {
+                        let dateStr = dateCols[rawHeader];
+                        let asignacion = isObject ? row[rawHeader] : row[headers.indexOf(rawHeader)];
+                        
                         if (asignacion && asignacion !== "Libre" && asignacion !== "-" && String(asignacion).includes("(")) {
                             let parts = String(asignacion).split("(");
                             let maqStr = parts[0].replace(/M/gi, '').trim();
@@ -428,7 +423,7 @@
                 }
             }
 
-            // 2. PROCESAR EFICIENCIAS
+            // 2. PROCESAR EFICIENCIAS E IDENTIFICAR NOMBRES
             let effByDate = {};
             let rankAyer = {}, rankSemana = {}, rankMes = {}, rankGlobal = {};
 
@@ -450,15 +445,14 @@
                         let maqNum = parseInt(maqStr.replace(/\D/g, ''), 10);
                         let letraTurno = tno.toLowerCase().includes("mañ") ? "M" : (tno.toLowerCase().includes("tar") ? "T" : "N");
 
-                        // LÓGICA ANTI-VACÍOS: Si la planilla de Turnos falló, agruparemos el puntaje con el nombre de la máquina
+                        // BÚSQUEDA DEL OPERADOR
                         let opNombre = "NO ASIGNADO";
                         
-                        // Plan B: Buscar en Roster
+                        // Busca en el Roster (El cruce exacto)
                         if (rosterMap[normDateStr] && rosterMap[normDateStr][maqNum] && rosterMap[normDateStr][maqNum][letraTurno]) {
                             opNombre = rosterMap[normDateStr][maqNum][letraTurno];
                         } else {
-                            // Si no encontró el nombre en el Roster, le ponemos como nombre su estación (ej: MAQ 5 (M))
-                            // Así NUNCA perderemos la estadística de eficiencia en el Top 5
+                            // FALLBACK: Si no lo encontró, le pone la Máquina en vez de borrar el dato
                             opNombre = `MAQ ${maqNum} (${letraTurno})`;
                         }
 
@@ -480,7 +474,7 @@
                             dict[name].sum += val; dict[name].count++;
                         };
 
-                        // Acumulaciones
+                        // ACUMULACIÓN PARA EL TOP 5
                         addStat(rankGlobal, opNombre, eff);
                         if (fileYM === currentYM) addStat(rankMes, opNombre, eff);
                         if (fileNum >= hace7Num) addStat(rankSemana, opNombre, eff);
@@ -492,7 +486,7 @@
                 });
             }
 
-            // Seleccionar Panel Derecho
+            // Seleccionar Panel Derecho: Si hoy no tiene registros, busca el más reciente
             let fechaParaMaquinas = hoyNorm;
             let allDates = Object.keys(effByDate).sort((a,b) => dateToNum(b) - dateToNum(a));
             if (!effByDate[hoyNorm] || Object.keys(effByDate[hoyNorm]).length === 0) {
@@ -501,7 +495,7 @@
 
             document.getElementById('mPanelTitle').innerText = (fechaParaMaquinas === hoyNorm) ? 
                 `🟢 PRODUCCIÓN EN LÍNEA (HOY - ${hoyNorm})` : 
-                `🟢 ÚLTIMA PRODUCCIÓN (${fechaParaMaquinas})`;
+                `🟢 ÚLTIMA PRODUCCIÓN EN LÍNEA (${fechaParaMaquinas})`;
 
             let bestAyerData = {};
             let ultimaFechaCerradaStr = null;
@@ -525,7 +519,6 @@
             let listSemana = getTop5(rankSemana);
             let listMes = getTop5(rankMes);
 
-            // Resguardo si no hay datos cerrados de ayer
             if (listAyer.length === 0) listAyer = listGlobal;
             if (listSemana.length === 0) listSemana = listGlobal;
             if (listMes.length === 0) listMes = listGlobal;
@@ -554,7 +547,7 @@
                     list.forEach((item, index) => {
                         let scoreText = item.eff.toFixed(1).replace('.',',') + '%';
                         let colorClass = `fill-${index+1}`;
-                        let colorNombre = '#222';
+                        let colorNombre = index === 0 ? 'var(--gold)' : (index === 1 ? '#64748b' : (index===2 ? 'var(--bronze)' : '#222'));
                         
                         html += `
                         <div class="bar-row">
@@ -633,7 +626,7 @@
 
             const getOpHtml = (opData, shiftLabel, cls) => {
                 if(!opData) return ''; 
-                let isMissing = opData.name.startsWith("MAQ ");
+                let isMissing = opData.name.startsWith("MAQ ") || opData.name === "NO ASIGNADO";
                 let init = getAvatarInitials(opData.name);
                 let colorName = isMissing ? "var(--primary)" : "#222";
                 let nameStr = isMissing ? "SIN ASIGNAR ROL" : opData.name;
